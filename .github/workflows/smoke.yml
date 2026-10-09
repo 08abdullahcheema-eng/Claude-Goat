@@ -1,47 +1,21 @@
-name: smoke
+name: sumi-test
 on: { push: { branches: [sumi-shell-test] }, workflow_dispatch: {} }
 permissions: { contents: write }
 jobs:
-  smoke:
+  test:
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
-        with: { nix_path: "nixpkgs=channel:nixos-26.05" }
-      - name: versions
+      - name: test
         run: |
-          mkdir -p out; exec > >(tee out/versions.log) 2>&1
-          nix --version
-          nix shell github:NixOS/nixpkgs/nixos-26.05#quickshell github:NixOS/nixpkgs/nixos-26.05#sway github:NixOS/nixpkgs/nixos-26.05#grim github:NixOS/nixpkgs/nixos-26.05#hyprland -c sh -c 'quickshell --version; sway --version; Hyprland --version | head -3'
-      - name: run in sway headless
-        run: |
-          mkdir -p out; export XDG_RUNTIME_DIR=$(mktemp -d); chmod 700 $XDG_RUNTIME_DIR
-          nix shell github:NixOS/nixpkgs/nixos-26.05#quickshell github:NixOS/nixpkgs/nixos-26.05#sway github:NixOS/nixpkgs/nixos-26.05#grim -c sh -c '
-            export WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1
-            printf "output HEADLESS-1 resolution 2560x1600 scale 1.6\n" > /tmp/sway.conf
-            sway -c /tmp/sway.conf > out/sway.log 2>&1 &
-            sleep 4; export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR | grep -E "^wayland-[0-9]+$" | head -1); echo display=$WAYLAND_DISPLAY
-            quickshell -p qs-smoke > out/qs.log 2>&1 &
-            sleep 6; grim out/smoke.png; cat out/qs.log'
-      - name: try hyprland headless
-        continue-on-error: true
-        run: |
-          export XDG_RUNTIME_DIR=$(mktemp -d); chmod 700 $XDG_RUNTIME_DIR
-          nix shell github:NixOS/nixpkgs/nixos-26.05#quickshell github:NixOS/nixpkgs/nixos-26.05#hyprland github:NixOS/nixpkgs/nixos-26.05#grim -c sh -c '
-            export AQ_BACKENDS=headless WLR_RENDERER=pixman
-            printf "monitor=HEADLESS-1,2560x1600,0x0,1.6\nmonitor=,2560x1600,auto,1.6\nmisc { disable_hyprland_logo = true }\n" > /tmp/h.conf
-            timeout 60 Hyprland -c /tmp/h.conf > out/hypr.log 2>&1 &
-            sleep 8; ls $XDG_RUNTIME_DIR $XDG_RUNTIME_DIR/hypr 2>/dev/null
-            export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR | grep -E "^wayland-[0-9]+$" | head -1); echo display=$WAYLAND_DISPLAY
-            export HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1)
-            hyprctl monitors || true
-            quickshell -p qs-smoke > out/qs-h.log 2>&1 &
-            sleep 6; grim out/smoke-hypr.png; tail -50 out/hypr.log'
+          sudo apt-get install -y fontconfig >/dev/null 2>&1 || true
+          bash ci/test.sh 2>&1 | tail -200
       - name: publish results
         if: always()
         run: |
-          cp -r out /tmp/out; cd /tmp/out
+          mkdir -p out; cp -r out /tmp/out; cd /tmp/out
           git init -q; git checkout -q -b results; git add -A
           git -c user.name=ci -c user.email=ci@localhost commit -qm "results ${{ github.run_id }}"
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" results:sumi-shell-results
