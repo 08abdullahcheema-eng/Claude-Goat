@@ -40,7 +40,7 @@
           ../predator.nix
           {
             boot.loader.grub.device = "nodev";
-            fileSystems."/".device = "/dev/sda1";
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             users.users.larp.isNormalUser = true;
             system.stateVersion = "26.05";
           }

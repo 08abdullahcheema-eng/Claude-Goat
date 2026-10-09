@@ -47,7 +47,7 @@ Singleton {
         "low-power": { label: "Eco", kanji: "省" },
         "quiet": { label: "Quiet", kanji: "静" },
         "balanced": { label: "Balanced", kanji: "均" },
-        "balanced-performance": { label: "Performance", kanji: "速" },
+        "balanced-performance": { label: "Perf", kanji: "速" },
         "performance": { label: "Turbo", kanji: "烈" }
     })
     function profileLabel(p) { return (profileInfo[p] || { label: p }).label; }

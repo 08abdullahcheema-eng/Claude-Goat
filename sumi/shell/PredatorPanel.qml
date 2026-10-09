@@ -258,7 +258,7 @@ Item {
                     spacing: Theme.px(4)
                     Label { text: "Battery" }
                     ToggleRow {
-                        label: "Charge limit 80%"; sub: "keeps the battery healthy when you're mostly plugged in"
+                        label: "Charge limit 80%"; sub: "better battery health"
                         value: Predator.limiter
                         onToggled: (v) => Predator.setToggle("limiter", v)
                     }
