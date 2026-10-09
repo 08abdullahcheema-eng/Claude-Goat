@@ -34,7 +34,7 @@
         ];
       };
       packages.x86_64-linux = {
-        inherit (pkgs) quickshell sway grim hyprlock mesa libglvnd jq papirus-icon-theme kitty pavucontrol btop;
+        inherit (pkgs) quickshell sway grim hyprlock mesa libglvnd jq papirus-icon-theme kitty pavucontrol btop libnotify dbus;
         fonts = pkgs.symlinkJoin { name = "fonts"; paths = [ pkgs.nerd-fonts.jetbrains-mono pkgs.noto-fonts-cjk-serif pkgs.inter ]; };
         sddm = pkgs.kdePackages.sddm;
       };

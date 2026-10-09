@@ -97,12 +97,6 @@ head -3 ~/.config/sumi/kitty.conf >> $OUT/summary.txt
 WAIT=4 run_qs washi SUMI_DEMO=1 SUMI_OPEN=agents
 sumi-theme sumi >/dev/null 2>&1
 
-# lock screen
-HL=$(B hyprlock)/bin/hyprlock
-(timeout 12 $HL -c $HF/.config/hypr/hyprlock.conf --immediate-render > $OUT/hyprlock.log 2>&1 &)
-sleep 6; $GRIM $OUT/shot-hyprlock.png 2>>$OUT/hyprlock.log
-sleep 7
-
 # login screen
 SDDM=$(B sddm)
 ls $SDDM/bin > $OUT/sddm-bin.txt
@@ -110,4 +104,22 @@ GREETER=$(ls $SDDM/bin | grep -E '^sddm-greeter(-qt6)?$' | tail -1)
 (timeout 15 env QML_DISABLE_DISK_CACHE=1 QT_QPA_PLATFORM=wayland $SDDM/bin/$GREETER --test-mode --theme $PWD/sddm-sumi > $OUT/sddm.log 2>&1 &)
 sleep 9; $GRIM $OUT/shot-sddm.png
 sleep 7
+# real notifications over a private D-Bus session
+NS=$(B libnotify)/bin/notify-send; DBR=$(B dbus)/bin/dbus-run-session
+$DBR -- bash -c "
+  env $QS -p $SHELLDIR > $OUT/qs-notif.log 2>&1 & Q=\$!
+  sleep 4
+  $NS -a Discord 'Jonas' 'kommst du heute noch online? cs2 um 8'
+  $NS -a 'claude' -A ok=Switch -A later=Later 'Waiting for your input' 'Build finished.' &
+  $NS -u critical -a power 'Battery low' '7% left, plug in soon'
+  sleep 2; $GRIM $OUT/shot-notif-real.png
+  kill \$Q
+"
+
+# lock screen
+HL=$(B hyprlock)/bin/hyprlock
+(timeout 12 $HL -c $HF/.config/hypr/hyprlock.conf --immediate-render > $OUT/hyprlock.log 2>&1 &)
+sleep 6; $GRIM $OUT/shot-hyprlock.png 2>>$OUT/hyprlock.log
+sleep 7
+
 log "done"
