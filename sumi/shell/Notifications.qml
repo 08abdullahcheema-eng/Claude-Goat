@@ -25,7 +25,7 @@ Scope {
     }
 
     Component.onCompleted: {
-        if (!Theme.demo) return;
+        if (!Theme.demo || Quickshell.env("SUMI_DEMO_NOTIFS") !== "1") return;
         demoList = [
             { appName: "claude · nixos-config", summary: "Waiting for your input", body: "Build finished. Apply with nixos-rebuild switch?", accent: "gold", icon: "agent", actions: [{ text: "Switch", primary: true }, { text: "Later" }], time: "now" },
             { appName: "Discord", summary: "Jonas", body: "kommst du heute noch online? cs2 um 8", appIcon: "discord", time: "2 m" },
@@ -115,7 +115,7 @@ Scope {
                             T { width: parent.width; text: nd.n.summary || ""; color: Theme.hi; font.pixelSize: Theme.px(13.5); elide: Text.ElideRight }
                             T { width: parent.width; text: nd.n.body || ""; visible: text !== ""; color: Theme.dim; font.pixelSize: Theme.px(11.5); wrapMode: Text.Wrap; maximumLineCount: 3; elide: Text.ElideRight; textFormat: Text.PlainText }
                             Row {
-                                visible: (nd.n.actions || []).filter(a => a.identifier !== "default").length > 0 || (Theme.demo && nd.n.actions)
+                                visible: (nd.n.actions || []).filter(a => a.identifier !== "default").length > 0 || (Theme.demo && !!nd.n.actions)
                                 spacing: Theme.px(6)
                                 topPadding: Theme.px(6)
                                 Repeater {

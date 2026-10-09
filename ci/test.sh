@@ -5,7 +5,7 @@ set -u
 cd "$(dirname "$0")/.."
 OUT=$PWD/out; mkdir -p $OUT
 log() { echo "== $*" | tee -a $OUT/summary.txt; }
-B() { nix build --no-link --print-out-paths "./ci#$1" 2>>$OUT/build.log; }
+B() { nix build --no-link --print-out-paths "./ci#$1^out" 2>>$OUT/build.log | head -1; }
 
 log "build home-manager config"
 if ! HM=$(nix build --no-link --print-out-paths ./ci#homeConfigurations.test.activationPackage 2>>$OUT/build.log); then
@@ -30,7 +30,7 @@ mkdir -p ~/.local/share/fonts && cp -rL $FONTS/share/fonts/* ~/.local/share/font
 fc-list | grep -ci "jetbrainsmono nerd" | xargs -I{} echo "jetbrains fonts: {}" | tee -a $OUT/summary.txt
 
 export PATH=$HM/home-path/bin:$PATH
-export XDG_DATA_DIRS=$PAP/share:$KITTY/share:$PAVU/share:$BTOP/share:$HM/home-path/share:/usr/share
+export XDG_DATA_DIRS=$PAP/share:$KITTY/share:$PAVU/share:$BTOP/share:$HM/home-path/share
 export XDG_RUNTIME_DIR=/tmp/xdg; rm -rf $XDG_RUNTIME_DIR; mkdir -p $XDG_RUNTIME_DIR; chmod 700 $XDG_RUNTIME_DIR
 export WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1
 export __EGL_VENDOR_LIBRARY_FILENAMES=$MESA/share/glvnd/egl_vendor.d/50_mesa.json
@@ -43,8 +43,8 @@ export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR | grep -E '^wayland-[0-9]+$' | head
 log "wayland display: $WAYLAND_DISPLAY"
 
 # theme files like the activation script does
-HOME_T=$HOME
-SUMI_SHELL_DIR=$HF/.config/quickshell/sumi sumi-theme --init; log "sumi-theme --init rc=$?"
+export SUMI_SHELL_DIR=$HF/.config/quickshell/sumi
+sumi-theme --init; log "sumi-theme --init rc=$?"
 ls -la ~/.config/sumi >> $OUT/summary.txt
 SHELLDIR=$(readlink -f $HF/.config/quickshell/sumi)
 
@@ -54,8 +54,9 @@ sleep 1
 
 run_qs() {   # name, extra env...
   local name=$1; shift
-  pkill -f "qs -p" 2>/dev/null; sleep 0.5
+  [ -n "${QPID:-}" ] && kill $QPID 2>/dev/null; sleep 0.8
   env "$@" $QS -p $SHELLDIR > $OUT/qs-$name.log 2>&1 &
+  QPID=$!
   sleep ${WAIT:-5}
   $GRIM $OUT/shot-$name.png
 }
@@ -75,7 +76,7 @@ run_qs agents SUMI_DEMO=1 SUMI_OPEN=agents
 run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
 run_qs polkit SUMI_DEMO=1 SUMI_DEMO_POLKIT=1
-run_qs osd SUMI_DEMO=1 SUMI_DEMO_OSD=1
+run_qs osd SUMI_DEMO=1 SUMI_DEMO_OSD=1 SUMI_DEMO_NOTIFS=1
 
 # real mode: no demo data, services missing on the runner must not break anything
 run_qs real
@@ -85,7 +86,7 @@ $QS ipc -p $SHELLDIR call shell toggle themes >> $OUT/ipc.log 2>&1; sleep 2; $GR
 $QS ipc -p $SHELLDIR call shell close >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR call osd brightness >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR show >> $OUT/ipc.log 2>&1
-sleep 1; pkill -f "qs -p"
+sleep 1; kill $QPID 2>/dev/null; QPID=
 
 log "qs warnings/errors:"
 for f in $OUT/qs-*.log; do echo "--- $(basename $f)"; grep -E "WARN|ERROR|FATAL|TypeError|ReferenceError|is not defined|Cannot|Unable|failed" $f | grep -v "Failed to create wl_display" | head -40; done >> $OUT/summary.txt
