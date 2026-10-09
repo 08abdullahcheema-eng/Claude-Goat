@@ -12,6 +12,9 @@ if ! HM=$(nix build --no-link --print-out-paths ./ci#homeConfigurations.test.act
   log "HM BUILD FAILED"; tail -60 $OUT/build.log | tee -a $OUT/summary.txt; exit 1
 fi
 log "hm: $HM"
+ls $HM/home-path/bin | grep -i helium | xargs -I{} echo "helium bin: {}" | tee -a $OUT/summary.txt
+grep -h "^Exec\|^Icon" $HM/home-path/share/applications/helium.desktop | tee -a $OUT/summary.txt
+(timeout 20 $HM/home-path/bin/helium --version > $OUT/helium-version.txt 2>&1; echo "helium rc=$?" >> $OUT/helium-version.txt)
 HF=$HM/home-files
 cp -L $HF/.config/hypr/hyprland.conf $OUT/hyprland.conf 2>/dev/null
 cp -L $HF/.config/hypr/hyprlock.conf $OUT/hyprlock.conf 2>/dev/null

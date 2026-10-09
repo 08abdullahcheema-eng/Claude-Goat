@@ -11,6 +11,7 @@
         inherit pkgs;
         modules = [
           ../sumi-shell.nix
+          ../helium.nix
           {
             home.username = "larp";
             home.homeDirectory = "/home/larp";
