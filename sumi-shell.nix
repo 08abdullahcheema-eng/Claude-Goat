@@ -44,6 +44,7 @@ in
     wl-clipboard
     yazi
     btop
+    claude-code
   ]) ++ [ sumi-theme sumi-agents sumi-lockinfo ];
 
   # the shell itself
@@ -82,7 +83,7 @@ in
       "SUPER, M, exec, ${ipc} shell open power"
       "SUPER, V, togglefloating,"
       "SUPER, F, fullscreen,"
-      "SUPER, L, exec, loginctl lock-session"
+      "SUPER, L, exec, pidof hyprlock || hyprlock"
 
       # Sumi shell
       "SUPER, SPACE, exec, ${ipc} shell launcher all"

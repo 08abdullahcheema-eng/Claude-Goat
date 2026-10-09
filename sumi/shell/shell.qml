@@ -18,6 +18,5 @@ ShellRoot {
         const p = Quickshell.env("SUMI_OPEN");
         if (p) Ui.open(p);
         Quickshell.inhibitReloadPopup();
-        if (!Theme.demo) Quickshell.execDetached(["sumi-theme", "--restore"]);
     }
 }

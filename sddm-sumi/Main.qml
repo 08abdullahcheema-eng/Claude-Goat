@@ -97,7 +97,7 @@ Rectangle {
         id: panel
         anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
         width: 475 * root.s
-        color: "#e60d0d12"
+        color: "#f20d0d12"
         Rectangle { anchors { right: parent.right; top: parent.top; bottom: parent.bottom } width: 1; color: root.line2 }
 
         Item {

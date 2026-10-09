@@ -28,7 +28,7 @@ Item {
         { title: "Update and rebuild", sub: "nix flake update, then rebuild", icon: "refresh", kw: "upgrade packages", run: () => root.term("cd ~/nixos-config && nix flake update && git add -A && sudo nixos-rebuild switch --flake .") },
         { title: "Screenshot area", sub: "select with the mouse, copies to clipboard", icon: "shot", kw: "screen capture grim slurp", run: () => Ui.run("sleep 0.3; grim -g \"$(slurp)\" - | wl-copy") },
         { title: "Screenshot screen", sub: "saves to ~/Pictures", icon: "camera", kw: "screen capture", run: () => Ui.run("sleep 0.3; mkdir -p ~/Pictures; grim ~/Pictures/shot-$(date +%F-%H%M%S).png") },
-        { title: "Lock screen", sub: "hyprlock", icon: "lock", kw: "lock", run: () => Ui.run("hyprlock") },
+        { title: "Lock screen", sub: "hyprlock", icon: "lock", kw: "lock", run: () => Ui.run("pidof hyprlock || hyprlock") },
         { title: "Do not disturb", sub: Ui.dnd ? "currently on" : "currently off", icon: "belloff", kw: "dnd notifications mute", run: () => Ui.dnd = !Ui.dnd },
         { title: "Edit config", sub: "open ~/nixos-config in nvim", icon: "file", kw: "nvim settings dotfiles", run: () => Ui.run("kitty -e nvim ~/nixos-config") },
         { title: "Clean up old generations", sub: "sudo nix-collect-garbage -d", icon: "refresh", kw: "garbage disk space", run: () => root.term("sudo nix-collect-garbage -d") },

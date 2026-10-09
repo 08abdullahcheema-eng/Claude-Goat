@@ -96,6 +96,7 @@ sumi-theme washi > $OUT/theme-switch.log 2>&1; log "sumi-theme washi rc=$?"
 head -3 ~/.config/sumi/kitty.conf >> $OUT/summary.txt
 WAIT=4 run_qs washi SUMI_DEMO=1 SUMI_OPEN=agents
 sumi-theme sumi >/dev/null 2>&1
+kill $QPID 2>/dev/null; QPID=
 
 # login screen
 SDDM=$(B sddm)

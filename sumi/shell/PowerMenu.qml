@@ -9,7 +9,7 @@ Item {
     focus: true
 
     readonly property var items: [
-        { key: "L", icon: "lock", name: "Lock", kanji: "錠", cmd: "loginctl lock-session || hyprlock", confirm: false },
+        { key: "L", icon: "lock", name: "Lock", kanji: "錠", cmd: "pidof hyprlock || hyprlock", confirm: false },
         { key: "S", icon: "moon", name: "Suspend", kanji: "眠", cmd: "systemctl suspend", confirm: false },
         { key: "E", icon: "logout", name: "Log out", kanji: "出", cmd: "hyprctl dispatch exit", confirm: true },
         { key: "R", icon: "reboot", name: "Reboot", kanji: "再", cmd: "systemctl reboot", confirm: true },
