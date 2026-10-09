@@ -7,6 +7,13 @@ OUT=$PWD/out; mkdir -p $OUT
 log() { echo "== $*" | tee -a $OUT/summary.txt; }
 B() { nix build --no-link --print-out-paths "./ci#$1^out" 2>>$OUT/build.log | head -1; }
 
+log "kernel default: $(nix eval --raw ./ci#kernel-default.version 2>>$OUT/build.log)"
+for k in linuwu-default linuwu-latest; do
+  if P=$(nix build --no-link --print-out-paths ./ci#$k 2>>$OUT/build-$k.log); then log "$k OK: $(find $P -name '*.ko*' | head -1)"; modinfo $(find $P -name '*.ko*' | head -1) 2>/dev/null | grep -E "^(vermagic|alias)" | head -3 | tee -a $OUT/summary.txt
+  else log "$k FAILED"; tail -40 $OUT/build-$k.log | tee -a $OUT/summary.txt; fi
+done
+if D=$(nix eval --raw ./ci#nixosConfigurations.test.config.system.build.toplevel.drvPath 2>>$OUT/build.log); then log "nixos eval OK"; else log "nixos eval FAILED"; tail -30 $OUT/build.log | tee -a $OUT/summary.txt; fi
+nix eval --json ./ci#nixosConfigurations.test.config.boot.blacklistedKernelModules 2>/dev/null | tee -a $OUT/summary.txt
 log "build home-manager config"
 if ! HM=$(nix build --no-link --print-out-paths ./ci#homeConfigurations.test.activationPackage 2>>$OUT/build.log); then
   log "HM BUILD FAILED"; tail -60 $OUT/build.log | tee -a $OUT/summary.txt; exit 1
@@ -80,12 +87,15 @@ run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
 run_qs polkit SUMI_DEMO=1 SUMI_DEMO_POLKIT=1
 run_qs osd SUMI_DEMO=1 SUMI_DEMO_OSD=1 SUMI_DEMO_NOTIFS=1
+run_qs predator SUMI_DEMO=1 SUMI_OPEN=predator
 
 # real mode: no demo data, services missing on the runner must not break anything
 run_qs real
 $QS ipc -p $SHELLDIR call shell toggle launcher > $OUT/ipc.log 2>&1; sleep 1.5; $GRIM $OUT/shot-real-ipc-launcher.png
 $QS ipc -p $SHELLDIR call shell toggle launcher >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR call shell toggle themes >> $OUT/ipc.log 2>&1; sleep 2; $GRIM $OUT/shot-real-themes.png
+$QS ipc -p $SHELLDIR call shell close >> $OUT/ipc.log 2>&1
+$QS ipc -p $SHELLDIR call shell toggle predator >> $OUT/ipc.log 2>&1; sleep 2; $GRIM $OUT/shot-real-predator.png
 $QS ipc -p $SHELLDIR call shell close >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR call osd brightness >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR show >> $OUT/ipc.log 2>&1

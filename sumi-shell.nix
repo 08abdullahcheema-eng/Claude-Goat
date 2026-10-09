@@ -94,6 +94,7 @@ in
       "SUPER CTRL, A, exec, ${ipc} shell toggle agents"
       "SUPER CTRL, T, exec, ${ipc} shell toggle themes"
       "SUPER CTRL, D, exec, ${ipc} shell dnd"
+      "SUPER CTRL, P, exec, ${ipc} shell toggle predator"
 
       # screenshots
       "SUPER SHIFT, S, exec, grim -g \"$(slurp)\" - | wl-copy"

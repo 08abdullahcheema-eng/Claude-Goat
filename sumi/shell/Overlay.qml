@@ -46,6 +46,7 @@ PanelWindow {
                 case "agents": return agentsC;
                 case "power": return powerC;
                 case "themes": return themesC;
+                case "predator": return predatorC;
                 }
                 return null;
             }
@@ -58,4 +59,5 @@ PanelWindow {
     Component { id: agentsC; AgentPanel {} }
     Component { id: powerC; PowerMenu {} }
     Component { id: themesC; ThemeSwitcher {} }
+    Component { id: predatorC; PredatorPanel {} }
 }

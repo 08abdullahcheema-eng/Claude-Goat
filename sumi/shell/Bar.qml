@@ -160,6 +160,17 @@ PanelWindow {
         anchors { right: parent.right; rightMargin: Theme.px(10); verticalCenter: parent.verticalCenter }
         spacing: Theme.px(10)
 
+        Pill {
+            anchors.verticalCenter: parent.verticalCenter
+            visible: Predator.available
+            icon: "fan"
+            iconColor: Predator.profile === "performance" ? Theme.accent : Theme.dim
+            iconSize: Theme.px(14)
+            text: Predator.profileKanji(Predator.profile) + (Predator.cpuTemp >= 0 ? " " + Predator.cpuTemp + "°" : "")
+            textColor: Predator.cpuTemp >= 90 ? Theme.accent2 : Theme.dim
+            active: Ui.panel === "predator"
+            onClicked: Ui.toggle("predator")
+        }
         Row {
             spacing: Theme.px(5); anchors.verticalCenter: parent.verticalCenter
             Icon { name: "cpu"; color: Theme.dim; size: Theme.px(14); anchors.verticalCenter: parent.verticalCenter }

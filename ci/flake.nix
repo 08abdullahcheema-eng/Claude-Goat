@@ -34,7 +34,22 @@
           }
         ];
       };
+      nixosConfigurations.test = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ../predator.nix
+          {
+            boot.loader.grub.device = "nodev";
+            fileSystems."/".device = "/dev/sda1";
+            users.users.larp.isNormalUser = true;
+            system.stateVersion = "26.05";
+          }
+        ];
+      };
       packages.x86_64-linux = {
+        linuwu-default = pkgs.linuxPackages.callPackage ../predator/linuwu-sense.nix { };
+        linuwu-latest = pkgs.linuxPackages_latest.callPackage ../predator/linuwu-sense.nix { };
+        kernel-default = pkgs.linuxPackages.kernel;
         inherit (pkgs) quickshell sway grim hyprlock mesa libglvnd jq papirus-icon-theme kitty pavucontrol btop libnotify dbus;
         fonts = pkgs.symlinkJoin { name = "fonts"; paths = [ pkgs.nerd-fonts.jetbrains-mono pkgs.noto-fonts-cjk-serif pkgs.inter ]; };
         sddm = pkgs.kdePackages.sddm;
