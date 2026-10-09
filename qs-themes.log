@@ -1,0 +1,12 @@
+[32m  INFO[0m: Launching config: "/nix/store/vbhbbiqqiyrj5ma2k37ddnc2zqzs6rrl-hm_shell/shell.qml"
+[32m  INFO[0m: Shell ID: "cb2cb81403a5d9c70e5d4ec6d6aef057" Path ID "cb2cb81403a5d9c70e5d4ec6d6aef057"
+[32m  INFO[0m: Saving logs to "/tmp/xdg/quickshell/by-id/dg4i1dnmt/log.qslog"
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[32m  INFO[0m: Configuration Loaded
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 5773
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"

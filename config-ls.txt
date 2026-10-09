@@ -1,0 +1,8 @@
+total 28
+dr-xr-xr-x 7 root root 4096 Jan  1  1970 .
+dr-xr-xr-x 5 root root 4096 Jan  1  1970 ..
+dr-xr-xr-x 2 root root 4096 Jan  1  1970 environment.d
+dr-xr-xr-x 2 root root 4096 Jan  1  1970 hypr
+dr-xr-xr-x 2 root root 4096 Jan  1  1970 kitty
+dr-xr-xr-x 2 root root 4096 Jan  1  1970 quickshell
+dr-xr-xr-x 3 root root 4096 Jan  1  1970 systemd

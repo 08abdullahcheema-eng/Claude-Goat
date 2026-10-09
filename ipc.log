@@ -1,0 +1,8 @@
+target osd
+  function brightness(): void
+target shell
+  function toggle(name: string): void
+  function close(): void
+  function dnd(): void
+  function launcher(mode: string): void
+  function open(name: string): void

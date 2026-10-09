@@ -1,0 +1,88 @@
+Hyprlock version v0.9.5
+[1;32mDEBUG [0m]:   | got iface: wl_fixes v1
+[1;32mDEBUG [0m]:   | got iface: wl_shm v2
+[1;32mDEBUG [0m]:    > Bound to wl_shm v2
+[1;32mDEBUG [0m]:   | got iface: wl_compositor v6
+[1;32mDEBUG [0m]:    > Bound to wl_compositor v6
+[1;32mDEBUG [0m]:   | got iface: wl_subcompositor v1
+[1;32mDEBUG [0m]:   | got iface: wl_data_device_manager v3
+[1;32mDEBUG [0m]:   | got iface: zwlr_gamma_control_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zxdg_output_manager_v1 v3
+[1;32mDEBUG [0m]:   | got iface: ext_idle_notifier_v1 v2
+[1;32mDEBUG [0m]:   | got iface: zwp_idle_inhibit_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwlr_layer_shell_v1 v5
+[1;32mDEBUG [0m]:   | got iface: xdg_wm_base v5
+[1;32mDEBUG [0m]:   | got iface: zwp_tablet_manager_v2 v1
+[1;32mDEBUG [0m]:   | got iface: org_kde_kwin_server_decoration_manager v1
+[1;32mDEBUG [0m]:   | got iface: zxdg_decoration_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwp_relative_pointer_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwp_pointer_constraints_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wp_presentation v2
+[1;32mDEBUG [0m]:   | got iface: wp_alpha_modifier_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwlr_output_manager_v1 v4
+[1;32mDEBUG [0m]:   | got iface: zwlr_output_power_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwp_input_method_manager_v2 v1
+[1;32mDEBUG [0m]:   | got iface: zwp_text_input_manager_v3 v1
+[1;32mDEBUG [0m]:   | got iface: ext_foreign_toplevel_list_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwlr_foreign_toplevel_manager_v1 v3
+[1;32mDEBUG [0m]:   | got iface: ext_session_lock_manager_v1 v1
+[1;32mDEBUG [0m]:    > Bound to ext_session_lock_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: ext_workspace_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwlr_export_dmabuf_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwlr_screencopy_manager_v1 v3
+[1;32mDEBUG [0m]:    > Bound to zwlr_screencopy_manager_v1 v3
+[1;32mDEBUG [0m]:   | got iface: ext_image_copy_capture_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: ext_output_image_capture_source_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwlr_data_control_manager_v1 v2
+[1;32mDEBUG [0m]:   | got iface: ext_data_control_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wp_security_context_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wp_viewporter v1
+[1;32mDEBUG [0m]:    > Bound to wp_viewporter v1
+[1;32mDEBUG [0m]:   | got iface: wp_single_pixel_buffer_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wp_content_type_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wp_fractional_scale_manager_v1 v1
+[1;32mDEBUG [0m]:    > Bound to wp_fractional_scale_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: ext_foreign_toplevel_image_capture_source_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wp_tearing_control_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zxdg_exporter_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zxdg_importer_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zxdg_exporter_v2 v1
+[1;32mDEBUG [0m]:   | got iface: zxdg_importer_v2 v1
+[1;32mDEBUG [0m]:   | got iface: xdg_activation_v1 v1
+[1;32mDEBUG [0m]:   | got iface: xdg_toplevel_tag_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wp_cursor_shape_manager_v1 v2
+[1;32mDEBUG [0m]:    > Bound to wp_cursor_shape_manager_v1 v2
+[1;32mDEBUG [0m]:   | got iface: wp_color_representation_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwp_virtual_keyboard_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwlr_virtual_pointer_manager_v1 v2
+[1;32mDEBUG [0m]:   | got iface: zwp_keyboard_shortcuts_inhibit_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: zwp_pointer_gestures_v1 v3
+[1;32mDEBUG [0m]:   | got iface: ext_transient_seat_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wl_seat v9
+[1;32mDEBUG [0m]:    > Bound to wl_seat v9
+[1;32mDEBUG [0m]:   | got iface: zwp_primary_selection_device_manager_v1 v1
+[1;32mDEBUG [0m]:   | got iface: wl_output v4
+[1;32mDEBUG [0m]:    > Bound to wl_output v4
+[1;32mDEBUG [0m]: Exposed seat name: seat0
+[1;32mDEBUG [0m]: output 56 make Unknown model Unknown
+[1;32mDEBUG [0m]: output HEADLESS-1 name HEADLESS-1
+[1;32mDEBUG [0m]: output 56 description Headless output 1
+[1;32mDEBUG [0m]: output 56 done
+[1;31mERR [0m]: Pam module "/etc/pam.d/hyprlock" does not exist! Falling back to "/etc/pam.d/su"
+[1;32mDEBUG [0m]: Running on 
+[1;31mERR [0m]: [sc] No DMABUF support?
+[1;32mDEBUG [0m]: Locking session
+[1;33mWARN [0m]: Querying modifiers without eglQueryDmaBufModifiersEXT support
+[1;31mERR [0m]: [bo] Couldn't create a drm buffer
+[1;31mERR [0m]: [sc] Failed to create a wayland buffer for the screencopy frame
+[1;32mDEBUG [0m]: onLockLocked called
+[1;32mDEBUG [0m]: Starting fade in
+[1;32mDEBUG [0m]: configure with serial 469
+[1;32mDEBUG [0m]: Configuring surface for logical [Vector2D: x: 1600, y: 1000] and pixel [Vector2D: x: 1600, y: 1000]
+[1;32mDEBUG [0m]: Updating placeholder text: <i>password</i>
+[1;32mDEBUG [0m]: Got fractional scale: 160.0%
+[1;32mDEBUG [0m]: configure with serial 469
+[1;32mDEBUG [0m]: Configuring surface for logical [Vector2D: x: 1600, y: 1000] and pixel [Vector2D: x: 2560, y: 1600]
+[1;32mDEBUG [0m]: Resizing existing eglWindow
+[1;32mDEBUG [0m]: output HEADLESS-1 changed, reloading widgets!
+[1;32mDEBUG [0m]: Updating placeholder text: <i>password</i>
