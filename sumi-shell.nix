@@ -89,7 +89,7 @@ in
       "SUPER, SPACE, exec, ${ipc} shell launcher all"
       "SUPER, R, exec, ${ipc} shell launcher apps"
       "SUPER, X, exec, ${ipc} shell toggle power"
-      "SUPER, W, exec, ${ipc} shell toggle network"
+      "SUPER, W, killactive,"
       "SUPER CTRL, N, exec, ${ipc} shell toggle network"
       "SUPER CTRL, A, exec, ${ipc} shell toggle agents"
       "SUPER CTRL, T, exec, ${ipc} shell toggle themes"
