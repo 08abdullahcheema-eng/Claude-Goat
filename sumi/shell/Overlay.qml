@@ -27,7 +27,8 @@ PanelWindow {
     }
     MouseArea {
         anchors.fill: parent
-        onClicked: Ui.close()
+        acceptedButtons: Qt.AllButtons
+        onPressed: Ui.close()
     }
 
     Item {

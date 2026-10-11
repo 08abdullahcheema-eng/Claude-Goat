@@ -10,6 +10,8 @@ Rectangle {
     property bool active: false
     property real iconSize: Theme.px(15)
     signal clicked(var mouse)
+    // screen x of this pill's centre (the bar window sits Theme.px(10) in from the screen edge)
+    function centerX() { return mapToItem(null, width / 2, 0).x + Theme.px(10); }
     signal wheel(var wheel)
 
     implicitHeight: Theme.barH - Theme.px(8)

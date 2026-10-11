@@ -43,9 +43,7 @@ Item {
     Card {
         id: card
         width: Theme.px(344)
-        x: Ui.calX < 0
-            ? (parent.width - width) / 2
-            : Math.max(Theme.px(10), Math.min(parent.width - width - Theme.px(10), Ui.calX - width / 2))
+        x: Ui.dropX(width, parent.width, (parent.width - width) / 2)
         y: Theme.px(8)
         pad: Theme.px(16)
 

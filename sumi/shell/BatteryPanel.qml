@@ -44,7 +44,7 @@ Item {
     Card {
         id: card
         width: Theme.px(350)
-        x: parent.width - width - Theme.px(10)
+        x: Ui.dropX(width, parent.width, parent.width - width - Theme.px(10))
         y: Theme.px(8)
         pad: Theme.px(18)
 

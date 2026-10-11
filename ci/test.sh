@@ -97,6 +97,18 @@ run_qs polkit SUMI_DEMO=1 SUMI_DEMO_POLKIT=1
 run_qs osd SUMI_DEMO=1 SUMI_DEMO_OSD=1 SUMI_DEMO_NOTIFS=1
 run_qs predator SUMI_DEMO=1 SUMI_OPEN=predator
 
+# real pointer clicks on the bar: open under the icon, click again to close, click outside to close
+SM=$(dirname $SWAY)/swaymsg
+click() { $SM -q "seat seat0 cursor set $1 $2"; $SM -q "seat seat0 cursor press button1"; sleep 0.1; $SM -q "seat seat0 cursor release button1"; sleep 1.2; }
+run_qs clicks SUMI_DEMO=1
+click 328 25; $GRIM $OUT/shot-click1-cpu-open.png
+click 328 25; $GRIM $OUT/shot-click2-cpu-reclick.png
+click 252 25; $GRIM $OUT/shot-click3-fan-open.png
+click 900 700; $GRIM $OUT/shot-click4-outside.png
+click 1500 25; $GRIM $OUT/shot-click5-battery-open.png
+click 700 25; $GRIM $OUT/shot-click6-barspace.png
+$SM -t get_seats > $OUT/seats.json 2>&1
+
 # real mode: no demo data, services missing on the runner must not break anything
 run_qs real
 $QS ipc -p $SHELLDIR call shell toggle launcher > $OUT/ipc.log 2>&1; sleep 1.5; $GRIM $OUT/shot-real-ipc-launcher.png

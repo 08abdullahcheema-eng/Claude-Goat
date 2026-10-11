@@ -12,7 +12,7 @@ Item {
     Card {
         id: card
         width: Theme.px(462)
-        x: Math.max(Theme.px(10), Math.min(parent.width - width - Theme.px(10), parent.width / 2 - Theme.px(150)))
+        x: Ui.dropX(width, parent.width, parent.width / 2 - Theme.px(150))
         y: Theme.px(8)
         pad: Theme.px(17)
 

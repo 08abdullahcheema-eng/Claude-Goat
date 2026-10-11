@@ -79,7 +79,7 @@ PanelWindow {
                 text: Predator.profileKanji(Predator.profile) + (Predator.cpuTemp >= 0 ? " " + Predator.cpuTemp + "°" : "")
                 textColor: Predator.cpuTemp >= 90 ? Theme.accent2 : Theme.dim
                 active: Ui.panel === "predator"
-                onClicked: Ui.toggle("predator")
+                onClicked: Ui.toggleAt("predator", centerX())
             }
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
@@ -87,7 +87,7 @@ PanelWindow {
                 text: Sys.cpu + "%"
                 textColor: Theme.fg
                 active: Ui.panel === "system"
-                onClicked: Ui.toggle("system")
+                onClicked: Ui.toggleAt("system", centerX())
             }
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
@@ -98,7 +98,7 @@ PanelWindow {
                 textColor: Theme.gold
                 active: Ui.panel === "agents"
                 visible: Agents.installed || Theme.demo
-                onClicked: Ui.toggle("agents")
+                onClicked: Ui.toggleAt("agents", centerX())
             }
     }
 
@@ -113,8 +113,7 @@ PanelWindow {
             text: ""
             implicitWidth: clockRow.implicitWidth + Theme.px(20)
             onClicked: (m) => {
-                Ui.calX = clockPill.mapToItem(null, clockPill.width / 2, 0).x;
-                Ui.toggle("calendar");
+                Ui.toggleAt("calendar", clockPill.centerX());
             }
             Row {
                 id: clockRow
@@ -138,7 +137,7 @@ PanelWindow {
                 active: Ui.panel === "network"
                 onClicked: (m) => {
                     if (m.button === Qt.RightButton) Ui.run("nm-connection-editor");
-                    else Ui.toggle("network");
+                    else Ui.toggleAt("network", centerX());
                 }
             }
             Pill {
@@ -204,7 +203,7 @@ PanelWindow {
                 text: pct + "%"
                 textColor: Theme.fg
                 active: Ui.panel === "battery"
-                onClicked: Ui.toggle("battery")
+                onClicked: Ui.toggleAt("battery", centerX())
             }
             Pill {
                 anchors.verticalCenter: parent.verticalCenter

@@ -11,7 +11,7 @@ Singleton {
     property string panel: ""
     property string launcherMode: "all"
     property bool dnd: false
-    property real calX: -1   // x of the clock in the bar, so the calendar drops down under it
+    property real anchorX: -1   // screen x of the bar icon that opened the panel, so it drops down under it
 
     // OSD
     property string osdKind: ""      // "volume" | "brightness"
@@ -23,7 +23,18 @@ Singleton {
     readonly property bool panelIsFull: fullscreenPanels.indexOf(panel) >= 0
 
     function toggle(name) { panel = (panel === name) ? "" : name; }
-    function open(name) { panel = name; }
+    // open a dropdown panel under the icon at screen x (press the same icon again to close)
+    function toggleAt(name, x) {
+        if (panel !== name) anchorX = x;
+        toggle(name);
+    }
+    // x for a dropdown card of width w in a screen of width sw, centred under anchorX
+    function dropX(w, sw, fallback) {
+        const m = Theme.px(10);
+        if (anchorX < 0) return Math.max(m, Math.min(sw - w - m, fallback));
+        return Math.max(m, Math.min(sw - w - m, anchorX - w / 2));
+    }
+    function open(name) { anchorX = -1; panel = name; }
     function close() { panel = ""; }
 
     function showOsd(kind, value, muted) {
@@ -37,7 +48,7 @@ Singleton {
 
     IpcHandler {
         target: "shell"
-        function toggle(name: string): void { root.toggle(name); }
+        function toggle(name: string): void { if (root.panel !== name) root.anchorX = -1; root.toggle(name); }
         function open(name: string): void { root.open(name); }
         function close(): void { root.close(); }
         function launcher(mode: string): void { root.launcherMode = mode || "all"; root.toggle("launcher"); }
