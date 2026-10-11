@@ -13,6 +13,8 @@ for k in linuwu-default linuwu-latest; do
   else log "$k FAILED"; tail -40 $OUT/build-$k.log | tee -a $OUT/summary.txt; fi
 done
 if D=$(nix eval --raw ./ci#nixosConfigurations.test.config.system.build.toplevel.drvPath 2>>$OUT/build.log); then log "nixos eval OK"; else log "nixos eval FAILED"; tail -30 $OUT/build.log | tee -a $OUT/summary.txt; fi
+nix eval --json ./ci#nixosConfigurations.test.config.hardware.bluetooth.enable 2>/dev/null | xargs -I{} echo "bluetooth enabled: {}" | tee -a $OUT/summary.txt
+nix eval --json ./ci#nixosConfigurations.test.config.services.blueman.enable 2>/dev/null | xargs -I{} echo "blueman enabled: {}" | tee -a $OUT/summary.txt
 nix eval --json ./ci#nixosConfigurations.test.config.boot.blacklistedKernelModules 2>/dev/null | tee -a $OUT/summary.txt
 log "build home-manager config"
 if ! HM=$(nix build --no-link --print-out-paths ./ci#homeConfigurations.test.activationPackage 2>>$OUT/build.log); then

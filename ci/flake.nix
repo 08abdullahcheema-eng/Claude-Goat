@@ -38,6 +38,7 @@
         system = "x86_64-linux";
         modules = [
           ../predator.nix
+          ../bluetooth.nix
           {
             boot.loader.grub.device = "nodev";
             fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
