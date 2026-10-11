@@ -44,6 +44,7 @@ in
     wl-clipboard
     yazi
     btop
+    claude-code
   ]) ++ [ sumi-theme sumi-agents sumi-lockinfo ];
 
   # the shell itself
