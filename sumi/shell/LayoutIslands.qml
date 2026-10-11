@@ -39,7 +39,7 @@ Scope {
         // ink: a short brush stroke of the accent under the clock
         Rectangle {
             visible: (Theme.p.barFx ?? "") === "ink"
-            x: mid.x + mid.width / 2 - width / 2; y: mid.y + mid.height + Theme.px(2)
+            x: mid.x + mid.width / 2 - width / 2; y: mid.y + mid.height - height - Theme.px(3)
             width: mid.width * 0.5; height: Theme.px(2.5); radius: height / 2
             gradient: Gradient { orientation: Gradient.Horizontal
                 GradientStop { position: 0; color: "transparent" } GradientStop { position: 0.5; color: Theme.accent } GradientStop { position: 1; color: "transparent" } }
