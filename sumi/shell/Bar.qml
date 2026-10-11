@@ -32,6 +32,8 @@ PanelWindow {
         anchors.fill: parent
         color: Theme.barBg
         Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: Theme.line }
+        // click on empty bar space closes an open panel
+        MouseArea { anchors.fill: parent; onClicked: Ui.close() }
     }
 
     // ---------------- left
@@ -52,16 +54,6 @@ PanelWindow {
         }
 
         Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: bar.modelData.name }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            width: Math.min(implicitWidth, bar.width * 0.22)
-            elide: Text.ElideRight
-            text: Theme.demo ? "nvim · home.nix" : (Hyprland.activeToplevel?.title ?? "")
-            color: Theme.mute
-            font.family: Theme.mono
-            font.pixelSize: Theme.fsm
-        }
     }
 
     // ---------------- centre
@@ -70,9 +62,15 @@ PanelWindow {
         spacing: Theme.px(4)
 
         Pill {
-            active: false
+            id: clockPill
+            anchors.verticalCenter: parent.verticalCenter
+            active: Ui.panel === "calendar"
             text: ""
             implicitWidth: clockRow.implicitWidth + Theme.px(16)
+            onClicked: (m) => {
+                Ui.calX = clockPill.mapToItem(null, clockPill.width / 2, 0).x;
+                Ui.toggle("calendar");
+            }
             Row {
                 id: clockRow
                 anchors.centerIn: parent
@@ -160,11 +158,12 @@ PanelWindow {
         anchors { right: parent.right; rightMargin: Theme.px(10); verticalCenter: parent.verticalCenter }
         spacing: Theme.px(10)
 
-        Row {
-            spacing: Theme.px(5); anchors.verticalCenter: parent.verticalCenter
-            Icon { name: "cpu"; color: Theme.dim; size: Theme.px(14); anchors.verticalCenter: parent.verticalCenter }
-            Text { text: Sys.cpu + "%"; color: Theme.dim; font.family: Theme.mono; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
-            MouseArea { width: 0; height: 0 }
+        Pill {
+            anchors.verticalCenter: parent.verticalCenter
+            icon: "cpu"; iconColor: Theme.dim; iconSize: Theme.px(14)
+            text: Sys.cpu + "%"
+            active: Ui.panel === "system"
+            onClicked: Ui.toggle("system")
         }
         Row {
             spacing: Theme.px(5); anchors.verticalCenter: parent.verticalCenter
@@ -172,17 +171,18 @@ PanelWindow {
             Icon { name: "kbd"; color: Theme.dim; size: Theme.px(14); anchors.verticalCenter: parent.verticalCenter }
             Text { text: Sys.layout; color: Theme.dim; font.family: Theme.mono; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
         }
-        Row {
-            spacing: Theme.px(5); anchors.verticalCenter: parent.verticalCenter
+        Pill {
+            anchors.verticalCenter: parent.verticalCenter
             visible: Theme.demo || (bar.bat && bar.bat.isLaptopBattery)
             readonly property int pct: Theme.demo ? 84 : Math.round((bar.bat?.percentage ?? 0) * 100)
             readonly property bool charging: Theme.demo || bar.bat?.state === UPowerDeviceState.Charging
-            Icon {
-                name: parent.charging ? "plug" : "bat"
-                color: parent.pct <= 15 && !parent.charging ? Theme.accent : (parent.pct >= 50 || parent.charging ? Theme.green : Theme.gold)
-                size: Theme.px(15); anchors.verticalCenter: parent.verticalCenter
-            }
-            Text { text: parent.pct + "%"; color: Theme.fg; font.family: Theme.mono; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
+            icon: charging ? "plug" : "bat"
+            iconColor: pct <= 15 && !charging ? Theme.accent : (pct >= 50 || charging ? Theme.green : Theme.gold)
+            iconSize: Theme.px(15)
+            text: pct + "%"
+            textColor: Theme.fg
+            active: Ui.panel === "battery"
+            onClicked: Ui.toggle("battery")
         }
         Pill {
             anchors.verticalCenter: parent.verticalCenter

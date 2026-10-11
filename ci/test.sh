@@ -78,6 +78,9 @@ run_qs network SUMI_DEMO=1 SUMI_OPEN=network
 run_qs agents SUMI_DEMO=1 SUMI_OPEN=agents
 run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
+run_qs calendar SUMI_DEMO=1 SUMI_OPEN=calendar
+run_qs system SUMI_DEMO=1 SUMI_OPEN=system
+run_qs battery SUMI_DEMO=1 SUMI_OPEN=battery
 run_qs polkit SUMI_DEMO=1 SUMI_DEMO_POLKIT=1
 run_qs osd SUMI_DEMO=1 SUMI_DEMO_OSD=1 SUMI_DEMO_NOTIFS=1
 

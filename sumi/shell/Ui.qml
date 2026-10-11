@@ -7,10 +7,11 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    // "", "launcher", "network", "agents", "power", "themes"
+    // "", "launcher", "network", "agents", "power", "themes", "calendar", "system", "battery"
     property string panel: ""
     property string launcherMode: "all"
     property bool dnd: false
+    property real calX: -1   // x of the clock in the bar, so the calendar drops down under it
 
     // OSD
     property string osdKind: ""      // "volume" | "brightness"

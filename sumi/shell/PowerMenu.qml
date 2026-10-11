@@ -67,7 +67,31 @@ Item {
         }
     }
 
+    // solid card, so the menu stays readable on top of white windows
+    Rectangle {
+        id: card
+        anchors.centerIn: parent
+        width: col.implicitWidth + Theme.px(88)
+        height: col.implicitHeight + Theme.px(72)
+        radius: Theme.px(16)
+        color: Theme.panelBg
+        border.width: 1
+        border.color: Theme.line2
+
+        Rectangle {
+            z: -1
+            anchors.fill: parent
+            anchors.topMargin: Theme.px(8)
+            anchors.bottomMargin: -Theme.px(16)
+            anchors.leftMargin: -Theme.px(2)
+            anchors.rightMargin: -Theme.px(2)
+            radius: parent.radius + Theme.px(4)
+            color: Qt.rgba(0, 0, 0, 0.45)
+        }
+        MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }
+
     Column {
+        id: col
         anchors.centerIn: parent
         spacing: Theme.px(10)
 
@@ -78,7 +102,7 @@ Item {
             sourceSize: Qt.size(width * 2, height * 2)
         }
         T { anchors.horizontalCenter: parent.horizontalCenter; text: (Quickshell.env("USER") || "larp") + "@" + root.host; color: Theme.hi; font.pixelSize: Theme.px(18); topPadding: Theme.px(4) }
-        T { anchors.horizontalCenter: parent.horizontalCenter; text: [root.uptime, "NixOS", root.gen].filter(x => x).join(" · "); color: Theme.mute; font.pixelSize: Theme.px(12) }
+        T { anchors.horizontalCenter: parent.horizontalCenter; text: [root.uptime, "NixOS", root.gen].filter(x => x).join(" · "); color: Theme.dim; font.pixelSize: Theme.px(12) }
 
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -93,8 +117,8 @@ Item {
                     readonly property bool on: root.sel === index
                     width: Theme.px(188); height: Theme.px(212)
                     radius: Theme.px(10)
-                    color: on ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.10) : Qt.rgba(Theme.bg1.r, Theme.bg1.g, Theme.bg1.b, 0.9)
-                    border.width: on ? Theme.px(1.5) : 1
+                    color: on ? Qt.tint(Theme.bg2, Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22)) : Theme.bg2
+                    border.width: on ? Theme.px(2) : 1
                     border.color: on ? Theme.accent : Theme.line2
                     scale: tm.pressed ? 0.97 : 1
                     Behavior on scale { NumberAnimation { duration: 80 } }
@@ -105,13 +129,13 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: tile.modelData.kanji
                             font.family: Theme.serif; font.weight: Font.Bold; font.pixelSize: Theme.px(52)
-                            color: tile.on ? Theme.accent : Theme.fg
+                            color: tile.on ? Theme.accent2 : Theme.hi
                         }
                         Row {
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: Theme.px(7)
-                            Icon { name: tile.modelData.icon; size: Theme.px(14); color: tile.on ? Theme.hi : Theme.dim; anchors.verticalCenter: parent.verticalCenter }
-                            T { text: tile.modelData.name; color: tile.on ? Theme.hi : Theme.dim; font.pixelSize: Theme.px(14) }
+                            Icon { name: tile.modelData.icon; size: Theme.px(14); color: tile.on ? Theme.hi : Theme.fg; anchors.verticalCenter: parent.verticalCenter }
+                            T { text: tile.modelData.name; color: tile.on ? Theme.hi : Theme.fg; font.pixelSize: Theme.px(14) }
                         }
                     }
                     Kbd { text: tile.modelData.key; anchors { top: parent.top; right: parent.right; margins: Theme.px(10) } }
@@ -133,7 +157,7 @@ Item {
             spacing: Theme.px(8)
             T {
                 anchors.verticalCenter: parent.verticalCenter
-                color: root.armed >= 0 ? Theme.fg : Theme.dim
+                color: root.armed >= 0 ? Theme.hi : Theme.fg
                 font.pixelSize: Theme.px(13)
                 text: root.armed >= 0
                     ? root.items[root.armed].name + " in " + root.countdown + " s, press again to do it now"
@@ -151,9 +175,10 @@ Item {
                     required property var modelData
                     spacing: Theme.px(6)
                     Kbd { text: modelData[0] }
-                    T { text: modelData[1]; color: Theme.mute; font.pixelSize: Theme.px(11); anchors.verticalCenter: parent.verticalCenter }
+                    T { text: modelData[1]; color: Theme.dim; font.pixelSize: Theme.px(11); anchors.verticalCenter: parent.verticalCenter }
                 }
             }
         }
+    }
     }
 }

@@ -4,14 +4,16 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 
 // One layer surface that hosts whichever panel is open.
-// Launcher, power menu and themes cover the whole screen; network and agents sit under the bar.
+// Launcher, power menu and themes cover the whole screen; the other panels sit under the bar.
 PanelWindow {
     id: win
     visible: Ui.panel !== "" && Ui.panel !== "polkit"
     screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
 
     anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: Ui.panelIsFull ? ExclusionMode.Ignore : ExclusionMode.Normal
+    // small panels start under the bar so the bar icons stay clickable (press again = close)
+    exclusionMode: ExclusionMode.Ignore
+    margins.top: Ui.panelIsFull ? 0 : Theme.barH
     color: "transparent"
     WlrLayershell.namespace: "sumi-overlay"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -46,6 +48,9 @@ PanelWindow {
                 case "agents": return agentsC;
                 case "power": return powerC;
                 case "themes": return themesC;
+                case "calendar": return calendarC;
+                case "system": return systemC;
+                case "battery": return batteryC;
                 }
                 return null;
             }
@@ -58,4 +63,7 @@ PanelWindow {
     Component { id: agentsC; AgentPanel {} }
     Component { id: powerC; PowerMenu {} }
     Component { id: themesC; ThemeSwitcher {} }
+    Component { id: calendarC; CalendarPanel {} }
+    Component { id: systemC; SysPanel {} }
+    Component { id: batteryC; BatteryPanel {} }
 }

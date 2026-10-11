@@ -44,7 +44,6 @@ in
     wl-clipboard
     yazi
     btop
-    claude-code
   ]) ++ [ sumi-theme sumi-agents sumi-lockinfo ];
 
   # the shell itself
@@ -72,12 +71,12 @@ in
   wayland.windowManager.hyprland.settings = {
     exec-once = lib.mkForce [
       "sumi-theme --restore"
-      "${qs} -c sumi"
+      "${qs} -n -c sumi"
     ];
 
     bind = lib.mkForce ([
       "SUPER, Q, exec, kitty"
-      "SUPER, B, exec, firefox"
+      "SUPER, B, exec, helium"
       "SUPER, E, exec, kitty -e yazi"
       "SUPER, C, killactive,"
       "SUPER, M, exec, ${ipc} shell open power"
@@ -87,7 +86,6 @@ in
 
       # Sumi shell
       "SUPER, SPACE, exec, ${ipc} shell launcher all"
-      "SUPER, R, exec, ${ipc} shell launcher apps"
       "SUPER, X, exec, ${ipc} shell toggle power"
       "SUPER, W, killactive,"
       "SUPER CTRL, N, exec, ${ipc} shell toggle network"

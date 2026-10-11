@@ -47,7 +47,7 @@ Singleton {
 
     readonly property color barBg: Qt.rgba(bg.r, bg.g, bg.b, 0.88)
     readonly property color panelBg: Qt.rgba(bg1.r, bg1.g, bg1.b, 0.97)
-    readonly property color scrim: Qt.rgba(0, 0, 0, dark ? 0.55 : 0.35)
+    readonly property color scrim: Qt.rgba(0, 0, 0, dark ? 0.78 : 0.55)
 
     readonly property string mono: "JetBrainsMono Nerd Font"
     readonly property string serif: "Noto Serif CJK JP"
