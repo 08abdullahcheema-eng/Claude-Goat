@@ -20,7 +20,9 @@ Scope {
         Row {
             anchors { left: parent.left; leftMargin: Theme.px(14); verticalCenter: parent.verticalCenter }
             spacing: Theme.px(12)
+            Logo { visible: (Theme.p.badge ?? "") !== ""; anchors.verticalCenter: parent.verticalCenter; size: Theme.px(17) }
             Text {
+                visible: (Theme.p.badge ?? "") === ""
                 text: Theme.kanji; color: Theme.accent; font.family: Theme.head; font.pixelSize: Theme.px(14); anchors.verticalCenter: parent.verticalCenter
                 MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: Ui.toggle("launcher") }
             }

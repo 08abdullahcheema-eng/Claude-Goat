@@ -7,6 +7,8 @@
  "fontHead": "Space Grotesk",
  "fontBody": "JetBrainsMono Nerd Font",
  "wsKanji": false,
+ "badge": "嵐",
+ "barFx": "electric",
  "bg": "#06080c",
  "bg1": "#0c0f16",
  "bg2": "#131722",

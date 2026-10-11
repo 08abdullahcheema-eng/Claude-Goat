@@ -7,6 +7,8 @@
  "fontHead": "Bebas Neue",
  "fontBody": "JetBrainsMono Nerd Font",
  "wsKanji": false,
+ "badge": "炎",
+ "barFx": "fire",
  "bg": "#0a0605",
  "bg1": "#120c0a",
  "bg2": "#1a110d",

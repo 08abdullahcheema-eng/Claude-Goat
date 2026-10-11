@@ -7,6 +7,8 @@
  "fontHead": "Shippori Mincho",
  "fontBody": "JetBrainsMono Nerd Font",
  "wsKanji": false,
+ "badge": "浪",
+ "barFx": "hanko",
  "bg": "#05080f",
  "bg1": "#0a0f19",
  "bg2": "#101724",

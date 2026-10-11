@@ -7,6 +7,8 @@
  "fontHead": "Shippori Mincho",
  "fontBody": "JetBrainsMono Nerd Font",
  "wsKanji": true,
+ "badge": "鳥",
+ "barFx": "lantern",
  "bg": "#0b0c0c",
  "bg1": "#121212",
  "bg2": "#1a1615",

@@ -51,6 +51,7 @@ Row {
                 color: {
                     if (root.mode === "dots") return cell.on ? Theme.accent : (cell.used ? Theme.dim : Theme.line2);
                     if (root.mode === "circles") return cell.on ? Theme.accent : "transparent";
+                    if (root.mode === "blocks" && cell.on && (Theme.p.barFx ?? "") === "fire") return Theme.accent;
                     if (root.mode === "blocks") return cell.on ? Theme.bg2 : (ma.containsMouse ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.6) : "transparent");
                     if (root.mode === "pill") return cell.on ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.20) : (ma.containsMouse ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.8) : "transparent");
                     return "transparent";
@@ -74,7 +75,7 @@ Row {
                 font.pixelSize: root.mode === "circles" ? Theme.px(11) : root.mode === "blocks" ? Theme.px(18) : root.mode === "text" ? Theme.px(12) : Theme.fmd
                 font.weight: root.mode === "circles" || root.mode === "blocks" ? Font.Bold : Font.Normal
                 color: root.mode === "circles" && cell.on ? Theme.onAccent
-                     : cell.on ? (root.mode === "blocks" ? Theme.accent : Theme.hi)
+                     : cell.on ? (root.mode === "blocks" ? ((Theme.p.barFx ?? "") === "fire" ? Theme.onAccent : Theme.accent) : Theme.hi)
                      : (cell.used ? Theme.fg : Theme.mute)
             }
             // pill mode: one dot per window, up to three

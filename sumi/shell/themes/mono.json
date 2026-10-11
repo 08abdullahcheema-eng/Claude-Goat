@@ -7,6 +7,8 @@
  "fontHead": "Inter",
  "fontBody": "Inter",
  "wsKanji": false,
+ "badge": "",
+ "barFx": "none",
  "bg": "#0c0c0c",
  "bg1": "#141414",
  "bg2": "#1c1c1c",

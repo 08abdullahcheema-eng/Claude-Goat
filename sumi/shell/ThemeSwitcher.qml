@@ -151,7 +151,15 @@ Item {
                     asynchronous: true
                     visible: false
                 }
-                MultiEffect { anchors.fill: parent; source: bimg; blurEnabled: true; blur: 1.0; blurMax: 64; brightness: -0.25; saturation: 0.1 }
+                MultiEffect {
+                    anchors.fill: parent; source: bimg; blurEnabled: true; blur: 1.0; blurMax: 64; brightness: -0.25; saturation: 0.1
+                    // a very slow drift keeps the backdrop alive
+                    SequentialAnimation on scale {
+                        loops: Animation.Infinite
+                        NumberAnimation { from: 1.04; to: 1.12; duration: 14000; easing.type: Easing.InOutSine }
+                        NumberAnimation { from: 1.12; to: 1.04; duration: 14000; easing.type: Easing.InOutSine }
+                    }
+                }
             }
         }
         Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, 0.45) }
@@ -182,22 +190,38 @@ Item {
                 readonly property var t: modelData
                 readonly property int d: { const v = (index - root.sel + root.n) % root.n; return v > root.n / 2 ? v - root.n : v; }
                 readonly property bool on: d === 0
-                readonly property real k: on ? 1 : (Math.abs(d) === 1 ? 0.62 : 0.42)     // size relative to the selected card
+                readonly property real k: on ? 1 : (Math.abs(d) === 1 ? 0.66 : 0.46)     // size relative to the selected card
                 readonly property int wi: root.wallIndex(t)
+                readonly property bool near: Math.abs(d) <= 2
 
-                width: stage.cw * k
-                height: stage.ch * k
-                // neighbours tuck in close to the selected picture, like a deck spread out
-                x: stage.width / 2 - width / 2 + (d === 0 ? 0 : Math.sign(d) * (stage.cw * 0.5 + stage.cw * 0.62 * 0.5 * 0.55 + (Math.abs(d) - 1) * stage.cw * 0.42 * 0.8))
-                y: stage.midY - height / 2
+                // fixed size, moved and scaled on the GPU: no image re-layout while animating
+                width: stage.cw
+                height: stage.ch
+                x: stage.width / 2 - width / 2 + (d === 0 ? 0 : Math.sign(d) * (stage.cw * 0.5 + stage.cw * 0.66 * 0.5 * 0.5 + (Math.abs(d) - 1) * stage.cw * 0.46 * 0.75))
+                y: stage.midY - height / 2 + (1 - intro) * Theme.px(60)
                 z: 10 - Math.abs(d)
-                opacity: on ? 1 : (Math.abs(d) === 1 ? 0.5 : (Math.abs(d) === 2 ? 0.16 : 0))
+                scale: k * (0.92 + 0.08 * intro)
+                opacity: (on ? 1 : (Math.abs(d) === 1 ? 0.55 : (Math.abs(d) === 2 ? 0.18 : 0))) * intro
                 visible: opacity > 0.01
+                // neighbours turn slightly towards the middle, like a cover flow
+                transform: Rotation {
+                    origin.x: card.width / 2; origin.y: card.height / 2
+                    axis { x: 0; y: 1; z: 0 }
+                    angle: card.d === 0 ? 0 : (card.d > 0 ? -16 : 16)
+                    Behavior on angle { NumberAnimation { duration: 520; easing.type: Easing.OutQuint } }
+                }
 
-                Behavior on x { enabled: Math.abs(card.d) <= 2; NumberAnimation { duration: 420; easing.type: Easing.OutQuint } }
-                Behavior on width { NumberAnimation { duration: 420; easing.type: Easing.OutQuint } }
-                Behavior on height { NumberAnimation { duration: 420; easing.type: Easing.OutQuint } }
-                Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                Behavior on x { enabled: card.near; NumberAnimation { duration: 520; easing.type: Easing.OutQuint } }
+                Behavior on scale { enabled: card.near; NumberAnimation { duration: 520; easing.type: Easing.OutQuint } }
+                Behavior on opacity { NumberAnimation { duration: 340; easing.type: Easing.OutCubic } }
+
+                // entry: cards rise in one after another, the selected one first
+                property real intro: 0
+                SequentialAnimation on intro {
+                    running: true
+                    PauseAnimation { duration: 40 + Math.abs(card.d) * 70 }
+                    NumberAnimation { to: 1; duration: 560; easing.type: Easing.OutQuint }
+                }
 
                 // soft shadow under the picture
                 Rectangle {
@@ -254,10 +278,18 @@ Item {
             }
         }
 
-        // name of the selected theme, set in its own display font
+        // name of the selected theme, set in its own display font; it slides in on every change
+        Connections { target: root; function onSelChanged() { nameAnim.restart(); } }
+        ParallelAnimation {
+            id: nameAnim
+            NumberAnimation { target: nameCol; property: "opacity"; from: 0; to: 1; duration: 380; easing.type: Easing.OutCubic }
+            NumberAnimation { target: nameCol; property: "shift"; from: Theme.px(14); to: 0; duration: 480; easing.type: Easing.OutQuint }
+        }
         Column {
+            id: nameCol
+            property real shift: 0
             anchors.horizontalCenter: parent.horizontalCenter
-            y: stage.midY + stage.ch / 2 + Theme.px(30)
+            y: stage.midY + stage.ch / 2 + Theme.px(30) + shift
             spacing: Theme.px(12)
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter

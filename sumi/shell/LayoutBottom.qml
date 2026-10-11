@@ -12,6 +12,15 @@ Scope {
         Rectangle {
             anchors.fill: parent
             color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.97)
+            // fire: embers glowing up from the top edge
+            Rectangle {
+                visible: (Theme.p.barFx ?? "") === "fire"
+                anchors { left: parent.left; right: parent.right; top: parent.top }
+                height: parent.height * 0.7
+                gradient: Gradient {
+                    GradientStop { position: 0; color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) }
+                    GradientStop { position: 1; color: "transparent" } }
+            }
             Rectangle { anchors { left: parent.left; right: parent.right; top: parent.top } height: Theme.px(2.5); color: Theme.accent }
 
             Row {

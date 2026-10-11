@@ -23,12 +23,7 @@ Scope {
         edge: "top"
         Island {
             x: Theme.px(10); y: Theme.barM
-            Item {
-                width: Theme.px(28); height: Theme.px(26)
-                anchors.verticalCenter: parent.verticalCenter
-                Image { anchors.centerIn: parent; width: Theme.px(24); height: width; source: "file://" + Theme.logo; sourceSize: Qt.size(width * 2, height * 2); smooth: true }
-                MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: Ui.toggle("launcher") }
-            }
+            Logo { anchors.verticalCenter: parent.verticalCenter; size: Theme.px(24) }
             Sep { anchors.verticalCenter: parent.verticalCenter }
             Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
             Sep { anchors.verticalCenter: parent.verticalCenter }
@@ -37,8 +32,17 @@ Scope {
             ModAgent { anchors.verticalCenter: parent.verticalCenter }
         }
         Island {
+            id: mid
             x: (parent.width - width) / 2; y: Theme.barM; padX: Theme.px(4)
-            ModClock { anchors.verticalCenter: parent.verticalCenter; showKanji: Theme.wsKanji; timeFont: Theme.body }
+            ModClock { anchors.verticalCenter: parent.verticalCenter; showKanji: Theme.wsKanji; timeFont: Theme.head; timeSize: Theme.px(15) }
+        }
+        // ink: a short brush stroke of the accent under the clock
+        Rectangle {
+            visible: (Theme.p.barFx ?? "") === "ink"
+            x: mid.x + mid.width / 2 - width / 2; y: mid.y + mid.height - height
+            width: mid.width * 0.34; height: Theme.px(2); radius: height / 2
+            gradient: Gradient { orientation: Gradient.Horizontal
+                GradientStop { position: 0; color: "transparent" } GradientStop { position: 0.5; color: Theme.accent } GradientStop { position: 1; color: "transparent" } }
         }
         Island {
             x: parent.width - width - Theme.px(10); y: Theme.barM

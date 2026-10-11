@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import QtQuick.Effects
 
 // Notch: one compact tab hanging from the middle of the top edge.
 Scope {
@@ -9,6 +10,13 @@ Scope {
     BarWindow {
         screen: lay.screenRef
         edge: "top"
+        // lantern: warm light spilling out under the tab
+        MultiEffect {
+            visible: (Theme.p.barFx ?? "") === "lantern"
+            anchors.fill: tab
+            source: tab
+            shadowEnabled: true; shadowColor: Theme.gold; shadowBlur: 1.0; shadowOpacity: 0.45; shadowVerticalOffset: Theme.px(3)
+        }
         Rectangle {
             id: tab
             anchors.horizontalCenter: parent.horizontalCenter
@@ -19,16 +27,19 @@ Scope {
             color: Theme.barBg
             border.width: 1
             border.color: Theme.line
+            Rectangle {
+                visible: (Theme.p.barFx ?? "") === "lantern"
+                anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: 1 }
+                width: parent.width * 0.7; height: Theme.px(1.5)
+                gradient: Gradient { orientation: Gradient.Horizontal
+                    GradientStop { position: 0; color: "transparent" } GradientStop { position: 0.5; color: Theme.gold } GradientStop { position: 1; color: "transparent" } }
+            }
             Row {
                 id: row
                 anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(3) }
                 height: BarStyle.itemH
                 spacing: Theme.px(4)
-                Item {
-                    width: Theme.px(26); height: parent.height
-                    Image { anchors.centerIn: parent; width: Theme.px(20); height: width; source: "file://" + Theme.logo; sourceSize: Qt.size(width * 2, height * 2); smooth: true }
-                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: Ui.toggle("launcher") }
-                }
+                Logo { anchors.verticalCenter: parent.verticalCenter; size: Theme.px(20) }
                 Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
                 Sep { anchors.verticalCenter: parent.verticalCenter }
                 ModClock { anchors.verticalCenter: parent.verticalCenter; timeFont: Theme.head; timeSize: Theme.px(16); timeWeight: Font.Bold }

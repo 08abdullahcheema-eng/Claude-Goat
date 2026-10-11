@@ -7,6 +7,8 @@
  "fontHead": "Shippori Mincho",
  "fontBody": "JetBrainsMono Nerd Font",
  "wsKanji": true,
+ "badge": "",
+ "barFx": "ink",
  "bg": "#0f0f14",
  "bg1": "#16161d",
  "bg2": "#1d1d26",
@@ -52,8 +54,7 @@
   "#f2ecd2"
  ],
  "walls": [
-  "wall-sumi-ink.jpg",
-  "wall-sumi-circuit.jpg"
+  "wall-sumi-ink.jpg"
  ],
  "bezier": [
   "easeOutQuint, 0.23, 1, 0.32, 1",
