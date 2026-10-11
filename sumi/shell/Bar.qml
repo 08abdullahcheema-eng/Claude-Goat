@@ -97,9 +97,14 @@ PanelWindow {
         }
     }
 
-    // ---------------- right: status and system
-    Island {
+    // ---------------- right: three groups, stats / quick controls / power
+    Row {
         anchors.right: parent.right
+        height: Theme.barH
+        spacing: Theme.px(6)
+
+        // group 1: performance and usage, each opens a panel
+        Island {
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: Predator.available
@@ -113,6 +118,14 @@ PanelWindow {
             }
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
+                icon: "cpu"; iconColor: Theme.dim; iconSize: Theme.px(14)
+                text: Sys.cpu + "%"
+                textColor: Theme.fg
+                active: Ui.panel === "system"
+                onClicked: Ui.toggle("system")
+            }
+            Pill {
+                anchors.verticalCenter: parent.verticalCenter
                 icon: "agent"
                 iconColor: Theme.gold
                 iconSize: Theme.px(14)
@@ -122,21 +135,10 @@ PanelWindow {
                 visible: Agents.installed || Theme.demo
                 onClicked: Ui.toggle("agents")
             }
-            Sep { anchors.verticalCenter: parent.verticalCenter }
-            Pill {
-                anchors.verticalCenter: parent.verticalCenter
-                icon: "cpu"; iconColor: Theme.dim; iconSize: Theme.px(14)
-                text: Sys.cpu + "%"
-                active: Ui.panel === "system"
-                onClicked: Ui.toggle("system")
-            }
-            Row {
-                spacing: Theme.px(5); anchors.verticalCenter: parent.verticalCenter
-                visible: Sys.layout !== ""
-                Icon { name: "kbd"; color: Theme.dim; size: Theme.px(14); anchors.verticalCenter: parent.verticalCenter }
-                Text { text: Sys.layout; color: Theme.dim; font.family: Theme.mono; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
-            }
-            Sep { anchors.verticalCenter: parent.verticalCenter }
+        }
+
+        // group 2: quick controls
+        Island {
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
                 icon: Net.kind === "ethernet" ? "eth" : (Net.kind === "wifi" ? "wifi" : "wifioff")
@@ -164,6 +166,7 @@ PanelWindow {
                 icon: muted ? "volmute" : "vol"
                 iconColor: muted ? Theme.mute : Theme.fg
                 text: vol + ""
+                textColor: Theme.fg
                 onClicked: (m) => {
                     if (m.button === Qt.RightButton) Ui.run("pavucontrol");
                     else if (bar.sink?.audio) bar.sink.audio.muted = !bar.sink.audio.muted;
@@ -190,8 +193,17 @@ PanelWindow {
                 iconSize: Theme.px(14)
                 onClicked: Ui.dnd = !Ui.dnd
             }
+        }
 
-            Sep { anchors.verticalCenter: parent.verticalCenter }
+        // group 3: battery, keyboard layout, power
+        Island {
+            Row {
+                spacing: Theme.px(5); anchors.verticalCenter: parent.verticalCenter
+                visible: Sys.layout !== ""
+                leftPadding: Theme.px(6)
+                Icon { name: "kbd"; color: Theme.dim; size: Theme.px(14); anchors.verticalCenter: parent.verticalCenter }
+                Text { text: Sys.layout; color: Theme.dim; font.family: Theme.mono; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
+            }
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: Theme.demo || (bar.bat && bar.bat.isLaptopBattery)
@@ -211,5 +223,6 @@ PanelWindow {
                 active: Ui.panel === "power"
                 onClicked: Ui.toggle("power")
             }
+        }
     }
 }

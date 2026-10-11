@@ -12,12 +12,23 @@ Rectangle {
     signal clicked(var mouse)
     signal wheel(var wheel)
 
-    implicitHeight: Theme.px(26)
-    implicitWidth: row.implicitWidth + Theme.px(16)
-    radius: Theme.px(5)
+    implicitHeight: Theme.barH - Theme.px(8)
+    implicitWidth: Math.max(Theme.px(32), row.implicitWidth + Theme.px(20))
+    radius: Theme.px(8)
     color: active ? Theme.bg2 : (ma.containsMouse ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.6) : "transparent")
     border.width: active ? 1 : 0
     border.color: Theme.line2
+    Behavior on color { ColorAnimation { duration: 120 } }
+
+    // small accent dot under an open panel's icon
+    Rectangle {
+        visible: root.active
+        width: Theme.px(10); height: 2; radius: 1
+        color: Theme.accent
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 1
+    }
 
     Row {
         id: row
