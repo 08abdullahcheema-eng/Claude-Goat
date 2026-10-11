@@ -43,7 +43,7 @@ QS=$(B quickshell)/bin/qs; SWAY=$(B sway)/bin/sway; GRIM=$(B grim)/bin/grim
 MESA=$(B mesa); GLVND=$(B libglvnd); FONTS=$(B fonts); PAP=$(B papirus-icon-theme)
 KITTY=$(B kitty); PAVU=$(B pavucontrol); BTOP=$(B btop)
 mkdir -p ~/.local/share/fonts && cp -rL $FONTS/share/fonts/* ~/.local/share/fonts/ 2>/dev/null
-cp -rL $HM/home-path/share/fonts/* ~/.local/share/fonts/ 2>/dev/null; fc-cache -f >/dev/null 2>&1
+chmod -R u+w ~/.local/share/fonts; cp -rL $HM/home-path/share/fonts/. ~/.local/share/fonts/hm/ 2>>$OUT/fontcopy.log || { mkdir -p ~/.local/share/fonts/hm; cp -rL $HM/home-path/share/fonts/. ~/.local/share/fonts/hm/; }; fc-cache -f >/dev/null 2>&1
 fc-list : family | grep -E "Shippori|Bebas|Space Grotesk|^Inter" | sort -u | tee -a $OUT/summary.txt
 fc-list | grep -ci "jetbrainsmono nerd" | xargs -I{} echo "jetbrains fonts: {}" | tee -a $OUT/summary.txt
 
