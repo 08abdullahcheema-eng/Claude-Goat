@@ -7,7 +7,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    // "", "launcher", "network", "agents", "power", "themes", "calendar", "system", "battery"
+    // "", "launcher", "network", "agents", "power", "themes", "calendar", "system", "battery", "predator", "bluetooth", "audio"
     property string panel: ""
     property string launcherMode: "all"
     property bool dnd: false

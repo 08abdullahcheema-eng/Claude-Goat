@@ -144,26 +144,34 @@ PanelWindow {
                 }
             }
             Pill {
+                id: btPill
                 anchors.verticalCenter: parent.verticalCenter
-                icon: "bt"
-                iconColor: (Theme.demo || (bar.bt && bar.bt.enabled)) ? Theme.fg : Theme.mute
-                visible: Theme.demo || bar.bt !== null
+                readonly property bool on: Theme.demo || (bar.bt?.enabled ?? false)
+                // connected devices: name of the first one when it is the only one, else the count
+                readonly property var conn: Theme.demo ? ["WH-1000XM5"]
+                    : (bar.bt ? bar.bt.devices.values.filter(d => d && d.connected).map(d => d.name || d.deviceName) : [])
+                icon: !on ? "btoff" : (conn.length > 0 ? "btcon" : "bt")
+                iconColor: !on ? Theme.mute : (conn.length > 0 ? Theme.blue : Theme.fg)
+                text: conn.length > 1 ? conn.length + "" : ""
+                textColor: Theme.blue
+                active: Ui.panel === "bluetooth"
                 onClicked: (m) => {
-                    if (m.button === Qt.RightButton) Ui.run("blueman-manager || overskride");
-                    else if (bar.bt) bar.bt.enabled = !bar.bt.enabled;
+                    if (m.button === Qt.RightButton) { if (bar.bt) bar.bt.enabled = !bar.bt.enabled; }
+                    else Ui.toggleAt("bluetooth", centerX());
                 }
             }
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
                 readonly property bool muted: bar.sink?.audio?.muted ?? false
                 readonly property int vol: Theme.demo ? 64 : Math.round((bar.sink?.audio?.volume ?? 0) * 100)
-                icon: muted ? "volmute" : "vol"
+                icon: muted ? "volmute" : (vol <= 0 ? "vol0" : (vol < 40 ? "vollow" : "vol"))
                 iconColor: muted ? Theme.mute : Theme.fg
-                text: vol + ""
-                textColor: Theme.fg
+                text: muted ? "mute" : vol + ""
+                textColor: muted ? Theme.mute : Theme.fg
+                active: Ui.panel === "audio"
                 onClicked: (m) => {
-                    if (m.button === Qt.RightButton) Ui.run("pavucontrol");
-                    else if (bar.sink?.audio) bar.sink.audio.muted = !bar.sink.audio.muted;
+                    if (m.button === Qt.RightButton || m.button === Qt.MiddleButton) { if (bar.sink?.audio) bar.sink.audio.muted = !bar.sink.audio.muted; }
+                    else Ui.toggleAt("audio", centerX());
                 }
                 onWheel: (w) => {
                     if (!bar.sink?.audio) return;

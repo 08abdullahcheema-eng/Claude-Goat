@@ -95,6 +95,8 @@ done
 run_qs calendar SUMI_DEMO=1 SUMI_OPEN=calendar
 run_qs system SUMI_DEMO=1 SUMI_OPEN=system
 run_qs battery SUMI_DEMO=1 SUMI_OPEN=battery
+run_qs bluetooth SUMI_DEMO=1 SUMI_OPEN=bluetooth
+run_qs audio SUMI_DEMO=1 SUMI_OPEN=audio
 run_qs polkit SUMI_DEMO=1 SUMI_DEMO_POLKIT=1
 run_qs osd SUMI_DEMO=1 SUMI_DEMO_OSD=1 SUMI_DEMO_NOTIFS=1
 run_qs predator SUMI_DEMO=1 SUMI_OPEN=predator
@@ -113,6 +115,9 @@ $QS ipc -p $SHELLDIR call shell toggle launcher >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR call shell toggle themes >> $OUT/ipc.log 2>&1; sleep 2; $GRIM $OUT/shot-real-themes.png
 $QS ipc -p $SHELLDIR call shell close >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR call shell toggle predator >> $OUT/ipc.log 2>&1; sleep 2; $GRIM $OUT/shot-real-predator.png
+$QS ipc -p $SHELLDIR call shell close >> $OUT/ipc.log 2>&1
+$QS ipc -p $SHELLDIR call shell toggle bluetooth >> $OUT/ipc.log 2>&1; sleep 2; $GRIM $OUT/shot-real-bluetooth.png
+$QS ipc -p $SHELLDIR call shell toggle audio >> $OUT/ipc.log 2>&1; sleep 2; $GRIM $OUT/shot-real-audio.png
 $QS ipc -p $SHELLDIR call shell close >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR call osd brightness >> $OUT/ipc.log 2>&1
 $QS ipc -p $SHELLDIR show >> $OUT/ipc.log 2>&1

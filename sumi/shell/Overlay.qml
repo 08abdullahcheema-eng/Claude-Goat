@@ -61,6 +61,8 @@ PanelWindow {
                 case "system": return systemC;
                 case "battery": return batteryC;
                 case "predator": return predatorC;
+                case "bluetooth": return bluetoothC;
+                case "audio": return audioC;
                 }
                 return null;
             }
@@ -77,4 +79,6 @@ PanelWindow {
     Component { id: systemC; SysPanel {} }
     Component { id: batteryC; BatteryPanel {} }
     Component { id: predatorC; PredatorPanel {} }
+    Component { id: bluetoothC; BluetoothPanel {} }
+    Component { id: audioC; AudioPanel {} }
 }
