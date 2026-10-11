@@ -58,7 +58,6 @@ Rectangle {
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         cursorShape: Qt.PointingHandCursor
-        onPressed: if (Theme.demo) console.log("pill pressed", root.icon)
         onClicked: (m) => root.clicked(m)
         onWheel: (w) => root.wheel(w)
     }

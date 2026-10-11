@@ -32,6 +32,9 @@ PanelWindow {
 
     SystemClock { id: clock; precision: SystemClock.Minutes }
 
+    Component.onCompleted: Ui.barWindows = Ui.barWindows.concat([bar])
+    Component.onDestruction: Ui.barWindows = Ui.barWindows.filter(w => w !== bar)
+
     // click on empty bar space closes an open panel
     MouseArea { anchors.fill: parent; onClicked: Ui.close() }
 

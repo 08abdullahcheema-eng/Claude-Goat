@@ -31,6 +31,14 @@ PanelWindow {
         onPressed: Ui.close()
     }
 
+    // Hyprland's own popup grab: any click outside the panel and the bar closes it.
+    // Clicks on the bar still reach the icons, so pressing the same icon again closes it too.
+    HyprlandFocusGrab {
+        active: win.visible
+        windows: [win].concat(Ui.barWindows)
+        onCleared: Ui.close()
+    }
+
     Item {
         id: host
         anchors.fill: parent

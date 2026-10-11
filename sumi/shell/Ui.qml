@@ -11,6 +11,7 @@ Singleton {
     property string panel: ""
     property string launcherMode: "all"
     property bool dnd: false
+    property var barWindows: []   // bar windows, clicks there must not count as "outside"
     property real anchorX: -1   // screen x of the bar icon that opened the panel, so it drops down under it
 
     // OSD
@@ -25,7 +26,6 @@ Singleton {
     function toggle(name) { panel = (panel === name) ? "" : name; }
     // open a dropdown panel under the icon at screen x (press the same icon again to close)
     function toggleAt(name, x) {
-        console.log("toggleAt", name, x, "open was", panel);
         if (panel !== name) anchorX = x;
         toggle(name);
     }
@@ -52,6 +52,7 @@ Singleton {
         function toggle(name: string): void { if (root.panel !== name) root.anchorX = -1; root.toggle(name); }
         function open(name: string): void { root.open(name); }
         function close(): void { root.close(); }
+        function toggleAt(name: string, x: real): void { root.toggleAt(name, x); }
         function launcher(mode: string): void { root.launcherMode = mode || "all"; root.toggle("launcher"); }
         function dnd(): void { root.dnd = !root.dnd; }
     }

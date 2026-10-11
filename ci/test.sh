@@ -96,28 +96,13 @@ run_qs battery SUMI_DEMO=1 SUMI_OPEN=battery
 run_qs polkit SUMI_DEMO=1 SUMI_DEMO_POLKIT=1
 run_qs osd SUMI_DEMO=1 SUMI_DEMO_OSD=1 SUMI_DEMO_NOTIFS=1
 run_qs predator SUMI_DEMO=1 SUMI_OPEN=predator
+# panels drop down under the icon that opened them
+run_qs anchor SUMI_DEMO=1
+$QS ipc -p $SHELLDIR call shell toggleAt system 328 >> $OUT/qs-anchor.log 2>&1; sleep 1.5; $GRIM $OUT/shot-anchor-system.png
+$QS ipc -p $SHELLDIR call shell toggleAt predator 252 >> $OUT/qs-anchor.log 2>&1; sleep 1.5; $GRIM $OUT/shot-anchor-predator.png
+$QS ipc -p $SHELLDIR call shell toggleAt battery 1500 >> $OUT/qs-anchor.log 2>&1; sleep 1.5; $GRIM $OUT/shot-anchor-battery.png
+$QS ipc -p $SHELLDIR call shell toggleAt battery 1500 >> $OUT/qs-anchor.log 2>&1; sleep 1.5; $GRIM $OUT/shot-anchor-closed.png
 
-# real pointer clicks on the bar: open under the icon, click again to close, click outside to close
-SM=$(dirname $SWAY)/swaymsg
-export SWAYSOCK=$(ls $XDG_RUNTIME_DIR/sway-ipc.*.sock 2>/dev/null | head -1); log "swaysock: $SWAYSOCK"
-WLRCTL=$(B wlrctl)/bin/wlrctl
-click() { $WLRCTL pointer move -5000 -5000; sleep 0.1; $WLRCTL pointer move $1 $2; sleep 0.3; $WLRCTL pointer click left; sleep 1.2; echo "click $1 $2" >> $OUT/qs-clicks.log; }
-# second variant: sway's own seat cursor, used once a virtual pointer exists
-sclick() { $SM -q "seat seat0 cursor set $1 $2"; sleep 0.3; $SM -q "seat seat0 cursor press button1"; sleep 0.08; $SM -q "seat seat0 cursor release button1"; sleep 1.2; echo "sclick $1 $2" >> $OUT/qs-clicks.log; }
-run_qs clicks SUMI_DEMO=1
-click 328 25; $GRIM $OUT/shot-click1-cpu-open.png
-click 328 25; $GRIM $OUT/shot-click2-cpu-reclick.png
-click 252 25; $GRIM $OUT/shot-click3-fan-open.png
-click 900 700; $GRIM $OUT/shot-click4-outside.png
-click 1500 25; $GRIM $OUT/shot-click5-battery-open.png
-click 700 25; $GRIM $OUT/shot-click6-barspace.png
-$SM -t get_seats > $OUT/seats.json 2>&1
-sclick 328 25; $GRIM $OUT/shot-sclick1-cpu-open.png
-sclick 328 25; $GRIM $OUT/shot-sclick2-cpu-reclick.png
-sclick 252 25; $GRIM $OUT/shot-sclick3-fan-open.png
-sclick 900 700; $GRIM $OUT/shot-sclick4-outside.png
-sclick 1500 25; $GRIM $OUT/shot-sclick5-battery-open.png
-sclick 700 25; $GRIM $OUT/shot-sclick6-barspace.png
 
 # real mode: no demo data, services missing on the runner must not break anything
 run_qs real
