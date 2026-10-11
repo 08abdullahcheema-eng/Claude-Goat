@@ -25,6 +25,7 @@ Singleton {
     function toggle(name) { panel = (panel === name) ? "" : name; }
     // open a dropdown panel under the icon at screen x (press the same icon again to close)
     function toggleAt(name, x) {
+        console.log("toggleAt", name, x, "open was", panel);
         if (panel !== name) anchorX = x;
         toggle(name);
     }

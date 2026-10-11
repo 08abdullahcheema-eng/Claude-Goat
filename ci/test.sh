@@ -101,7 +101,9 @@ run_qs predator SUMI_DEMO=1 SUMI_OPEN=predator
 SM=$(dirname $SWAY)/swaymsg
 export SWAYSOCK=$(ls $XDG_RUNTIME_DIR/sway-ipc.*.sock 2>/dev/null | head -1); log "swaysock: $SWAYSOCK"
 WLRCTL=$(B wlrctl)/bin/wlrctl
-click() { $WLRCTL pointer move -5000 -5000; sleep 0.1; $WLRCTL pointer move $1 $2; sleep 0.2; $WLRCTL pointer click left; sleep 1.2; }
+click() { $WLRCTL pointer move -5000 -5000; sleep 0.1; $WLRCTL pointer move $1 $2; sleep 0.3; $WLRCTL pointer click left; sleep 1.2; echo "click $1 $2" >> $OUT/qs-clicks.log; }
+# second variant: sway's own seat cursor, used once a virtual pointer exists
+sclick() { $SM -q "seat seat0 cursor set $1 $2"; sleep 0.3; $SM -q "seat seat0 cursor press button1"; sleep 0.08; $SM -q "seat seat0 cursor release button1"; sleep 1.2; echo "sclick $1 $2" >> $OUT/qs-clicks.log; }
 run_qs clicks SUMI_DEMO=1
 click 328 25; $GRIM $OUT/shot-click1-cpu-open.png
 click 328 25; $GRIM $OUT/shot-click2-cpu-reclick.png
@@ -110,6 +112,12 @@ click 900 700; $GRIM $OUT/shot-click4-outside.png
 click 1500 25; $GRIM $OUT/shot-click5-battery-open.png
 click 700 25; $GRIM $OUT/shot-click6-barspace.png
 $SM -t get_seats > $OUT/seats.json 2>&1
+sclick 328 25; $GRIM $OUT/shot-sclick1-cpu-open.png
+sclick 328 25; $GRIM $OUT/shot-sclick2-cpu-reclick.png
+sclick 252 25; $GRIM $OUT/shot-sclick3-fan-open.png
+sclick 900 700; $GRIM $OUT/shot-sclick4-outside.png
+sclick 1500 25; $GRIM $OUT/shot-sclick5-battery-open.png
+sclick 700 25; $GRIM $OUT/shot-sclick6-barspace.png
 
 # real mode: no demo data, services missing on the runner must not break anything
 run_qs real
