@@ -100,7 +100,8 @@ run_qs predator SUMI_DEMO=1 SUMI_OPEN=predator
 # real pointer clicks on the bar: open under the icon, click again to close, click outside to close
 SM=$(dirname $SWAY)/swaymsg
 export SWAYSOCK=$(ls $XDG_RUNTIME_DIR/sway-ipc.*.sock 2>/dev/null | head -1); log "swaysock: $SWAYSOCK"
-click() { $SM -q "seat seat0 cursor set $1 $2"; $SM -q "seat seat0 cursor press button1"; sleep 0.1; $SM -q "seat seat0 cursor release button1"; sleep 1.2; }
+WLRCTL=$(B wlrctl)/bin/wlrctl
+click() { $WLRCTL pointer move -5000 -5000; sleep 0.1; $WLRCTL pointer move $1 $2; sleep 0.2; $WLRCTL pointer click left; sleep 1.2; }
 run_qs clicks SUMI_DEMO=1
 click 328 25; $GRIM $OUT/shot-click1-cpu-open.png
 click 328 25; $GRIM $OUT/shot-click2-cpu-reclick.png
