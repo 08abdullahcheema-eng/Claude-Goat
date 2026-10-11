@@ -17,6 +17,11 @@ Item {
     property bool applied: false
     readonly property int n: themes.length
     readonly property var cur: themes[sel] || Theme.p
+    // the picker draws on a dark scrim whatever theme is being previewed, so its own text is fixed
+    readonly property color tInk: "#f2ecd2"
+    readonly property color tDim: "#b8b29a"
+    readonly property color tMute: "#85816f"
+    readonly property color tLine: "#454552"
 
     function wallsOf(t) { return (t && t.walls && t.walls.length) ? t.walls : ["wall-" + (t ? t.name : "sumi") + ".jpg"]; }
     function wallIndex(t) { return ((wv[t.name] ?? 0) % wallsOf(t).length + wallsOf(t).length) % wallsOf(t).length; }
@@ -99,10 +104,10 @@ Item {
 
         // heading
         Row {
-            anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: Theme.px(46) }
+            anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: Theme.px(96) }
             spacing: Theme.px(12)
-            T { text: "Theme"; color: Theme.hi; font.pixelSize: Theme.px(22) }
-            Text { text: "色"; color: Theme.mute; font.family: Theme.serif; font.pixelSize: Theme.px(18); anchors.verticalCenter: parent.verticalCenter }
+            T { text: "Theme"; color: root.tInk; font.pixelSize: Theme.px(22) }
+            Text { text: "色"; color: root.tMute; font.family: Theme.serif; font.pixelSize: Theme.px(18); anchors.verticalCenter: parent.verticalCenter }
         }
 
         Repeater {
@@ -161,24 +166,24 @@ Item {
                     }
                 }
 
-                // two tiled windows
-                Rectangle { x: tc.u * 3; y: tc.u * 9; width: tc.u * 45; height: tc.u * 50; radius: tc.u * 1.3; color: tc.t.bg; opacity: 0.94; border.width: tc.u * 0.3; border.color: tc.t.accent
-                    Column { x: tc.u * 2.5; y: tc.u * 3; spacing: tc.u * 2
-                        Rectangle { width: tc.u * 14; height: tc.u * 1.5; radius: height / 2; color: tc.t.accent }
-                        Repeater { model: [30, 38, 24, 34, 18]; delegate: Rectangle { required property real modelData; width: tc.u * modelData; height: tc.u * 1.3; radius: height / 2; color: tc.t.fg; opacity: 0.4 } }
-                        Rectangle { width: tc.u * 10; height: tc.u * 1.5; radius: height / 2; color: tc.t.green }
-                        Rectangle { width: tc.u * 22; height: tc.u * 1.3; radius: height / 2; color: tc.t.gold; opacity: 0.8 }
+                // three tiled windows, kept to the left so the wallpaper stays visible
+                Rectangle { x: tc.u * 4; y: tc.u * 11; width: tc.u * 31; height: tc.u * 44; radius: tc.u * 1.3; color: tc.t.bg; opacity: 0.93; border.width: tc.u * 0.35; border.color: tc.t.accent
+                    Column { x: tc.u * 2.4; y: tc.u * 3; spacing: tc.u * 2
+                        Rectangle { width: tc.u * 11; height: tc.u * 1.5; radius: height / 2; color: tc.t.accent }
+                        Repeater { model: [22, 26, 17, 24, 13]; delegate: Rectangle { required property real modelData; width: tc.u * modelData; height: tc.u * 1.3; radius: height / 2; color: tc.t.fg; opacity: 0.4 } }
+                        Rectangle { width: tc.u * 8; height: tc.u * 1.5; radius: height / 2; color: tc.t.green }
+                        Rectangle { width: tc.u * 16; height: tc.u * 1.3; radius: height / 2; color: tc.t.gold; opacity: 0.8 }
                     }
                 }
-                Rectangle { x: tc.u * 51; y: tc.u * 9; width: tc.u * 46; height: tc.u * 27; radius: tc.u * 1.3; color: tc.t.bg1; opacity: 0.94; border.width: 1; border.color: tc.t.line2
-                    Column { x: tc.u * 2.5; y: tc.u * 3; spacing: tc.u * 2
-                        Repeater { model: [32, 20, 36, 26]; delegate: Rectangle { required property real modelData; width: tc.u * modelData; height: tc.u * 1.3; radius: height / 2; color: tc.t.fg; opacity: 0.35 } }
-                        Rectangle { width: tc.u * 12; height: tc.u * 1.4; radius: height / 2; color: tc.t.blue }
+                Rectangle { x: tc.u * 37; y: tc.u * 11; width: tc.u * 25; height: tc.u * 21; radius: tc.u * 1.3; color: tc.t.bg1; opacity: 0.93; border.width: 1; border.color: tc.t.line2
+                    Column { x: tc.u * 2.4; y: tc.u * 3; spacing: tc.u * 2
+                        Repeater { model: [17, 11, 19, 14]; delegate: Rectangle { required property real modelData; width: tc.u * modelData; height: tc.u * 1.3; radius: height / 2; color: tc.t.fg; opacity: 0.35 } }
+                        Rectangle { width: tc.u * 8; height: tc.u * 1.4; radius: height / 2; color: tc.t.blue }
                     }
                 }
-                Rectangle { x: tc.u * 51; y: tc.u * 39; width: tc.u * 46; height: tc.u * 20; radius: tc.u * 1.3; color: tc.t.bg; opacity: 0.94; border.width: 1; border.color: tc.t.line2
-                    Row { anchors.centerIn: parent; spacing: tc.u * 1.4
-                        Repeater { model: [tc.t.accent, tc.t.gold, tc.t.green, tc.t.cyan, tc.t.blue, tc.t.violet]; delegate: Rectangle { required property var modelData; width: tc.u * 4.6; height: tc.u * 4.6; radius: tc.u * 1; color: modelData } }
+                Rectangle { x: tc.u * 37; y: tc.u * 35; width: tc.u * 25; height: tc.u * 20; radius: tc.u * 1.3; color: tc.t.bg; opacity: 0.93; border.width: 1; border.color: tc.t.line2
+                    Grid { anchors.centerIn: parent; columns: 3; spacing: tc.u * 1.3
+                        Repeater { model: [tc.t.accent, tc.t.gold, tc.t.green, tc.t.cyan, tc.t.blue, tc.t.violet]; delegate: Rectangle { required property var modelData; width: tc.u * 5.4; height: tc.u * 5.4; radius: tc.u * 1; color: modelData } }
                     }
                 }
 
@@ -198,15 +203,15 @@ Item {
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: Theme.px(10)
-                T { text: root.cur.label || ""; color: Theme.hi; font.pixelSize: Theme.px(26) }
-                Text { text: root.cur.kanji || ""; color: Theme.mute; font.family: Theme.serif; font.pixelSize: Theme.px(22); anchors.verticalCenter: parent.verticalCenter }
+                T { text: root.cur.label || ""; color: root.tInk; font.pixelSize: Theme.px(26) }
+                Text { text: root.cur.kanji || ""; color: root.tMute; font.family: Theme.serif; font.pixelSize: Theme.px(22); anchors.verticalCenter: parent.verticalCenter }
             }
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: Theme.px(7)
                 Repeater {
                     model: [root.cur.bg, root.cur.fg, root.cur.accent, root.cur.gold, root.cur.green, root.cur.cyan, root.cur.blue, root.cur.violet]
-                    delegate: Rectangle { required property var modelData; width: Theme.px(14); height: width; radius: width / 2; color: modelData || "transparent"; border.width: 1; border.color: Theme.line2 }
+                    delegate: Rectangle { required property var modelData; width: Theme.px(14); height: width; radius: width / 2; color: modelData || "transparent"; border.width: 1; border.color: root.tLine }
                 }
             }
             Row {
@@ -218,7 +223,7 @@ Item {
                     delegate: Rectangle {
                         required property int index
                         width: index === root.wallIndex(root.cur) ? Theme.px(22) : Theme.px(7); height: Theme.px(7); radius: height / 2
-                        color: index === root.wallIndex(root.cur) ? Theme.accent : Theme.line2
+                        color: index === root.wallIndex(root.cur) ? (root.cur.accent || root.tInk) : root.tLine
                         Behavior on width { NumberAnimation { duration: 160 } }
                     }
                 }
@@ -234,8 +239,13 @@ Item {
                 delegate: Row {
                     required property var modelData
                     spacing: Theme.px(7)
-                    Kbd { text: modelData[0]; anchors.verticalCenter: parent.verticalCenter }
-                    T { text: modelData[1]; color: Theme.dim; font.pixelSize: Theme.px(12); anchors.verticalCenter: parent.verticalCenter }
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: kt.implicitWidth + Theme.px(12); height: kt.implicitHeight + Theme.px(5)
+                        radius: Theme.px(4); color: "transparent"; border.width: 1; border.color: root.tLine
+                        T { id: kt; anchors.centerIn: parent; text: modelData[0]; color: root.tDim; font.pixelSize: Theme.px(10.5) }
+                    }
+                    T { text: modelData[1]; color: root.tMute; font.pixelSize: Theme.px(12); anchors.verticalCenter: parent.verticalCenter }
                 }
             }
         }

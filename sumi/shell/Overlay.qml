@@ -21,7 +21,7 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: Ui.panelIsFull ? Theme.scrim : Qt.rgba(0, 0, 0, Theme.dark ? 0.28 : 0.12)
+        color: Ui.panel === "themes" ? Qt.rgba(0, 0, 0, 0.8) : (Ui.panelIsFull ? Theme.scrim : Qt.rgba(0, 0, 0, Theme.dark ? 0.28 : 0.12))
         opacity: win.visible ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 140 } }
     }
