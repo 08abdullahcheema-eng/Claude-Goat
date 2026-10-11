@@ -67,7 +67,7 @@ Item {
 
     Process {
         running: true
-        command: ["sh", "-c", "for f in sumi kin ai washi; do cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
+        command: ["sh", "-c", "for f in sumi kin ai washi sakura matcha yuki hotaru momiji; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
         stdout: StdioCollector {
             onStreamFinished: {
                 const parts = this.text.split("WALL:");
@@ -108,6 +108,7 @@ Item {
             spacing: Theme.px(12)
             T { text: "Theme"; color: root.tInk; font.pixelSize: Theme.px(22) }
             Text { text: "色"; color: root.tMute; font.family: Theme.serif; font.pixelSize: Theme.px(18); anchors.verticalCenter: parent.verticalCenter }
+            T { visible: root.n > 0; text: (root.sel + 1) + " / " + root.n; color: root.tMute; font.pixelSize: Theme.px(12); anchors.verticalCenter: parent.verticalCenter }
         }
 
         Repeater {

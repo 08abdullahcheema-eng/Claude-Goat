@@ -1,4 +1,4 @@
-# sumi-theme <name> [wall.jpg]   switch theme (sumi, kin, ai, washi), optionally with one of its wallpapers
+# sumi-theme <name> [wall.jpg]   switch theme (sumi, kin, ai, washi, sakura, matcha, yuki, hotaru, momiji), optionally with one of its wallpapers
 # sumi-theme --wall <wall.jpg>   change only the wallpaper of the current theme
 # sumi-theme --restore  re-apply the saved theme (wallpaper, borders, kitty, lock screen)
 # sumi-theme --init     write the theme files if missing, touch nothing that is running
