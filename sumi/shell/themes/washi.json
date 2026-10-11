@@ -28,7 +28,6 @@
  "sel": "#d8cfb3",
  "diffAdd": "#dfe6c8",
  "diffDel": "#efd0c8",
- "wallpaper": "wall-washi.png",
  "logo": "logo-washi.svg",
  "ansi": [
   "#c9bf9f",
@@ -47,5 +46,9 @@
   "#6e5a99",
   "#3e7d76",
   "#16161d"
+ ],
+ "walls": [
+  "wall-washi.jpg",
+  "wall-washi-circuit.jpg"
  ]
 }

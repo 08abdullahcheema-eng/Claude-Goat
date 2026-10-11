@@ -74,6 +74,44 @@ in
       "${qs} -n -c sumi"
     ];
 
+    # window feel: small even gaps that line up with the floating bar, smooth motion, tidy tiling
+    general = {
+      gaps_in = lib.mkForce 4;
+      gaps_out = lib.mkForce "6, 10, 10, 10";
+      border_size = lib.mkForce 2;
+      resize_on_border = lib.mkForce true;
+      extend_border_grab_area = lib.mkForce 14;
+      layout = lib.mkForce "dwindle";
+    };
+    animations = {
+      enabled = lib.mkForce true;
+      bezier = lib.mkForce [
+        "easeOutQuint, 0.22, 1, 0.36, 1"
+        "smooth, 0.25, 0.1, 0.25, 1"
+      ];
+      animation = lib.mkForce [
+        "windows, 1, 5, easeOutQuint, popin 88%"
+        "windowsOut, 1, 4, smooth, popin 88%"
+        "windowsMove, 1, 4, easeOutQuint"
+        "fade, 1, 5, smooth"
+        "border, 1, 8, smooth"
+        "layers, 1, 4, easeOutQuint, fade"
+        "workspaces, 1, 6, easeOutQuint, slide"
+      ];
+    };
+    dwindle = {
+      pseudotile = lib.mkForce true;
+      preserve_split = lib.mkForce true;
+      force_split = lib.mkForce 2;
+    };
+    misc = {
+      disable_hyprland_logo = lib.mkForce true;
+      disable_splash_rendering = lib.mkForce true;
+      force_default_wallpaper = lib.mkForce 0;
+      focus_on_activate = lib.mkForce true;
+      vfr = lib.mkForce true;
+    };
+
     bind = lib.mkForce ([
       "SUPER, Q, exec, kitty"
       "SUPER, B, exec, helium"
@@ -82,7 +120,30 @@ in
       "SUPER, M, exec, ${ipc} shell open power"
       "SUPER, V, togglefloating,"
       "SUPER, F, fullscreen,"
+      "SUPER SHIFT, F, fullscreen, 1"
       "SUPER, L, exec, pidof hyprlock || hyprlock"
+
+      # tiling: flip the split, pseudo-tile, pin a floating window on top of every workspace
+      "SUPER, T, layoutmsg, togglesplit"
+      "SUPER, P, pseudo,"
+      "SUPER, O, pin,"
+
+      # move the focused window around the layout
+      "SUPER SHIFT, left, movewindow, l"
+      "SUPER SHIFT, right, movewindow, r"
+      "SUPER SHIFT, up, movewindow, u"
+      "SUPER SHIFT, down, movewindow, d"
+
+      # workspaces: back and forth, next and previous, scratchpad
+      "SUPER, TAB, workspace, previous"
+      "SUPER, period, workspace, e+1"
+      "SUPER, comma, workspace, e-1"
+      "SUPER, mouse_down, workspace, e+1"
+      "SUPER, mouse_up, workspace, e-1"
+      "SUPER, S, togglespecialworkspace, magic"
+      "SUPER ALT, S, movetoworkspace, special:magic"
+      "ALT, TAB, cyclenext,"
+      "ALT, TAB, bringactivetotop,"
 
       # Sumi shell
       "SUPER, SPACE, exec, ${ipc} shell launcher all"
@@ -91,6 +152,7 @@ in
       "SUPER CTRL, N, exec, ${ipc} shell toggle network"
       "SUPER CTRL, A, exec, ${ipc} shell toggle agents"
       "SUPER CTRL, T, exec, ${ipc} shell toggle themes"
+      "SUPER CTRL, SPACE, exec, ${ipc} shell toggle themes"
       "SUPER CTRL, D, exec, ${ipc} shell dnd"
       "SUPER CTRL, P, exec, ${ipc} shell toggle predator"
 
@@ -107,7 +169,16 @@ in
       let ws = toString (i + 1); in [
         "SUPER, ${ws}, workspace, ${ws}"
         "SUPER SHIFT, ${ws}, movetoworkspace, ${ws}"
+        "SUPER ALT, ${ws}, movetoworkspacesilent, ${ws}"
       ]) 9));
+
+    # hold to keep resizing the focused window
+    binde = lib.mkForce [
+      "SUPER ALT, left, resizeactive, -40 0"
+      "SUPER ALT, right, resizeactive, 40 0"
+      "SUPER ALT, up, resizeactive, 0 -40"
+      "SUPER ALT, down, resizeactive, 0 40"
+    ];
 
     bindm = lib.mkForce [
       "SUPER, mouse:272, movewindow"

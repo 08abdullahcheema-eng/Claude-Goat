@@ -1,4 +1,5 @@
-# sumi-theme <name>   switch theme (sumi, kin, ai, washi)
+# sumi-theme <name> [wall.jpg]   switch theme (sumi, kin, ai, washi), optionally with one of its wallpapers
+# sumi-theme --wall <wall.jpg>   change only the wallpaper of the current theme
 # sumi-theme --restore  re-apply the saved theme (wallpaper, borders, kitty, lock screen)
 # sumi-theme --init     write the theme files if missing, touch nothing that is running
 set -u
@@ -9,11 +10,17 @@ mkdir -p "$CONF"
 mode="${1:---restore}"
 case "$mode" in
   --restore|--init) ;;
+  --wall)
+    printf '%s' "${2:-}" > "$CONF/wall"
+    mode="--restore"
+    ;;
   *)
     src="$SHELL_DIR/themes/$mode.json"
     if [ ! -f "$src" ]; then echo "unknown theme: $mode (have: $(ls "$SHELL_DIR/themes" | sed 's/.json//' | tr '\n' ' '))" >&2; exit 1; fi
     cp "$src" "$CONF/theme.json.tmp" && mv "$CONF/theme.json.tmp" "$CONF/theme.json"
     chmod u+w "$CONF/theme.json"
+    # a theme switch resets the wallpaper unless one was named
+    if [ -n "${2:-}" ]; then printf '%s' "$2" > "$CONF/wall"; else rm -f "$CONF/wall"; fi
     mode="--restore"
     ;;
 esac
@@ -26,6 +33,10 @@ t="$CONF/theme.json"
 get() { jq -r ".$1" "$t"; }
 name=$(get name)
 wall="$SHELL_DIR/assets/walls/wall-$name.jpg"
+wf=$(cat "$CONF/wall" 2>/dev/null || true)
+case "$wf" in
+  wall-"$name"*.jpg) [ -f "$SHELL_DIR/assets/walls/$wf" ] && wall="$SHELL_DIR/assets/walls/$wf" ;;
+esac
 [ -f "$wall" ] || wall="$SHELL_DIR/assets/walls/wall-sumi.jpg"
 hex() { get "$1" | tr -d '#'; }
 dark=$(get dark)

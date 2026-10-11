@@ -13,7 +13,7 @@ PanelWindow {
     anchors { top: true; bottom: true; left: true; right: true }
     // small panels start under the bar so the bar icons stay clickable (press again = close)
     exclusionMode: ExclusionMode.Ignore
-    margins.top: Ui.panelIsFull ? 0 : Theme.barH
+    margins.top: Ui.panelIsFull ? 0 : Theme.barH + Theme.barM
     color: "transparent"
     WlrLayershell.namespace: "sumi-overlay"
     WlrLayershell.layer: WlrLayer.Overlay

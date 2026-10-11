@@ -28,7 +28,6 @@
  "sel": "#2d4f67",
  "diffAdd": "#2b3328",
  "diffDel": "#43242b",
- "wallpaper": "wall-sumi.png",
  "logo": "logo-sumi.svg",
  "ansi": [
   "#1d1d26",
@@ -47,5 +46,9 @@
   "#957fb8",
   "#7aa89f",
   "#f2ecd2"
+ ],
+ "walls": [
+  "wall-sumi.jpg",
+  "wall-sumi-circuit.jpg"
  ]
 }

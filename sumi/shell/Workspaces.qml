@@ -29,20 +29,31 @@ Row {
             required property int modelData
             readonly property bool on: modelData === root.focusedId
             readonly property var inf: root.info(modelData)
-            width: Theme.px(27); height: Theme.px(25)
-            radius: Theme.px(4)
-            color: on ? Theme.bg2 : (ma.containsMouse ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.6) : "transparent")
+            width: on ? Theme.px(36) : Theme.px(27); height: Theme.px(26)
+            radius: Theme.px(8)
+            color: on ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.20)
+                      : (ma.containsMouse ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.8) : "transparent")
+            border.width: on ? 1 : 0
+            border.color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.6)
+            Behavior on width { NumberAnimation { duration: 170; easing.type: Easing.OutCubic } }
+            Behavior on color { ColorAnimation { duration: 120 } }
             Text {
                 anchors.centerIn: parent
+                anchors.verticalCenterOffset: parent.inf.windows > 0 ? -Theme.px(1.5) : 0
                 text: modelData <= 10 ? root.kanji[modelData - 1] : modelData
                 font.family: Theme.serif
                 font.pixelSize: Theme.fmd
-                color: parent.on ? Theme.hi : (parent.inf.windows > 0 ? Theme.dim : Theme.mute)
+                color: parent.on ? Theme.hi : (parent.inf.windows > 0 ? Theme.fg : Theme.mute)
             }
-            Rectangle {
-                visible: parent.on
-                anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-                height: Theme.px(2); color: Theme.accent
+            // one dot per window, up to three
+            Row {
+                visible: parent.inf.windows > 0
+                anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(2.5) }
+                spacing: Theme.px(2)
+                Repeater {
+                    model: Math.min(3, parent.parent.inf.windows)
+                    delegate: Rectangle { width: Theme.px(3); height: width; radius: width / 2; color: parent.parent.on ? Theme.accent2 : Theme.dim }
+                }
             }
             MouseArea {
                 id: ma

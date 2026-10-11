@@ -45,7 +45,7 @@ Singleton {
     readonly property color blue: p.blue ?? "#7e9cd8"
     readonly property color violet: p.violet ?? "#957fb8"
 
-    readonly property color barBg: Qt.rgba(bg.r, bg.g, bg.b, 0.88)
+    readonly property color barBg: Qt.rgba(bg.r, bg.g, bg.b, 0.92)
     readonly property color panelBg: Qt.rgba(bg1.r, bg1.g, bg1.b, 0.97)
     readonly property color scrim: Qt.rgba(0, 0, 0, dark ? 0.78 : 0.55)
 
@@ -62,6 +62,7 @@ Singleton {
     readonly property int fxl: px(18)
 
     readonly property int barH: px(36)
+    readonly property int barM: px(7)       // gap around the floating bar
     readonly property int radius: px(8)
     readonly property int gap: px(9)
 
@@ -69,6 +70,7 @@ Singleton {
     property var saved: ({})
     function preview(pal) { if (pal) root.p = pal; }
     function revert() { if (saved && saved.name) root.p = saved; }
+    function wall(file) { return Quickshell.shellPath("assets/walls/" + file); }
     function wallpaper(name) { return Quickshell.shellPath("assets/walls/wall-" + (name || root.name) + ".jpg"); }
 
     function load() {

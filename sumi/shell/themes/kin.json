@@ -28,7 +28,6 @@
  "sel": "#3d3628",
  "diffAdd": "#2a2e1c",
  "diffDel": "#3d2420",
- "wallpaper": "wall-kin.png",
  "logo": "logo-kin.svg",
  "ansi": [
   "#221e17",
@@ -47,5 +46,9 @@
   "#b89ab8",
   "#89b4a0",
   "#f6eedb"
+ ],
+ "walls": [
+  "wall-kin.jpg",
+  "wall-kin-circuit.jpg"
  ]
 }

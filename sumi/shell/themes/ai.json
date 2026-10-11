@@ -28,7 +28,6 @@
  "sel": "#2d3a5c",
  "diffAdd": "#1f2f2a",
  "diffDel": "#3a2230",
- "wallpaper": "wall-ai.png",
  "logo": "logo-ai.svg",
  "ansi": [
   "#1a2034",
@@ -47,5 +46,9 @@
   "#a99ae0",
   "#7fc4c4",
   "#e6ecfb"
+ ],
+ "walls": [
+  "wall-ai.jpg",
+  "wall-ai-circuit.jpg"
  ]
 }
