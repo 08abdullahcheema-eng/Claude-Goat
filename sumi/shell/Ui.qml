@@ -29,6 +29,8 @@ Singleton {
         if (panel !== name) anchorX = x;
         toggle(name);
     }
+    // y for a dropdown card: under a top bar, or above a bottom bar
+    function dropY(h, sh) { return Theme.barEdge === "bottom" ? sh - h - Theme.px(8) : Theme.px(8); }
     // x for a dropdown card of width w in a screen of width sw, centred under anchorX
     function dropX(w, sw, fallback) {
         const m = Theme.px(10);

@@ -1,5 +1,7 @@
-# sumi-theme <name> [wall.jpg]   switch theme (sumi, tokyo, catppuccin, gruvbox, nord, everforest, jade, matte, latte), optionally with one of its wallpapers
+# sumi-theme <name> [wall.jpg] [layout]   switch theme (sumi, ember, mono, torii, ronin, storm),
+#                                        optionally with one of its wallpapers and a bar layout
 # sumi-theme --wall <wall.jpg>   change only the wallpaper of the current theme
+# sumi-theme --layout <layout>   change only the bar layout: islands, bottom, corners, notch, rail, pill, or auto
 # sumi-theme --restore  re-apply the saved theme (wallpaper, borders, kitty, lock screen)
 # sumi-theme --init     write the theme files if missing, touch nothing that is running
 set -u
@@ -14,6 +16,14 @@ case "$mode" in
     printf '%s' "${2:-}" > "$CONF/wall"
     mode="--restore"
     ;;
+  --layout)
+    case "${2:-auto}" in
+      islands|bottom|corners|notch|rail|pill) printf '%s' "$2" > "$CONF/layout" ;;
+      auto|"") rm -f "$CONF/layout" ;;
+      *) echo "unknown layout: $2 (islands bottom corners notch rail pill auto)" >&2; exit 1 ;;
+    esac
+    exit 0
+    ;;
   *)
     src="$SHELL_DIR/themes/$mode.json"
     if [ ! -f "$src" ]; then echo "unknown theme: $mode (have: $(ls "$SHELL_DIR/themes" | sed 's/.json//' | tr '\n' ' '))" >&2; exit 1; fi
@@ -21,6 +31,11 @@ case "$mode" in
     chmod u+w "$CONF/theme.json"
     # a theme switch resets the wallpaper unless one was named
     if [ -n "${2:-}" ]; then printf '%s' "$2" > "$CONF/wall"; else rm -f "$CONF/wall"; fi
+    # and the bar layout: a named one, or the theme's own
+    case "${3:-}" in
+      islands|bottom|corners|notch|rail|pill) printf '%s' "$3" > "$CONF/layout" ;;
+      *) rm -f "$CONF/layout" ;;
+    esac
     mode="--restore"
     ;;
 esac
@@ -42,7 +57,7 @@ wf=$(cat "$CONF/wall" 2>/dev/null || true)
 case "$wf" in
   wall-"$name"*.jpg) [ -f "$SHELL_DIR/assets/walls/$wf" ] && wall="$SHELL_DIR/assets/walls/$wf" ;;
 esac
-[ -f "$wall" ] || wall="$SHELL_DIR/assets/walls/wall-sumi-circuit.jpg"
+[ -f "$wall" ] || wall="$SHELL_DIR/assets/walls/wall-sumi-ink.jpg"
 hex() { get "$1" | tr -d '#'; }
 dark=$(get dark)
 if [ "$dark" = "true" ]; then ink=$(hex bg); else ink=$(hex hi); fi
@@ -82,12 +97,30 @@ mv "$CONF/hyprlock-colors.conf.tmp" "$CONF/hyprlock-colors.conf"
 } > "$CONF/kitty.conf.tmp"
 mv "$CONF/kitty.conf.tmp" "$CONF/kitty.conf"
 
+# lock screen layout of the theme
+lock="$SHELL_DIR/locks/$name.conf"; [ -f "$lock" ] || lock="$SHELL_DIR/locks/sumi.conf"
+cp "$lock" "$CONF/hyprlock-theme.conf.tmp" && chmod u+w "$CONF/hyprlock-theme.conf.tmp" && mv "$CONF/hyprlock-theme.conf.tmp" "$CONF/hyprlock-theme.conf"
+
+# Hyprland part of the theme (sourced by hyprland.conf): borders and the theme's animations
+{
+  echo "# written by sumi-theme ($name)"
+  echo "general {"
+  echo "  col.active_border = rgb($(hex accent))"
+  echo "  col.inactive_border = rgb($(hex line))"
+  echo "}"
+  jq -r '.bezier[]? | "bezier = " + .' "$t"
+  jq -r '.animation[]? | "animation = " + .' "$t"
+} > "$CONF/hypr-theme.conf.tmp"
+mv "$CONF/hypr-theme.conf.tmp" "$CONF/hypr-theme.conf"
+
 if [ "$mode" = "--init" ]; then exit 0; fi
 
 # live parts: only when a Hyprland session is running
 if [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
   hyprctl keyword general:col.active_border "rgb($(hex accent))" >/dev/null 2>&1 || true
   hyprctl keyword general:col.inactive_border "rgb($(hex line))" >/dev/null 2>&1 || true
+  batch=$( { jq -r '.bezier[]? | "keyword bezier " + .' "$t"; jq -r '.animation[]? | "keyword animation " + .' "$t"; } | paste -sd ';' - )
+  [ -n "$batch" ] && hyprctl --batch "$batch" >/dev/null 2>&1 || true
 fi
 if [ -n "${WAYLAND_DISPLAY:-}" ]; then
   old=$(pgrep -x swaybg || true)

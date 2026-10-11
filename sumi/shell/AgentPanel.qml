@@ -13,7 +13,7 @@ Item {
         id: card
         width: Theme.px(462)
         x: Ui.dropX(width, parent.width, parent.width / 2 - Theme.px(150))
-        y: Theme.px(8)
+        y: Ui.dropY(height, parent.height)
         pad: Theme.px(17)
 
         Column {

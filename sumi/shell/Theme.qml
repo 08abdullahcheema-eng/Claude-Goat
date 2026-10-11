@@ -51,6 +51,35 @@ Singleton {
 
     readonly property string mono: "JetBrainsMono Nerd Font"
     readonly property string serif: "Noto Serif CJK JP"
+    // per theme: display font for clocks and titles, font for bar text
+    readonly property string head: p.fontHead ?? serif
+    readonly property string body: p.fontBody ?? mono
+    readonly property bool wsKanji: p.wsKanji ?? false
+
+    // bar layout: the user's choice in ~/.config/sumi/layout, else the theme's own layout
+    readonly property var layouts: ["islands", "bottom", "corners", "notch", "rail", "pill"]
+    property string userLayout: ""
+    property string previewLayout: ""          // set by the theme picker while browsing
+    readonly property string envLayout: Quickshell.env("SUMI_LAYOUT") ?? ""
+    readonly property string layout: {
+        for (const c of [previewLayout, envLayout, userLayout, saved.layout ?? ""])
+            if (c && layouts.indexOf(c) >= 0) return c;
+        return "islands";
+    }
+    function edgeOf(l) { return (l === "bottom" || l === "pill") ? "bottom" : "top"; }
+    function reserveOf(l) {
+        switch (l) {
+        case "islands": return barH + barM;
+        case "bottom": return px(40);
+        case "corners": return px(44);
+        case "notch": return px(42);
+        case "rail": return px(26);
+        case "pill": return px(58);
+        }
+        return barH + barM;
+    }
+    readonly property string barEdge: edgeOf(layout)
+    readonly property int barReserve: reserveOf(layout)
 
     function px(v) { return Math.round(v * s); }
 
@@ -90,6 +119,15 @@ Singleton {
         onFileChanged: reload()
         onLoaded: root.load()
         onLoadFailed: root.load()
+    }
+    FileView {
+        id: layoutView
+        path: root.home + "/.config/sumi/layout"
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: { let t = ""; try { t = text(); } catch (e) {} root.userLayout = (t || "").trim(); }
+        onLoadFailed: root.userLayout = ""
     }
     FileView {
         id: defaultView

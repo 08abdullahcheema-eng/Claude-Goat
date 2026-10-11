@@ -14,6 +14,21 @@ Item {
     property var themes: []
     property int sel: 0
     property var wv: ({})              // theme name -> wallpaper index
+    property var lv: ({})              // theme name -> chosen bar layout
+    readonly property var layoutNames: ({ islands: "Inseln", bottom: "Leiste unten", corners: "Ecken", notch: "Notch", rail: "Schiene", pill: "Pille" })
+    function layoutOf(t) {
+        if (!t) return "islands";
+        const c = lv[t.name];
+        if (c) return c;
+        return Theme.layouts.indexOf(t.layout) >= 0 ? t.layout : "islands";
+    }
+    function cycleLayout(d) {
+        const t = themes[sel];
+        if (!t) return;
+        const L = Theme.layouts;
+        const i = (L.indexOf(layoutOf(t)) + d + L.length) % L.length;
+        const m = Object.assign({}, lv); m[t.name] = L[i]; lv = m;
+    }
     property bool applied: false
     readonly property int n: themes.length
     readonly property var cur: themes[sel] || Theme.p
@@ -56,7 +71,8 @@ Item {
         const t = themes[sel];
         if (!t) { Ui.close(); return; }
         applied = true;
-        if (!Theme.demo) Quickshell.execDetached(["sumi-theme", t.name, wallFile(t)]);
+        const l = layoutOf(t);
+        if (!Theme.demo) Quickshell.execDetached(["sumi-theme", t.name, wallFile(t), l === t.layout ? "auto" : l]);
         Ui.close();
     }
     Component.onDestruction: {
@@ -69,15 +85,17 @@ Item {
     Keys.onPressed: (e) => {
         if (e.key === Qt.Key_Left || e.key === Qt.Key_H || e.key === Qt.Key_A) { browse(-1); e.accepted = true; }
         else if (e.key === Qt.Key_Right || e.key === Qt.Key_L || e.key === Qt.Key_D) { browse(1); e.accepted = true; }
-        else if (e.key === Qt.Key_Down || e.key === Qt.Key_Tab || e.key === Qt.Key_J) { cycleWall(1); e.accepted = true; }
-        else if (e.key === Qt.Key_Up || e.key === Qt.Key_Backtab || e.key === Qt.Key_K) { cycleWall(-1); e.accepted = true; }
+        else if (e.key === Qt.Key_Down || e.key === Qt.Key_J) { cycleWall(1); e.accepted = true; }
+        else if (e.key === Qt.Key_Up || e.key === Qt.Key_K) { cycleWall(-1); e.accepted = true; }
+        else if (e.key === Qt.Key_Tab) { cycleLayout(1); e.accepted = true; }
+        else if (e.key === Qt.Key_Backtab) { cycleLayout(-1); e.accepted = true; }
         else if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter || e.key === Qt.Key_Space) { apply(); e.accepted = true; }
         else if (e.key === Qt.Key_Escape) { Ui.close(); e.accepted = true; }
     }
 
     Process {
         running: true
-        command: ["sh", "-c", "for f in sumi tokyo catppuccin gruvbox nord everforest jade matte latte; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
+        command: ["sh", "-c", "for f in sumi ember mono torii ronin storm; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
         stdout: StdioCollector {
             onStreamFinished: {
                 const parts = this.text.split("WALL:");
@@ -94,6 +112,10 @@ Item {
                 if (cw !== "" && i >= 0) {
                     const k = root.wallsOf(list[i]).indexOf(cw);
                     if (k > 0) { const w = {}; w[list[i].name] = k; root.wv = w; }
+                }
+                // and on the layout that is active right now
+                if (i >= 0 && Theme.userLayout && Theme.layouts.indexOf(Theme.userLayout) >= 0) {
+                    const m = {}; m[list[i].name] = Theme.userLayout; root.lv = m;
                 }
             }
         }
@@ -177,20 +199,74 @@ Item {
                     }
                 }
 
-                // the bar, as floating islands
-                Rectangle { x: tc.u * 1.6; y: tc.u * 1.6; width: tc.u * 17; height: tc.u * 4.6; radius: tc.u * 1.4; color: tc.t.bg; opacity: 0.92; border.width: 1; border.color: tc.t.line
-                    Row { anchors.centerIn: parent; spacing: tc.u * 1.1
-                        Rectangle { width: tc.u * 2; height: width; radius: width / 2; color: tc.t.accent; anchors.verticalCenter: parent.verticalCenter }
-                        Repeater { model: 4; delegate: Rectangle { required property int index; width: index === 0 ? tc.u * 3.2 : tc.u * 1.6; height: tc.u * 1.6; radius: height / 2; color: index === 0 ? tc.t.accent : tc.t.fg; opacity: index === 0 ? 1 : 0.35; anchors.verticalCenter: parent.verticalCenter } }
+                // the bar in the chosen layout
+                readonly property string lay: root.layoutOf(tc.t)
+                Item {
+                    anchors.fill: parent
+                    visible: tc.lay === "islands"
+                    Rectangle { x: tc.u * 1.6; y: tc.u * 1.6; width: tc.u * 17; height: tc.u * 4.6; radius: tc.u * 1.4; color: tc.t.bg; opacity: 0.92; border.width: 1; border.color: tc.t.line
+                        Row { anchors.centerIn: parent; spacing: tc.u * 1.1
+                            Rectangle { width: tc.u * 2; height: width; radius: width / 2; color: tc.t.accent; anchors.verticalCenter: parent.verticalCenter }
+                            Repeater { model: 4; delegate: Rectangle { required property int index; width: index === 0 ? tc.u * 3.2 : tc.u * 1.6; height: tc.u * 1.6; radius: height / 2; color: index === 0 ? tc.t.accent : tc.t.fg; opacity: index === 0 ? 1 : 0.35; anchors.verticalCenter: parent.verticalCenter } }
+                        }
+                    }
+                    Rectangle { x: (parent.width - width) / 2; y: tc.u * 1.6; width: tc.u * 14; height: tc.u * 4.6; radius: tc.u * 1.4; color: tc.t.bg; opacity: 0.92; border.width: 1; border.color: tc.t.line
+                        Rectangle { anchors.centerIn: parent; width: tc.u * 8; height: tc.u * 1.5; radius: height / 2; color: tc.t.fg; opacity: 0.6 } }
+                    Rectangle { x: parent.width - width - tc.u * 1.6; y: tc.u * 1.6; width: tc.u * 22; height: tc.u * 4.6; radius: tc.u * 1.4; color: tc.t.bg; opacity: 0.92; border.width: 1; border.color: tc.t.line
+                        Row { anchors.centerIn: parent; spacing: tc.u * 1.4
+                            Repeater { model: 6; delegate: Rectangle { required property int index; width: tc.u * 1.8; height: width; radius: width / 2; color: index === 5 ? tc.t.accent : tc.t.fg; opacity: index === 5 ? 1 : 0.4 } } } }
+                }
+                Item {
+                    anchors.fill: parent
+                    visible: tc.lay === "bottom"
+                    Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: tc.u * 4.4; color: tc.t.bg
+                        Rectangle { anchors { left: parent.left; right: parent.right; top: parent.top } height: tc.u * 0.45; color: tc.t.accent }
+                        Rectangle { x: 0; y: tc.u * 0.45; width: tc.u * 11; height: parent.height - y; color: tc.t.accent }
+                        Row { x: tc.u * 13; anchors.verticalCenter: parent.verticalCenter; spacing: tc.u * 1.8
+                            Repeater { model: 5; delegate: Rectangle { required property int index; width: tc.u * 1.4; height: tc.u * 1.8; color: index === 0 ? tc.t.accent : tc.t.fg; opacity: index === 0 ? 1 : 0.45 } } }
+                        Rectangle { anchors.right: parent.right; y: tc.u * 0.45; width: tc.u * 9; height: parent.height - y; color: tc.t.bg2
+                            Rectangle { anchors.centerIn: parent; width: tc.u * 5; height: tc.u * 1.8; color: tc.t.hi } }
                     }
                 }
-                Rectangle { x: (parent.width - width) / 2; y: tc.u * 1.6; width: tc.u * 14; height: tc.u * 4.6; radius: tc.u * 1.4; color: tc.t.bg; opacity: 0.92; border.width: 1; border.color: tc.t.line
-                    Rectangle { anchors.centerIn: parent; width: tc.u * 8; height: tc.u * 1.5; radius: height / 2; color: tc.t.fg; opacity: 0.6 }
+                Item {
+                    anchors.fill: parent
+                    visible: tc.lay === "corners"
+                    Row { x: tc.u * 2.5; y: tc.u * 2.4; spacing: tc.u * 1.6
+                        Repeater { model: 5; delegate: Rectangle { required property int index; width: tc.u * 1.1; height: tc.u * 1.7; color: index === 0 ? "#ffffff" : tc.t.dim; opacity: index === 0 ? 1 : 0.6 } } }
+                    Rectangle { x: parent.width - width - tc.u * 2.5; y: tc.u * 1.8; width: tc.u * 8; height: tc.u * 2.6; color: "#ffffff"; opacity: 0.85 }
+                    Rectangle { x: parent.width - width - tc.u * 2.5; y: parent.height - tc.u * 3; width: tc.u * 16; height: tc.u * 1; color: tc.t.dim; opacity: 0.6 }
+                    Rectangle { x: parent.width - tc.u * 1.9; y: parent.height - tc.u * 3.2; width: tc.u * 1.4; height: width; radius: width / 2; color: tc.t.accent }
                 }
-                Rectangle { x: parent.width - width - tc.u * 1.6; y: tc.u * 1.6; width: tc.u * 22; height: tc.u * 4.6; radius: tc.u * 1.4; color: tc.t.bg; opacity: 0.92; border.width: 1; border.color: tc.t.line
-                    Row { anchors.centerIn: parent; spacing: tc.u * 1.4
-                        Repeater { model: 6; delegate: Rectangle { required property int index; width: tc.u * 1.8; height: width; radius: width / 2; color: index === 5 ? tc.t.accent : tc.t.fg; opacity: index === 5 ? 1 : 0.4 } }
+                Item {
+                    anchors.fill: parent
+                    visible: tc.lay === "notch"
+                    Rectangle { x: (parent.width - width) / 2; y: -tc.u * 2; width: tc.u * 40; height: tc.u * 6.6; radius: tc.u * 2; color: tc.t.bg; opacity: 0.94; border.width: 1; border.color: tc.t.line
+                        Row { anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: tc.u * 1.5 } spacing: tc.u * 1.2
+                            Repeater { model: 4; delegate: Rectangle { required property int index; width: index === 0 ? tc.u * 3 : tc.u * 1.2; height: tc.u * 1.2; radius: height / 2; color: index === 0 ? tc.t.accent : tc.t.dim } }
+                            Rectangle { width: tc.u * 6; height: tc.u * 1.6; radius: height / 2; color: tc.t.hi }
+                            Repeater { model: 5; delegate: Rectangle { width: tc.u * 1.4; height: width; radius: width / 2; color: tc.t.fg; opacity: 0.5 } } } }
+                }
+                Item {
+                    anchors.fill: parent
+                    visible: tc.lay === "rail"
+                    Rectangle { anchors { left: parent.left; right: parent.right; top: parent.top } height: tc.u * 2.6; color: tc.t.bg; opacity: 0.9
+                        Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: tc.t.accent2; opacity: 0.3 }
+                        Row { x: tc.u * 1.6; anchors.verticalCenter: parent.verticalCenter; spacing: tc.u * 1.2
+                            Rectangle { width: tc.u * 1.6; height: tc.u * 1; color: tc.t.accent }
+                            Repeater { model: 5; delegate: Rectangle { required property int index; width: tc.u * 0.8; height: tc.u * 1; color: index === 0 ? "#ffffff" : tc.t.dim } } }
+                        Rectangle { anchors.centerIn: parent; width: tc.u * 7; height: tc.u * 1; color: tc.t.fg; opacity: 0.8 }
+                        Rectangle { anchors { right: parent.right; rightMargin: tc.u * 1.6; verticalCenter: parent.verticalCenter } width: tc.u * 18; height: tc.u * 0.8; color: tc.t.dim; opacity: 0.6 }
                     }
+                }
+                Item {
+                    anchors.fill: parent
+                    visible: tc.lay === "pill"
+                    Rectangle { x: (parent.width - width) / 2; y: parent.height - height - tc.u * 1.6; width: tc.u * 40; height: tc.u * 4.8; radius: height / 2; color: tc.t.bg; opacity: 0.94; border.width: 1; border.color: tc.t.line
+                        Row { anchors.centerIn: parent; spacing: tc.u * 1.3
+                            Repeater { model: 4; delegate: Rectangle { required property int index; width: tc.u * 2.2; height: width; radius: width / 2; color: index === 0 ? tc.t.accent : "transparent"; border.width: index === 0 ? 0 : 1; border.color: tc.t.dim } }
+                            Rectangle { width: tc.u * 6; height: tc.u * 1.8; radius: height / 2; color: tc.t.hi; anchors.verticalCenter: parent.verticalCenter }
+                            Repeater { model: 4; delegate: Rectangle { width: tc.u * 1.4; height: width; radius: width / 2; color: tc.t.fg; opacity: 0.5; anchors.verticalCenter: parent.verticalCenter } }
+                            Rectangle { width: tc.u * 2.6; height: width; radius: width / 2; color: "transparent"; border.width: tc.u * 0.4; border.color: tc.t.gold } } }
                 }
 
                 // three tiled windows, kept to the left so the wallpaper stays visible
@@ -233,6 +309,14 @@ Item {
                 T { text: root.cur.label || ""; color: root.tInk; font.pixelSize: Theme.px(26) }
                 Text { text: root.cur.kanji || ""; color: root.tMute; font.family: Theme.serif; font.pixelSize: Theme.px(22); anchors.verticalCenter: parent.verticalCenter }
             }
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: lchip.implicitWidth + Theme.px(24); height: Theme.px(26); radius: height / 2
+                color: "transparent"; border.width: 1; border.color: root.cur.accent || root.tLine
+                T { id: lchip; anchors.centerIn: parent; color: root.tDim; font.pixelSize: Theme.px(11.5)
+                    text: "Bar: " + (root.layoutNames[root.layoutOf(root.cur)] || "") + (root.layoutOf(root.cur) === root.cur.layout ? "" : "  ·  eigene Wahl") }
+                MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.cycleLayout(1) }
+            }
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: Theme.px(7)
@@ -262,7 +346,7 @@ Item {
             anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(46) }
             spacing: Theme.px(18)
             Repeater {
-                model: [["←→", "theme"], ["↑↓", "wallpaper"], ["↵", "apply"], ["esc", "cancel"]]
+                model: [["←→", "Theme"], ["↑↓", "Wallpaper"], ["⇥", "Bar-Layout"], ["↵", "Übernehmen"], ["esc", "Abbrechen"]]
                 delegate: Row {
                     required property var modelData
                     spacing: Theme.px(7)

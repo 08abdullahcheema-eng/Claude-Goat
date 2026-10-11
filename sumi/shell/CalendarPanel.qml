@@ -44,7 +44,7 @@ Item {
         id: card
         width: Theme.px(344)
         x: Ui.dropX(width, parent.width, (parent.width - width) / 2)
-        y: Theme.px(8)
+        y: Ui.dropY(height, parent.height)
         pad: Theme.px(16)
 
         Column {

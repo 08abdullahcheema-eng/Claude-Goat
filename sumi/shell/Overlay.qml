@@ -13,7 +13,8 @@ PanelWindow {
     anchors { top: true; bottom: true; left: true; right: true }
     // small panels start under the bar so the bar icons stay clickable (press again = close)
     exclusionMode: ExclusionMode.Ignore
-    margins.top: Ui.panelIsFull ? 0 : Theme.barH + Theme.barM
+    margins.top: Ui.panelIsFull || Theme.barEdge !== "top" ? 0 : Theme.barReserve
+    margins.bottom: Ui.panelIsFull || Theme.barEdge !== "bottom" ? 0 : Theme.barReserve
     color: "transparent"
     WlrLayershell.namespace: "sumi-overlay"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -76,7 +77,7 @@ PanelWindow {
         ParallelAnimation {
             id: enterAnim
             NumberAnimation { target: loader; property: "opacity"; from: 0; to: 1; duration: 190; easing.type: Easing.OutCubic }
-            NumberAnimation { target: slide; property: "y"; from: Ui.panelIsFull ? 0 : -Theme.px(10); to: 0; duration: 280; easing.type: Easing.OutQuint }
+            NumberAnimation { target: slide; property: "y"; from: Ui.panelIsFull ? 0 : (Theme.barEdge === "bottom" ? Theme.px(10) : -Theme.px(10)); to: 0; duration: 280; easing.type: Easing.OutQuint }
         }
     }
 

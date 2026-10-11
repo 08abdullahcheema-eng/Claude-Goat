@@ -34,8 +34,6 @@ ls -la $HF/.config/ > $OUT/config-ls.txt 2>&1
 ls $HM/home-path/bin > $OUT/bin-ls.txt 2>&1
 HYPR=$(B hyprland)
 $HYPR/bin/Hyprland --version 2>&1 | head -2 | tee -a $OUT/summary.txt
-log "hyprland --verify-config:"
-(cd /tmp && timeout 60 $HYPR/bin/Hyprland --verify-config -c $OUT/hyprland.conf 2>&1 | grep -v "^$" | tail -25) | tee -a $OUT/summary.txt
 grep -c "old-bind-should-be-gone" $OUT/hyprland.conf | xargs -I{} echo "old bind count (want 0): {}" | tee -a $OUT/summary.txt
 grep -c "waybar" $OUT/hyprland.conf | xargs -I{} echo "waybar mentions (want 0): {}" | tee -a $OUT/summary.txt
 [ -e $HF/.config/waybar ] && log "waybar config still present (bad)" || log "waybar config gone (good)"
@@ -44,7 +42,9 @@ grep -c "waybar" $OUT/hyprland.conf | xargs -I{} echo "waybar mentions (want 0):
 QS=$(B quickshell)/bin/qs; SWAY=$(B sway)/bin/sway; GRIM=$(B grim)/bin/grim
 MESA=$(B mesa); GLVND=$(B libglvnd); FONTS=$(B fonts); PAP=$(B papirus-icon-theme)
 KITTY=$(B kitty); PAVU=$(B pavucontrol); BTOP=$(B btop)
-mkdir -p ~/.local/share/fonts && cp -rL $FONTS/share/fonts/* ~/.local/share/fonts/ 2>/dev/null; fc-cache -f >/dev/null 2>&1
+mkdir -p ~/.local/share/fonts && cp -rL $FONTS/share/fonts/* ~/.local/share/fonts/ 2>/dev/null
+cp -rL $HM/home-path/share/fonts/* ~/.local/share/fonts/ 2>/dev/null; fc-cache -f >/dev/null 2>&1
+fc-list : family | grep -E "Shippori|Bebas|Space Grotesk|^Inter" | sort -u | tee -a $OUT/summary.txt
 fc-list | grep -ci "jetbrainsmono nerd" | xargs -I{} echo "jetbrains fonts: {}" | tee -a $OUT/summary.txt
 
 export PATH=$HM/home-path/bin:$PATH
@@ -93,11 +93,20 @@ run_qs network SUMI_DEMO=1 SUMI_OPEN=network
 run_qs agents SUMI_DEMO=1 SUMI_OPEN=agents
 run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
-for t in tokyo catppuccin gruvbox nord everforest jade matte latte sumi; do
+for t in ember mono torii ronin storm sumi; do
   sumi-theme $t >/dev/null 2>&1
   WAIT=4 run_qs themes-$t SUMI_DEMO=1 SUMI_OPEN=themes
-  WAIT=3 run_qs bar-$t SUMI_DEMO=1
+  WAIT=4 run_qs bar-$t SUMI_DEMO=1
+  # the theme's animations must be valid Hyprland config
+  echo "== verify $t" >> $OUT/verify-themes.log
+  (cd /tmp && timeout 60 $HYPR/bin/Hyprland --verify-config -c $OUT/hyprland.conf 2>&1 | grep -v "^$" | tail -4) >> $OUT/verify-themes.log
 done
+grep -A4 "== verify" $OUT/verify-themes.log | grep -E "== verify|config ok|rror" | tee -a $OUT/summary.txt
+# every bar layout with the sumi theme, and a panel above a bottom bar
+for l in islands bottom corners notch rail pill; do WAIT=4 run_qs layout-$l SUMI_DEMO=1 SUMI_LAYOUT=$l; done
+WAIT=4 run_qs pill-audio SUMI_DEMO=1 SUMI_LAYOUT=pill SUMI_OPEN=audio
+WAIT=4 run_qs bottom-calendar SUMI_DEMO=1 SUMI_LAYOUT=bottom SUMI_OPEN=calendar
+WAIT=4 run_qs rail-system SUMI_DEMO=1 SUMI_LAYOUT=rail SUMI_OPEN=system
 run_qs calendar SUMI_DEMO=1 SUMI_OPEN=calendar
 run_qs system SUMI_DEMO=1 SUMI_OPEN=system
 run_qs battery SUMI_DEMO=1 SUMI_OPEN=battery
@@ -133,9 +142,10 @@ log "qs warnings/errors:"
 for f in $OUT/qs-*.log; do echo "--- $(basename $f)"; grep -E "WARN|ERROR|FATAL|TypeError|ReferenceError|is not defined|Cannot|Unable|failed" $f | grep -v "Failed to create wl_display" | head -40; done >> $OUT/summary.txt
 
 # theme switch end to end
-sumi-theme latte > $OUT/theme-switch.log 2>&1; log "sumi-theme latte rc=$?"
+sumi-theme storm "" pill > $OUT/theme-switch.log 2>&1; log "sumi-theme storm rc=$? layout=$(cat ~/.config/sumi/layout 2>/dev/null)"
+sumi-theme --layout auto; log "layout after auto: $(cat ~/.config/sumi/layout 2>/dev/null || echo none)"
 head -3 ~/.config/sumi/kitty.conf >> $OUT/summary.txt
-WAIT=4 run_qs latte SUMI_DEMO=1 SUMI_OPEN=agents
+WAIT=4 run_qs storm-agents SUMI_DEMO=1 SUMI_OPEN=agents
 sumi-theme sumi >/dev/null 2>&1
 kill $QPID 2>/dev/null; QPID=
 
@@ -158,10 +168,14 @@ $DBR -- bash -c "
   kill \$Q
 "
 
-# lock screen
+# lock screen of every theme
 HL=$(B hyprlock)/bin/hyprlock
-(timeout 12 $HL -c $HF/.config/hypr/hyprlock.conf --immediate-render > $OUT/hyprlock.log 2>&1 &)
-sleep 6; $GRIM $OUT/shot-hyprlock.png 2>>$OUT/hyprlock.log
-sleep 7
+for t in sumi ember mono torii ronin storm; do
+  sumi-theme $t >/dev/null 2>&1
+  (timeout 9 $HL -c $HF/.config/hypr/hyprlock.conf --immediate-render > $OUT/hyprlock-$t.log 2>&1 &)
+  sleep 5; $GRIM $OUT/shot-lock-$t.png 2>>$OUT/hyprlock-$t.log
+  sleep 5
+done
+sumi-theme sumi >/dev/null 2>&1
 
 log "done"

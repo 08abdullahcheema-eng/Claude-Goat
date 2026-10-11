@@ -6,7 +6,7 @@ import Quickshell
 ShellRoot {
     Variants {
         model: Quickshell.screens
-        delegate: Component { Bar {} }
+        delegate: Component { BarHost {} }
     }
     Overlay {}
     Notifications {}

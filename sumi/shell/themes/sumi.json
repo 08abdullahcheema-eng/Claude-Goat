@@ -3,6 +3,10 @@
  "label": "Sumi",
  "kanji": "墨",
  "dark": true,
+ "layout": "islands",
+ "fontHead": "Shippori Mincho",
+ "fontBody": "JetBrainsMono Nerd Font",
+ "wsKanji": true,
  "bg": "#0f0f14",
  "bg1": "#16161d",
  "bg2": "#1d1d26",
@@ -21,10 +25,10 @@
  "cyan": "#7aa89f",
  "blue": "#7e9cd8",
  "violet": "#957fb8",
- "error": "#e82424",
- "warn": "#ff9e3b",
- "ok": "#76946a",
- "info": "#658594",
+ "error": "#c8323a",
+ "warn": "#ffa066",
+ "ok": "#98bb6c",
+ "info": "#7aa89f",
  "sel": "#2d4f67",
  "diffAdd": "#2b3328",
  "diffDel": "#43242b",
@@ -48,8 +52,23 @@
   "#f2ecd2"
  ],
  "walls": [
-  "wall-sumi-circuit.jpg",
-  "wall-sumi.jpg",
-  "wall-sumi-wave.jpg"
+  "wall-sumi-ink.jpg",
+  "wall-sumi-circuit.jpg"
+ ],
+ "bezier": [
+  "easeOutQuint, 0.23, 1, 0.32, 1",
+  "easeInOutCubic, 0.65, 0.05, 0.36, 1",
+  "soft, 0.25, 0.1, 0.25, 1"
+ ],
+ "animation": [
+  "global, 1, 10, default",
+  "border, 1, 6, soft",
+  "windows, 1, 5, easeOutQuint",
+  "windowsIn, 1, 5, easeOutQuint, popin 86%",
+  "windowsOut, 1, 3, soft, popin 86%",
+  "windowsMove, 1, 4.5, easeOutQuint",
+  "fade, 1, 4, soft",
+  "layers, 1, 4, easeOutQuint, fade",
+  "workspaces, 1, 5, easeOutQuint, slide"
  ]
 }

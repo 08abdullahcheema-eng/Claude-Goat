@@ -19,7 +19,7 @@ let
 
   sumi-lockinfo = pkgs.writeShellApplication {
     name = "sumi-lockinfo";
-    runtimeInputs = with pkgs; [ jq playerctl gawk coreutils ];
+    runtimeInputs = with pkgs; [ jq playerctl gawk coreutils gnugrep ];
     text = builtins.readFile ./sumi/scripts/sumi-lockinfo.sh;
     checkPhase = "";
   };
@@ -45,10 +45,15 @@ in
     yazi
     btop
     claude-code
+    # theme fonts: Shippori Mincho (Sumi, Torii, Ronin), Bebas Neue (Ember), Space Grotesk (Storm), Inter (Monolith)
+    inter
+    (google-fonts.override { fonts = [ "ShipporiMincho" "BebasNeue" "SpaceGrotesk" ]; })
   ]) ++ [ sumi-theme sumi-agents sumi-lockinfo ];
 
   # the shell itself
   xdg.configFile."quickshell/sumi".source = ./sumi/shell;
+
+  fonts.fontconfig.enable = true;
 
   # write default theme files once (they stay editable by sumi-theme)
   home.activation.sumiTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -84,35 +89,11 @@ in
       extend_border_grab_area = lib.mkForce 14;
       layout = lib.mkForce "dwindle";
     };
-    animations = {
-      enabled = lib.mkForce true;
-      bezier = lib.mkForce [
-        "easeOutQuint, 0.23, 1, 0.32, 1"
-        "easeInOutCubic, 0.65, 0.05, 0.36, 1"
-        "almostLinear, 0.5, 0.5, 0.75, 1"
-        "quick, 0.15, 0, 0.1, 1"
-        "linear, 0, 0, 1, 1"
-      ];
-      # short, soft curves: windows pop in, close fast, workspaces glide
-      animation = lib.mkForce [
-        "global, 1, 10, default"
-        "border, 1, 5.4, easeOutQuint"
-        "windows, 1, 4.8, easeOutQuint"
-        "windowsIn, 1, 4.1, easeOutQuint, popin 87%"
-        "windowsOut, 1, 1.5, linear, popin 87%"
-        "windowsMove, 1, 4.2, easeOutQuint"
-        "fadeIn, 1, 1.7, almostLinear"
-        "fadeOut, 1, 1.5, almostLinear"
-        "fade, 1, 3, quick"
-        "layers, 1, 3.8, easeOutQuint"
-        "layersIn, 1, 4, easeOutQuint, fade"
-        "layersOut, 1, 1.5, linear, fade"
-        "fadeLayersIn, 1, 1.8, almostLinear"
-        "fadeLayersOut, 1, 1.4, almostLinear"
-        "workspaces, 1, 4.2, easeOutQuint, slide"
-        "specialWorkspace, 1, 4, easeOutQuint, slidevert"
-      ];
-    };
+    # the theme's own animations and border colours come from ~/.config/sumi/hypr-theme.conf
+    # (written by sumi-theme, switched together with the theme)
+    animations.enabled = lib.mkForce true;
+    source = [ "~/.config/sumi/hypr-theme.conf" ];
+
     dwindle = {
       preserve_split = lib.mkForce true;
       force_split = lib.mkForce 2;

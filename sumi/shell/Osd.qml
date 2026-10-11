@@ -30,7 +30,7 @@ Scope {
         visible: root.shown
         screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
         anchors.bottom: true
-        margins.bottom: Theme.px(56)
+        margins.bottom: Theme.barEdge === "bottom" ? Theme.barReserve + Theme.px(24) : Theme.px(56)
         implicitWidth: Theme.px(350)
         implicitHeight: Theme.px(52)
         exclusiveZone: 0

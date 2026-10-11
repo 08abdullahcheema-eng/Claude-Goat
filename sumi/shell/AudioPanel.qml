@@ -56,7 +56,7 @@ Item {
         id: card
         width: Theme.px(400)
         x: Ui.dropX(width, parent.width, parent.width - width - Theme.px(10))
-        y: Theme.px(8)
+        y: Ui.dropY(height, parent.height)
 
         Column {
             width: parent.width
