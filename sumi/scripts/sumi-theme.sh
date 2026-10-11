@@ -79,5 +79,14 @@ if [ -n "${WAYLAND_DISPLAY:-}" ]; then
   # let the new wallpaper map before removing the old one (no black flash)
   if [ -n "$old" ]; then (sleep 0.6; kill $old 2>/dev/null) & fi
 fi
+# keyboard follows the theme accent (PredatorSense panel option)
+kb=/sys/module/linuwu_sense/drivers/platform:acer-wmi/acer-wmi/four_zoned_kb
+if [ -w "$kb/per_zone_mode" ] && grep -q '"followTheme": true' "$CONF/predator.json" 2>/dev/null; then
+  a=$(hex accent)
+  br=$(cut -d, -f5 "$kb/per_zone_mode" 2>/dev/null || echo 70)
+  [ -n "$br" ] || br=70
+  printf '0,1,%s,1,%d,%d,%d' "$br" "0x${a:0:2}" "0x${a:2:2}" "0x${a:4:2}" > "$kb/four_zone_mode" 2>/dev/null || true
+  printf '%s,%s,%s,%s,%s' "$a" "$a" "$a" "$a" "$br" > "$kb/per_zone_mode" 2>/dev/null || true
+fi
 for p in kitty .kitty-wrapped; do pkill -USR1 -x "$p" 2>/dev/null || true; done
 exit 0

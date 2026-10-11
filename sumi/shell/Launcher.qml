@@ -18,6 +18,7 @@ Item {
         { title: "Wi-Fi & network", sub: "networks, speed test, share via QR", icon: "wifi", kw: "wlan internet ethernet", run: () => Ui.open("network") },
         { title: "Agents usage", sub: "Claude Code limits and tokens", icon: "agent", kw: "claude ai tokens", run: () => Ui.open("agents") },
         { title: "Themes", sub: "Sumi, Kin, Ai, Washi · live preview", icon: "palette", kw: "colors appearance wallpaper", run: () => Ui.open("themes") },
+        { title: "Predator", sub: "fans, thermal profile, keyboard light, battery", icon: "fan", kw: "predatorsense fan rgb keyboard turbo temperature battery limit", run: () => Ui.open("predator") },
         { title: "Sound", sub: "outputs, inputs, per-app volume", icon: "vol", kw: "audio speaker headphones pavucontrol", run: () => Ui.run("pavucontrol") },
         { title: "Network connections", sub: "advanced NetworkManager editor", icon: "eth", kw: "vpn ip dns", run: () => Ui.run("nm-connection-editor") },
         { title: "Display", sub: "monitors and scaling (hyprctl)", icon: "monitor", kw: "screen resolution", run: () => root.term("hyprctl monitors") },

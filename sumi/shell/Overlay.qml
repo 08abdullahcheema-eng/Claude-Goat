@@ -51,6 +51,7 @@ PanelWindow {
                 case "calendar": return calendarC;
                 case "system": return systemC;
                 case "battery": return batteryC;
+                case "predator": return predatorC;
                 }
                 return null;
             }
@@ -66,4 +67,5 @@ PanelWindow {
     Component { id: calendarC; CalendarPanel {} }
     Component { id: systemC; SysPanel {} }
     Component { id: batteryC; BatteryPanel {} }
+    Component { id: predatorC; PredatorPanel {} }
 }
