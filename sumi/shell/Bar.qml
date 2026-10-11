@@ -69,42 +69,7 @@ PanelWindow {
         }
             Sep { anchors.verticalCenter: parent.verticalCenter }
         Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: bar.modelData.name }
-    }
-
-    // ---------------- centre: clock, opens the calendar
-    Island {
-        anchors.horizontalCenter: parent.horizontalCenter
-        pad: Theme.px(4)
-        Pill {
-            id: clockPill
-            anchors.verticalCenter: parent.verticalCenter
-            active: Ui.panel === "calendar"
-            text: ""
-            implicitWidth: clockRow.implicitWidth + Theme.px(20)
-            onClicked: (m) => {
-                Ui.calX = clockPill.mapToItem(null, clockPill.width / 2, 0).x;
-                Ui.toggle("calendar");
-            }
-            Row {
-                id: clockRow
-                anchors.centerIn: parent
-                spacing: Theme.px(9)
-                readonly property var d: Theme.demo ? new Date(2026, 9, 9, 8, 12) : clock.date
-                Text { text: Qt.formatTime(clockRow.d, "HH:mm"); color: Theme.hi; font.family: Theme.mono; font.pixelSize: Theme.fmd; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
-                Text { text: clockRow.d.toLocaleDateString(Qt.locale("de_DE"), "ddd dd MMM").replace(/\./g, ""); color: Theme.dim; font.family: Theme.mono; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
-                Text { text: ["日", "月", "火", "水", "木", "金", "土"][clockRow.d.getDay()]; color: Theme.mute; font.family: Theme.serif; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
-            }
-        }
-    }
-
-    // ---------------- right: three groups, stats / quick controls / power
-    Row {
-        anchors.right: parent.right
-        height: Theme.barH
-        spacing: Theme.px(6)
-
-        // group 1: performance and usage, each opens a panel
-        Island {
+        Sep { anchors.verticalCenter: parent.verticalCenter }
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: Predator.available
@@ -135,10 +100,37 @@ PanelWindow {
                 visible: Agents.installed || Theme.demo
                 onClicked: Ui.toggle("agents")
             }
-        }
+    }
 
-        // group 2: quick controls
-        Island {
+    // ---------------- centre: clock, opens the calendar
+    Island {
+        anchors.horizontalCenter: parent.horizontalCenter
+        pad: Theme.px(4)
+        Pill {
+            id: clockPill
+            anchors.verticalCenter: parent.verticalCenter
+            active: Ui.panel === "calendar"
+            text: ""
+            implicitWidth: clockRow.implicitWidth + Theme.px(20)
+            onClicked: (m) => {
+                Ui.calX = clockPill.mapToItem(null, clockPill.width / 2, 0).x;
+                Ui.toggle("calendar");
+            }
+            Row {
+                id: clockRow
+                anchors.centerIn: parent
+                spacing: Theme.px(9)
+                readonly property var d: Theme.demo ? new Date(2026, 9, 9, 8, 12) : clock.date
+                Text { text: Qt.formatTime(clockRow.d, "HH:mm"); color: Theme.hi; font.family: Theme.mono; font.pixelSize: Theme.fmd; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
+                Text { text: clockRow.d.toLocaleDateString(Qt.locale("de_DE"), "ddd dd MMM").replace(/\./g, ""); color: Theme.dim; font.family: Theme.mono; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
+                Text { text: ["日", "月", "火", "水", "木", "金", "土"][clockRow.d.getDay()]; color: Theme.mute; font.family: Theme.serif; font.pixelSize: Theme.fsm; anchors.verticalCenter: parent.verticalCenter }
+            }
+        }
+    }
+
+    // ---------------- right: one bubble with quick controls, battery and power
+    Island {
+        anchors.right: parent.right
             Pill {
                 anchors.verticalCenter: parent.verticalCenter
                 icon: Net.kind === "ethernet" ? "eth" : (Net.kind === "wifi" ? "wifi" : "wifioff")
@@ -193,10 +185,7 @@ PanelWindow {
                 iconSize: Theme.px(14)
                 onClicked: Ui.dnd = !Ui.dnd
             }
-        }
-
-        // group 3: battery, keyboard layout, power
-        Island {
+            Sep { anchors.verticalCenter: parent.verticalCenter }
             Row {
                 spacing: Theme.px(5); anchors.verticalCenter: parent.verticalCenter
                 visible: Sys.layout !== ""
@@ -223,6 +212,5 @@ PanelWindow {
                 active: Ui.panel === "power"
                 onClicked: Ui.toggle("power")
             }
-        }
     }
 }
