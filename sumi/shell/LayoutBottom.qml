@@ -25,6 +25,7 @@ Scope {
 
             Row {
                 anchors { left: parent.left; top: parent.top; bottom: parent.bottom; topMargin: Theme.px(2.5) }
+                spacing: Theme.px(6)
                 // name block, opens the launcher
                 Rectangle {
                     height: parent.height; width: nm.implicitWidth + Theme.px(28)
