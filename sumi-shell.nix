@@ -100,7 +100,6 @@ in
       ];
     };
     dwindle = {
-      pseudotile = lib.mkForce true;
       preserve_split = lib.mkForce true;
       force_split = lib.mkForce 2;
     };
@@ -109,7 +108,6 @@ in
       disable_splash_rendering = lib.mkForce true;
       force_default_wallpaper = lib.mkForce 0;
       focus_on_activate = lib.mkForce true;
-      vfr = lib.mkForce true;
     };
 
     bind = lib.mkForce ([
