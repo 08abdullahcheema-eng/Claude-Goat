@@ -32,6 +32,10 @@ cp -L $HF/.config/hypr/hyprlock.conf $OUT/hyprlock.conf 2>/dev/null
 cp -L $HF/.config/kitty/kitty.conf $OUT/kitty.conf 2>/dev/null
 ls -la $HF/.config/ > $OUT/config-ls.txt 2>&1
 ls $HM/home-path/bin > $OUT/bin-ls.txt 2>&1
+HYPR=$(B hyprland)
+$HYPR/bin/Hyprland --version 2>&1 | head -2 | tee -a $OUT/summary.txt
+log "hyprland --verify-config:"
+(cd /tmp && timeout 60 $HYPR/bin/Hyprland --verify-config -c $OUT/hyprland.conf 2>&1 | grep -v "^$" | tail -25) | tee -a $OUT/summary.txt
 grep -c "old-bind-should-be-gone" $OUT/hyprland.conf | xargs -I{} echo "old bind count (want 0): {}" | tee -a $OUT/summary.txt
 grep -c "waybar" $OUT/hyprland.conf | xargs -I{} echo "waybar mentions (want 0): {}" | tee -a $OUT/summary.txt
 [ -e $HF/.config/waybar ] && log "waybar config still present (bad)" || log "waybar config gone (good)"
@@ -89,7 +93,7 @@ run_qs network SUMI_DEMO=1 SUMI_OPEN=network
 run_qs agents SUMI_DEMO=1 SUMI_OPEN=agents
 run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
-for t in kin ai washi sakura matcha yuki hotaru momiji sumi; do
+for t in tokyo catppuccin gruvbox nord everforest jade matte latte sumi; do
   sumi-theme $t >/dev/null 2>&1
   WAIT=4 run_qs themes-$t SUMI_DEMO=1 SUMI_OPEN=themes
   WAIT=3 run_qs bar-$t SUMI_DEMO=1
@@ -129,9 +133,9 @@ log "qs warnings/errors:"
 for f in $OUT/qs-*.log; do echo "--- $(basename $f)"; grep -E "WARN|ERROR|FATAL|TypeError|ReferenceError|is not defined|Cannot|Unable|failed" $f | grep -v "Failed to create wl_display" | head -40; done >> $OUT/summary.txt
 
 # theme switch end to end
-sumi-theme washi > $OUT/theme-switch.log 2>&1; log "sumi-theme washi rc=$?"
+sumi-theme latte > $OUT/theme-switch.log 2>&1; log "sumi-theme latte rc=$?"
 head -3 ~/.config/sumi/kitty.conf >> $OUT/summary.txt
-WAIT=4 run_qs washi SUMI_DEMO=1 SUMI_OPEN=agents
+WAIT=4 run_qs latte SUMI_DEMO=1 SUMI_OPEN=agents
 sumi-theme sumi >/dev/null 2>&1
 kill $QPID 2>/dev/null; QPID=
 

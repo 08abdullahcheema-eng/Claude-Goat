@@ -87,17 +87,30 @@ in
     animations = {
       enabled = lib.mkForce true;
       bezier = lib.mkForce [
-        "easeOutQuint, 0.22, 1, 0.36, 1"
-        "smooth, 0.25, 0.1, 0.25, 1"
+        "easeOutQuint, 0.23, 1, 0.32, 1"
+        "easeInOutCubic, 0.65, 0.05, 0.36, 1"
+        "almostLinear, 0.5, 0.5, 0.75, 1"
+        "quick, 0.15, 0, 0.1, 1"
+        "linear, 0, 0, 1, 1"
       ];
+      # short, soft curves: windows pop in, close fast, workspaces glide
       animation = lib.mkForce [
-        "windows, 1, 5, easeOutQuint, popin 88%"
-        "windowsOut, 1, 4, smooth, popin 88%"
-        "windowsMove, 1, 4, easeOutQuint"
-        "fade, 1, 5, smooth"
-        "border, 1, 8, smooth"
-        "layers, 1, 4, easeOutQuint, fade"
-        "workspaces, 1, 6, easeOutQuint, slide"
+        "global, 1, 10, default"
+        "border, 1, 5.4, easeOutQuint"
+        "windows, 1, 4.8, easeOutQuint"
+        "windowsIn, 1, 4.1, easeOutQuint, popin 87%"
+        "windowsOut, 1, 1.5, linear, popin 87%"
+        "windowsMove, 1, 4.2, easeOutQuint"
+        "fadeIn, 1, 1.7, almostLinear"
+        "fadeOut, 1, 1.5, almostLinear"
+        "fade, 1, 3, quick"
+        "layers, 1, 3.8, easeOutQuint"
+        "layersIn, 1, 4, easeOutQuint, fade"
+        "layersOut, 1, 1.5, linear, fade"
+        "fadeLayersIn, 1, 1.8, almostLinear"
+        "fadeLayersOut, 1, 1.4, almostLinear"
+        "workspaces, 1, 4.2, easeOutQuint, slide"
+        "specialWorkspace, 1, 4, easeOutQuint, slidevert"
       ];
     };
     dwindle = {
@@ -109,7 +122,15 @@ in
       disable_splash_rendering = lib.mkForce true;
       force_default_wallpaper = lib.mkForce 0;
       focus_on_activate = lib.mkForce true;
+      # a new window next to a maximised one ends the maximise and tiles beside it
+      on_focus_under_fullscreen = lib.mkForce 2;
     };
+    # apps may not maximise themselves (Electron apps like Claude or Discord do), so the
+    # next terminal always gets its own tile instead of covering the screen.
+    # Real fullscreen (games, SUPER+F) still works.
+    windowrule = [
+      "suppress_event maximize, match:class .*"
+    ];
 
     bind = lib.mkForce ([
       "SUPER, Q, exec, kitty"

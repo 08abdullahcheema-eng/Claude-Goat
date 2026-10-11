@@ -31,8 +31,18 @@ Item {
     function select(i) {
         if (n < 1) return;
         sel = ((i % n) + n) % n;
-        Theme.preview(themes[sel]);
-        if (!Theme.demo) Quickshell.execDetached(["hyprctl", "keyword", "general:col.active_border", "rgb(" + String(themes[sel].accent).replace("#", "") + ")"]);
+        previewTimer.restart();
+    }
+    // the whole shell recolours on preview; wait until browsing pauses so the carousel stays fluid
+    Timer {
+        id: previewTimer
+        interval: 140
+        onTriggered: {
+            const t = root.themes[root.sel];
+            if (!t) return;
+            Theme.preview(t);
+            if (!Theme.demo) Quickshell.execDetached(["hyprctl", "keyword", "general:col.active_border", "rgb(" + String(t.accent).replace("#", "") + ")"]);
+        }
     }
     function browse(d) { select(sel + d); }
     function cycleWall(d) {
@@ -67,7 +77,7 @@ Item {
 
     Process {
         running: true
-        command: ["sh", "-c", "for f in sumi kin ai washi sakura matcha yuki hotaru momiji; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
+        command: ["sh", "-c", "for f in sumi tokyo catppuccin gruvbox nord everforest jade matte latte; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
         stdout: StdioCollector {
             onStreamFinished: {
                 const parts = this.text.split("WALL:");
@@ -93,6 +103,11 @@ Item {
     Item {
         id: stage
         anchors.fill: parent
+        opacity: 0
+        scale: 0.97
+        Component.onCompleted: { opacity = 1; scale = 1; }
+        Behavior on opacity { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+        Behavior on scale { NumberAnimation { duration: 320; easing.type: Easing.OutQuint } }
 
         readonly property real cwC: Math.min(width * 0.46, Theme.px(760))
         readonly property real cwS: cwC * 0.54
@@ -128,7 +143,7 @@ Item {
                     : (d > 0 ? stage.width / 2 + stage.cwC / 2 + stage.gap + (d - 1) * (stage.cwS + stage.gap)
                              : stage.width / 2 - stage.cwC / 2 - stage.gap - stage.cwS - (-d - 1) * (stage.cwS + stage.gap))
                 y: stage.midY - height / 2
-                opacity: on ? 1 : (Math.abs(d) === 1 ? 0.5 : 0)
+                opacity: on ? 1 : (Math.abs(d) === 1 ? 0.55 : (Math.abs(d) === 2 ? 0.18 : 0))
                 visible: opacity > 0.01
                 z: on ? 2 : 1
                 radius: Theme.px(14)
@@ -137,18 +152,29 @@ Item {
                 border.width: on ? Theme.px(2.5) : 1
                 border.color: on ? t.accent : Theme.line2
 
-                Behavior on x { NumberAnimation { duration: 280; easing.type: Easing.OutCubic } }
-                Behavior on y { NumberAnimation { duration: 280; easing.type: Easing.OutCubic } }
-                Behavior on width { NumberAnimation { duration: 280; easing.type: Easing.OutCubic } }
-                Behavior on opacity { NumberAnimation { duration: 220 } }
+                // hidden cards jump across the wrap-around point without flying over the screen
+                Behavior on x { enabled: Math.abs(tc.d) <= 2; NumberAnimation { duration: 360; easing.type: Easing.OutQuint } }
+                Behavior on y { NumberAnimation { duration: 360; easing.type: Easing.OutQuint } }
+                Behavior on width { NumberAnimation { duration: 360; easing.type: Easing.OutQuint } }
+                Behavior on opacity { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+                Behavior on border.color { ColorAnimation { duration: 200 } }
 
-                Image {
-                    anchors.fill: parent
-                    source: "file://" + Theme.wall(root.wallFile(tc.t))
-                    sourceSize: Qt.size(1280, 800)
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    cache: true
+                // every wallpaper of the theme, decoded small once, crossfaded on ↑↓
+                Repeater {
+                    model: root.wallsOf(tc.t)
+                    delegate: Image {
+                        required property string modelData
+                        required property int index
+                        anchors.fill: parent
+                        source: "file://" + Theme.wall(modelData)
+                        sourceSize: Qt.size(960, 600)
+                        fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
+                        cache: true
+                        smooth: true
+                        opacity: index === root.wallIndex(tc.t) && status === Image.Ready ? 1 : 0
+                        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                    }
                 }
 
                 // the bar, as floating islands

@@ -66,7 +66,17 @@ PanelWindow {
                 }
                 return null;
             }
-            onLoaded: { if (item.focusFirst) item.focusFirst(); else item.forceActiveFocus(); }
+            onLoaded: {
+                if (item.focusFirst) item.focusFirst(); else item.forceActiveFocus();
+                enterAnim.restart();
+            }
+            transform: Translate { id: slide }
+        }
+        // panels fade in and drop down a few pixels; full-screen ones only fade
+        ParallelAnimation {
+            id: enterAnim
+            NumberAnimation { target: loader; property: "opacity"; from: 0; to: 1; duration: 190; easing.type: Easing.OutCubic }
+            NumberAnimation { target: slide; property: "y"; from: Ui.panelIsFull ? 0 : -Theme.px(10); to: 0; duration: 280; easing.type: Easing.OutQuint }
         }
     }
 
