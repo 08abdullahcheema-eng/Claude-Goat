@@ -38,11 +38,11 @@ Scope {
             Row {
                 anchors { right: clockBlock.left; rightMargin: Theme.px(10); verticalCenter: parent.verticalCenter; verticalCenterOffset: Theme.px(1) }
                 spacing: Theme.px(4)
-                ModFan {} ModCpu {} ModAgent {}
+                ModFan {} ModCpuCurve {} ModAgent {}
                 Rectangle { width: 1; height: Theme.px(18); color: Theme.line2; anchors.verticalCenter: parent.verticalCenter }
                 ModNet {} ModBt {} ModVol {} ModMic {} ModDnd {}
                 KbdLayout { anchors.verticalCenter: parent.verticalCenter }
-                ModBat {} ModPower {}
+                ModBatRing { showPct: true } ModPower {}
             }
             Rectangle {
                 id: clockBlock

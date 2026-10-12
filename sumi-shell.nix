@@ -112,6 +112,16 @@ in
     windowrule = [
       "suppress_event maximize, match:class .*"
     ];
+    # frosted glass behind the bar (only where the bar is drawn, not its transparent parts)
+    decoration.blur = {
+      enabled = lib.mkDefault true;
+      size = lib.mkDefault 8;
+      passes = lib.mkDefault 3;
+    };
+    layerrule = [
+      "blur on, match:namespace sumi-bar"
+      "ignore_alpha 0.25, match:namespace sumi-bar"
+    ];
 
     bind = lib.mkForce ([
       "SUPER, Q, exec, kitty"

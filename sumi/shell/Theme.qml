@@ -57,7 +57,7 @@ Singleton {
     readonly property bool wsKanji: p.wsKanji ?? false
 
     // bar layout: the user's choice in ~/.config/sumi/layout, else the theme's own layout
-    readonly property var layouts: ["islands", "bottom", "corners", "notch", "rail", "pill"]
+    readonly property var layouts: ["islands", "capsule", "rail", "dune", "side", "notch", "pill", "bottom", "corners"]
     property string userLayout: ""
     property string previewLayout: ""          // set by the theme picker while browsing
     readonly property string envLayout: Quickshell.env("SUMI_LAYOUT") ?? ""
@@ -66,7 +66,7 @@ Singleton {
             if (c && layouts.indexOf(c) >= 0) return c;
         return "islands";
     }
-    function edgeOf(l) { return (l === "bottom" || l === "pill") ? "bottom" : "top"; }
+    function edgeOf(l) { return (l === "bottom" || l === "pill" || l === "dune") ? "bottom" : (l === "side" ? "left" : "top"); }
     function reserveOf(l) {
         switch (l) {
         case "islands": return barH + barM;
@@ -75,6 +75,9 @@ Singleton {
         case "notch": return px(42);
         case "rail": return px(26);
         case "pill": return px(58);
+        case "capsule": return px(47);
+        case "dune": return px(66);
+        case "side": return px(70);
         }
         return barH + barM;
     }

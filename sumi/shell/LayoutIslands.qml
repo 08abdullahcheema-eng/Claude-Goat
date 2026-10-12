@@ -28,7 +28,7 @@ Scope {
             Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
             Sep { anchors.verticalCenter: parent.verticalCenter }
             ModFan { anchors.verticalCenter: parent.verticalCenter }
-            ModCpu { anchors.verticalCenter: parent.verticalCenter }
+            ModCpuCurve { anchors.verticalCenter: parent.verticalCenter; curveColor: Theme.gold }
             ModAgent { anchors.verticalCenter: parent.verticalCenter }
         }
         Island {
@@ -46,6 +46,8 @@ Scope {
         }
         Island {
             x: parent.width - width - Theme.px(10); y: Theme.barM
+            ModMedia { anchors.verticalCenter: parent.verticalCenter; maxTitle: Theme.px(130); barW: Theme.px(46) }
+            Sep { anchors.verticalCenter: parent.verticalCenter; visible: Media.active }
             ModNet { anchors.verticalCenter: parent.verticalCenter }
             ModBt { anchors.verticalCenter: parent.verticalCenter }
             ModVol { anchors.verticalCenter: parent.verticalCenter }
@@ -53,7 +55,7 @@ Scope {
             ModDnd { anchors.verticalCenter: parent.verticalCenter }
             Sep { anchors.verticalCenter: parent.verticalCenter }
             KbdLayout { anchors.verticalCenter: parent.verticalCenter }
-            ModBat { anchors.verticalCenter: parent.verticalCenter }
+            ModBatRing { anchors.verticalCenter: parent.verticalCenter; showPct: true; ringSize: Theme.px(17) }
             ModPower { anchors.verticalCenter: parent.verticalCenter }
         }
     }

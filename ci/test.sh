@@ -93,7 +93,7 @@ run_qs network SUMI_DEMO=1 SUMI_OPEN=network
 run_qs agents SUMI_DEMO=1 SUMI_OPEN=agents
 run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
-for t in ember mono torii ronin storm sumi; do
+for t in kiri hagane suna iso sumi; do
   sumi-theme $t >/dev/null 2>&1
   WAIT=4 run_qs themes-$t SUMI_DEMO=1 SUMI_OPEN=themes
   WAIT=4 run_qs bar-$t SUMI_DEMO=1
@@ -103,10 +103,12 @@ for t in ember mono torii ronin storm sumi; do
 done
 grep -A4 "== verify" $OUT/verify-themes.log | grep -E "== verify|config ok|rror" | tee -a $OUT/summary.txt
 # every bar layout with the sumi theme, and a panel above a bottom bar
-for l in islands bottom corners notch rail pill; do WAIT=4 run_qs layout-$l SUMI_DEMO=1 SUMI_LAYOUT=$l; done
+for l in islands capsule rail dune side notch pill bottom corners; do WAIT=4 run_qs layout-$l SUMI_DEMO=1 SUMI_LAYOUT=$l; done
 WAIT=4 run_qs pill-audio SUMI_DEMO=1 SUMI_LAYOUT=pill SUMI_OPEN=audio
 WAIT=4 run_qs bottom-calendar SUMI_DEMO=1 SUMI_LAYOUT=bottom SUMI_OPEN=calendar
 WAIT=4 run_qs rail-system SUMI_DEMO=1 SUMI_LAYOUT=rail SUMI_OPEN=system
+WAIT=4 run_qs side-audio SUMI_DEMO=1 SUMI_LAYOUT=side SUMI_OPEN=audio
+WAIT=4 run_qs dune-calendar SUMI_DEMO=1 SUMI_LAYOUT=dune SUMI_OPEN=calendar
 run_qs calendar SUMI_DEMO=1 SUMI_OPEN=calendar
 run_qs system SUMI_DEMO=1 SUMI_OPEN=system
 run_qs battery SUMI_DEMO=1 SUMI_OPEN=battery
@@ -142,10 +144,10 @@ log "qs warnings/errors:"
 for f in $OUT/qs-*.log; do echo "--- $(basename $f)"; grep -E "WARN|ERROR|FATAL|TypeError|ReferenceError|is not defined|Cannot|Unable|failed" $f | grep -v "Failed to create wl_display" | head -40; done >> $OUT/summary.txt
 
 # theme switch end to end
-sumi-theme storm "" pill > $OUT/theme-switch.log 2>&1; log "sumi-theme storm rc=$? layout=$(cat ~/.config/sumi/layout 2>/dev/null)"
+sumi-theme iso wall-iso-2.jpg pill > $OUT/theme-switch.log 2>&1; log "sumi-theme iso rc=$? layout=$(cat ~/.config/sumi/layout 2>/dev/null) wall=$(cat ~/.config/sumi/wall 2>/dev/null)"
 sumi-theme --layout auto; log "layout after auto: $(cat ~/.config/sumi/layout 2>/dev/null || echo none)"
 head -3 ~/.config/sumi/kitty.conf >> $OUT/summary.txt
-WAIT=4 run_qs storm-agents SUMI_DEMO=1 SUMI_OPEN=agents
+WAIT=4 run_qs iso-agents SUMI_DEMO=1 SUMI_OPEN=agents
 sumi-theme sumi >/dev/null 2>&1
 kill $QPID 2>/dev/null; QPID=
 
@@ -153,9 +155,20 @@ kill $QPID 2>/dev/null; QPID=
 SDDM=$(B sddm)
 ls $SDDM/bin > $OUT/sddm-bin.txt
 GREETER=$(ls $SDDM/bin | grep -E '^sddm-greeter(-qt6)?$' | tail -1)
-(timeout 15 env QML_DISABLE_DISK_CACHE=1 QT_QPA_PLATFORM=wayland $SDDM/bin/$GREETER --test-mode --theme $PWD/sddm-sumi > $OUT/sddm.log 2>&1 &)
-sleep 9; $GRIM $OUT/shot-sddm.png
-sleep 7
+# login screen of every theme: sumi-theme writes the palette, the greeter reads it
+export SUMI_LOGIN_DIR=/tmp/sumi-login; mkdir -p $SUMI_LOGIN_DIR
+rm -rf /tmp/sddm-test; cp -r $PWD/sddm-sumi /tmp/sddm-test; chmod -R u+w /tmp/sddm-test
+printf '[General]\nstateDir=/tmp/sumi-login\n' > /tmp/sddm-test/theme.conf
+QTSVG=$(B qtsvg)
+for t in sumi kiri hagane suna iso; do
+  sumi-theme $t >/dev/null 2>&1
+  [ $t = sumi ] && cat $SUMI_LOGIN_DIR/palette.qml >> $OUT/summary.txt
+  (timeout 14 env QML_DISABLE_DISK_CACHE=1 QT_QPA_PLATFORM=wayland QT_PLUGIN_PATH=$QTSVG/lib/qt-6/plugins $SDDM/bin/$GREETER --test-mode --theme /tmp/sddm-test > $OUT/sddm-$t.log 2>&1 &)
+  sleep 9; $GRIM $OUT/shot-sddm-$t.png
+  sleep 6
+done
+grep -hiE "error|warn|cannot|unable" $OUT/sddm-*.log | sort | uniq -c | head -20 >> $OUT/summary.txt
+unset SUMI_LOGIN_DIR
 # real notifications over a private D-Bus session
 NS=$(B libnotify)/bin/notify-send; DBR=$(B dbus)/bin/dbus-run-session
 $DBR -- bash -c "
@@ -170,7 +183,7 @@ $DBR -- bash -c "
 
 # lock screen of every theme
 HL=$(B hyprlock)/bin/hyprlock
-for t in sumi ember mono torii ronin storm; do
+for t in sumi kiri hagane suna iso; do
   sumi-theme $t >/dev/null 2>&1
   (timeout 9 $HL -c $HF/.config/hypr/hyprlock.conf --immediate-render > $OUT/hyprlock-$t.log 2>&1 &)
   sleep 5; $GRIM $OUT/shot-lock-$t.png 2>>$OUT/hyprlock-$t.log

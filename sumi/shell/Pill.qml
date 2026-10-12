@@ -20,11 +20,13 @@ Rectangle {
     property bool bold: false
     property string activeStyle: BarStyle.activeStyle   // "box" | "line" | "fill" | "none"
     property real pad: BarStyle.pad
+    property Component lead: null              // optional item drawn before the icon (curve, ring)
     signal clicked(var mouse)
     signal wheel(var wheel)
 
     // screen x of this item's centre (bar windows span the whole screen width)
-    function centerX() { return mapToItem(null, width / 2, 0).x; }
+    // (also remembers the centre y, used when the bar stands on the left edge)
+    function centerX() { Ui.anchorY = mapToItem(null, 0, height / 2).y; return mapToItem(null, width / 2, 0).x; }
 
     implicitHeight: BarStyle.itemH
     implicitWidth: Math.max(labels ? 0 : Theme.px(32), row.implicitWidth + pad * 2)
@@ -51,6 +53,7 @@ Rectangle {
         id: row
         anchors.centerIn: parent
         spacing: Theme.px(6)
+        Loader { active: root.lead !== null; visible: active; sourceComponent: root.lead; anchors.verticalCenter: parent.verticalCenter }
         Icon {
             visible: root.icon !== "" && !root.labels
             name: root.icon

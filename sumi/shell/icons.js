@@ -1,6 +1,10 @@
 .pragma library
 // generated: 24x24 stroke paths
 var paths = {
+  "play": "M8 5.5l10 6.5-10 6.5z",
+  "pause": "M8.5 5.5v13M15.5 5.5v13",
+  "next": "M6 6l8 6-8 6zM18 6v12",
+  "prev": "M18 6l-8 6 8 6zM6 6v12",
   "btoff": "M7 7l10 10-5 5V2l5 5L7 17M3 3l18 18",
   "btcon": "M7 7l10 10-5 5V2l5 5L7 17M2.5 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19.5 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0",
   "vollow": "M4 9h4l5-4v14l-5-4H4zM16.5 8.5a5 5 0 0 1 0 7",

@@ -1,7 +1,7 @@
-# sumi-theme <name> [wall.jpg] [layout]   switch theme (sumi, ember, mono, torii, ronin, storm),
+# sumi-theme <name> [wall.jpg] [layout]   switch theme (sumi, kiri, hagane, suna, iso),
 #                                        optionally with one of its wallpapers and a bar layout
 # sumi-theme --wall <wall.jpg>   change only the wallpaper of the current theme
-# sumi-theme --layout <layout>   change only the bar layout: islands, bottom, corners, notch, rail, pill, or auto
+# sumi-theme --layout <layout>   change only the bar layout: islands capsule rail dune side notch pill bottom corners, or auto
 # sumi-theme --restore  re-apply the saved theme (wallpaper, borders, kitty, lock screen)
 # sumi-theme --init     write the theme files if missing, touch nothing that is running
 set -u
@@ -18,9 +18,9 @@ case "$mode" in
     ;;
   --layout)
     case "${2:-auto}" in
-      islands|bottom|corners|notch|rail|pill) printf '%s' "$2" > "$CONF/layout" ;;
+      islands|capsule|rail|dune|side|notch|pill|bottom|corners) printf '%s' "$2" > "$CONF/layout" ;;
       auto|"") rm -f "$CONF/layout" ;;
-      *) echo "unknown layout: $2 (islands bottom corners notch rail pill auto)" >&2; exit 1 ;;
+      *) echo "unknown layout: $2 (islands capsule rail dune side notch pill bottom corners auto)" >&2; exit 1 ;;
     esac
     exit 0
     ;;
@@ -33,7 +33,7 @@ case "$mode" in
     if [ -n "${2:-}" ]; then printf '%s' "$2" > "$CONF/wall"; else rm -f "$CONF/wall"; fi
     # and the bar layout: a named one, or the theme's own
     case "${3:-}" in
-      islands|bottom|corners|notch|rail|pill) printf '%s' "$3" > "$CONF/layout" ;;
+      islands|capsule|rail|dune|side|notch|pill|bottom|corners) printf '%s' "$3" > "$CONF/layout" ;;
       *) rm -f "$CONF/layout" ;;
     esac
     mode="--restore"
@@ -112,6 +112,41 @@ cp "$lock" "$CONF/hyprlock-theme.conf.tmp" && chmod u+w "$CONF/hyprlock-theme.co
   jq -r '.animation[]? | "animation = " + .' "$t"
 } > "$CONF/hypr-theme.conf.tmp"
 mv "$CONF/hypr-theme.conf.tmp" "$CONF/hypr-theme.conf"
+
+# login screen (SDDM): the same wallpaper, logo and colours, in a folder the greeter can read
+# (/var/lib/sumi, created by sumi-login.nix). Skipped quietly when the folder is not there.
+L="${SUMI_LOGIN_DIR:-/var/lib/sumi}"
+if [ -d "$L" ] && [ -w "$L" ]; then
+  cp "$wall" "$L/login-wall.jpg.tmp" 2>/dev/null && mv "$L/login-wall.jpg.tmp" "$L/login-wall.jpg"
+  logo="$SHELL_DIR/assets/$(get logo)"; [ -f "$logo" ] || logo="$SHELL_DIR/assets/logo-sumi.svg"
+  cp "$logo" "$L/logo.svg.tmp" 2>/dev/null && mv "$L/logo.svg.tmp" "$L/logo.svg"
+  case "$name" in hagane) rad=4 ;; sumi) rad=16 ;; *) rad=24 ;; esac
+  q() { get "$1" | sed 's/"/\\"/g'; }
+  cat > "$L/palette.qml.tmp" <<EOQ
+import QtQuick
+// written by sumi-theme ($name), read by the Sumi login screen
+Item {
+    property string name: "$name"
+    property string label: "$(q label)"
+    property string kanji: "$(q kanji)"
+    property color bg: "$(get bg)"
+    property color bg1: "$(get bg1)"
+    property color line: "$(get line)"
+    property color mute: "$(get mute)"
+    property color dim: "$(get dim)"
+    property color fg: "$(get fg)"
+    property color hi: "$(get hi)"
+    property color accent: "$(get accent)"
+    property color accent2: "$(get accent2)"
+    property color error: "$(get error)"
+    property string head: "$(q fontHead)"
+    property string body: "$(q fontBody)"
+    property real radius: $rad
+}
+EOQ
+  mv "$L/palette.qml.tmp" "$L/palette.qml"
+  chmod a+r "$L/login-wall.jpg" "$L/logo.svg" "$L/palette.qml" 2>/dev/null || true
+fi
 
 if [ "$mode" = "--init" ]; then exit 0; fi
 

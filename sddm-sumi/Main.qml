@@ -1,31 +1,43 @@
 import QtQuick 2.15
+import QtQuick.Effects
 
-// Sumi login: glass panel on the left, wallpaper on the right.
+// Sumi login: the wallpaper of the active theme, a glass card in the middle with the λ logo,
+// the theme's colours and fonts. sumi-theme writes them to /var/lib/sumi on every theme switch.
 Rectangle {
     id: root
     width: 1600
     height: 1000
-    color: "#0f0f14"
+    color: P.bg
 
-    // designed on a 1600x1000 canvas
     readonly property real s: Math.min(width / 1600, height / 1000)
-    readonly property color bg: "#0f0f14"
-    readonly property color bg1: "#16161d"
-    readonly property color bg2: "#1d1d26"
-    readonly property color line: "#2a2a37"
-    readonly property color line2: "#363646"
-    readonly property color mute: "#54546d"
-    readonly property color dim: "#727169"
-    readonly property color fg: "#dcd7ba"
-    readonly property color hi: "#f2ecd2"
-    readonly property color red: "#c8323a"
-    readonly property color red2: "#e46876"
-    readonly property color gold: "#e6c384"
-    readonly property string mono: "JetBrainsMono Nerd Font"
-    readonly property string jp: "Noto Serif CJK JP"
+    readonly property string stateDir: (config.stateDir && config.stateDir !== "") ? config.stateDir : "/var/lib/sumi"
+
+    // palette of the active theme, Sumi when nothing has been written yet
+    Loader { id: palLoader; source: "file://" + root.stateDir + "/palette.qml" }
+    QtObject {
+        id: P
+        readonly property var t: palLoader.status === Loader.Ready ? palLoader.item : null
+        readonly property string name: t ? t.name : "sumi"
+        readonly property string label: t ? t.label : "Sumi"
+        readonly property string kanji: t ? t.kanji : "墨"
+        readonly property color bg: t ? t.bg : "#0f0f14"
+        readonly property color bg1: t ? t.bg1 : "#16161d"
+        readonly property color line: t ? t.line : "#2a2a37"
+        readonly property color mute: t ? t.mute : "#54546d"
+        readonly property color dim: t ? t.dim : "#727169"
+        readonly property color fg: t ? t.fg : "#dcd7ba"
+        readonly property color hi: t ? t.hi : "#f2ecd2"
+        readonly property color accent: t ? t.accent : "#c8323a"
+        readonly property color accent2: t ? t.accent2 : "#e46876"
+        readonly property color error: t ? t.error : "#e46876"
+        readonly property string head: t ? t.head : "Shippori Mincho"
+        readonly property string body: t ? t.body : "JetBrainsMono Nerd Font"
+        readonly property real radius: t ? t.radius : 22
+    }
 
     property int sessionIndex: sessionModel.lastIndex >= 0 ? sessionModel.lastIndex : 0
     property string userName: userModel.lastUser !== "" ? userModel.lastUser : "larp"
+    property var userNames: []
     property bool busy: false
     property bool failed: false
 
@@ -51,18 +63,32 @@ Rectangle {
         return wanted.length ? wanted[0].name : "Session"
     }
     function nextSession() {
-        if (!wanted.length) return
+        if (wanted.length < 2) return
         var at = 0
         for (var k = 0; k < wanted.length; k++) if (wanted[k].i === root.sessionIndex) at = k
         root.sessionIndex = wanted[(at + 1) % wanted.length].i
     }
+    function nextUser() {
+        if (userNames.length < 2) return
+        var at = userNames.indexOf(root.userName)
+        root.userName = userNames[(at + 1) % userNames.length]
+    }
 
-    // hidden helper to read session names (sessionModel is a C++ model)
     Repeater {
         id: sessionRepeater
         model: sessionModel
         delegate: Item { property string sName: model.name; visible: false }
         onCountChanged: root.pickSessions()
+    }
+    Repeater {
+        id: userRepeater
+        model: userModel
+        delegate: Item { property string uName: model.name; visible: false }
+        onCountChanged: {
+            var l = []
+            for (var i = 0; i < count; i++) { var it = itemAt(i); if (it) l.push(it.uName) }
+            root.userNames = l
+        }
     }
 
     function doLogin() {
@@ -84,117 +110,141 @@ Rectangle {
         }
     }
 
+    // ---------------- wallpaper ----------------
     Image {
+        id: wallSrc
         anchors.fill: parent
-        source: "wall.jpg"
+        source: "file://" + root.stateDir + "/login-wall.jpg"
         fillMode: Image.PreserveAspectCrop
-        smooth: true
-        asynchronous: false
+        sourceSize.width: 1920
+        cache: false
+        visible: false
+        onStatusChanged: if (status === Image.Error) source = "wall.jpg"
+    }
+    MultiEffect {
+        anchors.fill: parent
+        source: wallSrc
+        blurEnabled: true; blur: 0.25; blurMax: 32
+        brightness: -0.32
+        saturation: 0.05
     }
 
-    // ---------------- panel ----------------
-    Rectangle {
-        id: panel
-        anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
-        width: 475 * root.s
-        color: "#f20d0d12"
-        Rectangle { anchors { right: parent.right; top: parent.top; bottom: parent.bottom } width: 1; color: root.line2 }
+    // ---------------- clock ----------------
+    Column {
+        x: 56 * root.s; y: 46 * root.s
+        spacing: 2 * root.s
+        Text { id: clock; color: P.hi; font.family: P.head; font.pixelSize: 68 * root.s; font.weight: Font.Bold }
+        Text { id: dateText; x: 3 * root.s; color: P.fg; font.family: P.body; font.pixelSize: 16 * root.s; font.letterSpacing: 2.5 * root.s }
+    }
 
+    // ---------------- glass card ----------------
+    Item {
+        id: card
+        width: 388 * root.s
+        height: cardCol.implicitHeight + 64 * root.s
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset: 10 * root.s
+        transform: Translate { id: shakeT; x: 0 }
+
+        // frosted glass: the wallpaper behind the card, blurred hard, cut to the rounded card
         Item {
-            id: inner
-            anchors { fill: parent; leftMargin: 62 * root.s; rightMargin: 62 * root.s; topMargin: 69 * root.s; bottomMargin: 56 * root.s }
+            id: glass
+            anchors.fill: parent
+            layer.enabled: true
+            layer.effect: MultiEffect {
+                maskEnabled: true
+                maskSource: glassMask
+                maskThresholdMin: 0.5
+                maskSpreadAtMin: 1.0
+            }
+            MultiEffect {
+                x: -card.x; y: -card.y
+                width: root.width; height: root.height
+                source: wallSrc
+                blurEnabled: true; blur: 1.0; blurMax: 64
+                brightness: -0.42
+                saturation: 0.15
+            }
+            Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, 0.28) }
+        }
+        Item {
+            id: glassMask
+            anchors.fill: parent
+            layer.enabled: true
+            visible: false
+            Rectangle { anchors.fill: parent; radius: Math.min(P.radius, 24) * root.s; color: "black" }
+        }
+        Rectangle {
+            anchors.fill: parent
+            radius: Math.min(P.radius, 24) * root.s
+            color: "transparent"
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.14)
+        }
 
-            Image {
-                id: logo
-                width: 69 * root.s; height: width
-                source: "logo.svg"
-                sourceSize.width: width * 2
-                sourceSize.height: height * 2
-            }
-            Text {
-                id: hello
-                anchors { top: logo.bottom; topMargin: 25 * root.s }
-                text: "おかえり"
-                color: root.hi
-                font.family: root.jp
-                font.pixelSize: 34 * root.s
-            }
-            Text {
-                id: sub
-                anchors { top: hello.bottom; topMargin: 4 * root.s }
-                text: "welcome back · " + (sddm.hostName || "helios")
-                color: root.dim
-                font.family: root.mono
-                font.pixelSize: 13 * root.s
-            }
+        Column {
+            id: cardCol
+            anchors { top: parent.top; topMargin: 38 * root.s; horizontalCenter: parent.horizontalCenter }
+            spacing: 0
 
-            // users
-            Text {
-                id: userLbl
-                anchors { top: sub.bottom; topMargin: 44 * root.s }
-                text: "USER"
-                color: root.mute; font.family: root.mono; font.pixelSize: 9.5 * root.s; font.letterSpacing: 2.5 * root.s
-            }
-            Column {
-                id: users
-                anchors { top: userLbl.bottom; topMargin: 8 * root.s; left: parent.left; right: parent.right; leftMargin: -12 * root.s }
-                spacing: 2 * root.s
-                Repeater {
-                    model: userModel
-                    delegate: Rectangle {
-                        readonly property bool on: model.name === root.userName
-                        width: users.width
-                        height: 54 * root.s
-                        radius: 6 * root.s
-                        color: on ? root.bg2 : (um.containsMouse ? "#801d1d26" : "transparent")
-                        Rectangle { visible: parent.on; width: 2.5 * root.s; height: parent.height; color: root.red }
-                        Rectangle {
-                            id: av
-                            x: 12 * root.s
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 34 * root.s; height: width; radius: width / 2
-                            color: root.bg1; border.width: 1; border.color: root.line2
-                            Image { visible: parent.parent.on; anchors.centerIn: parent; width: parent.width * 0.82; height: width; source: "logo.svg"; sourceSize.width: 96; sourceSize.height: 96 }
-                            Text { visible: !parent.parent.on; anchors.centerIn: parent; text: (model.name || "?").charAt(0).toUpperCase(); color: root.dim; font.family: root.mono; font.pixelSize: 14 * root.s }
-                        }
-                        Column {
-                            anchors { left: av.right; leftMargin: 12 * root.s; verticalCenter: parent.verticalCenter }
-                            spacing: 1 * root.s
-                            Text { text: model.name; color: parent.parent.on ? root.hi : root.dim; font.family: root.mono; font.pixelSize: 15 * root.s }
-                            Text { text: (model.realName && model.realName !== model.name) ? model.realName : (parent.parent.on ? "last user" : "user"); color: root.mute; font.family: root.mono; font.pixelSize: 10 * root.s }
-                        }
-                        MouseArea { id: um; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { root.userName = model.name; password.forceActiveFocus() } }
-                    }
+            // avatar: the λ logo in a ring of the accent
+            Item {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 96 * root.s; height: width
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: parent.width + 14 * root.s; height: width; radius: width / 2
+                    color: "transparent"
+                    border.width: 5 * root.s
+                    border.color: Qt.rgba(0, 0, 0, 0.28)
                 }
+                Rectangle {
+                    anchors.fill: parent
+                    radius: width / 2
+                    color: P.bg
+                    border.width: 2 * root.s
+                    border.color: P.accent
+                }
+                Image {
+                    anchors.centerIn: parent
+                    width: parent.width - 6 * root.s; height: width
+                    source: "file://" + root.stateDir + "/logo.svg"
+                    sourceSize.width: 256; sourceSize.height: 256
+                    cache: false
+                    onStatusChanged: if (status === Image.Error) source = "logo.svg"
+                }
+                MouseArea { anchors.fill: parent; cursorShape: root.userNames.length > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor; onClicked: { root.nextUser(); password.forceActiveFocus() } }
             }
+            Item { width: 1; height: 16 * root.s }
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: root.userName
+                color: P.hi
+                font.family: P.head
+                font.pixelSize: 27 * root.s
+                font.weight: Font.Bold
+            }
+            Item { width: 1; height: 22 * root.s }
 
             // password
-            Text {
-                id: pwLbl
-                anchors { top: users.bottom; topMargin: 28 * root.s }
-                text: "PASSWORD"
-                color: root.mute; font.family: root.mono; font.pixelSize: 9.5 * root.s; font.letterSpacing: 2.5 * root.s
-            }
             Rectangle {
                 id: field
-                anchors { top: pwLbl.bottom; topMargin: 9 * root.s; left: parent.left; right: parent.right }
-                height: 45 * root.s
-                radius: 6 * root.s
-                color: root.bg
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 276 * root.s; height: 40 * root.s
+                radius: Math.min(P.radius, 20) * root.s
+                color: Qt.rgba(1, 1, 1, 0.07)
                 border.width: Math.max(1, 1.5 * root.s)
-                border.color: root.failed ? root.red2 : root.red
-                transform: Translate { id: shakeT; x: 0 }
-
+                border.color: root.failed ? P.error : (password.activeFocus ? P.accent : Qt.rgba(P.accent.r, P.accent.g, P.accent.b, 0.7))
                 TextInput {
                     id: password
-                    anchors { left: parent.left; leftMargin: 14 * root.s; right: enterKey.left; rightMargin: 10 * root.s; verticalCenter: parent.verticalCenter }
+                    anchors { left: parent.left; leftMargin: 16 * root.s; right: go.left; rightMargin: 8 * root.s; verticalCenter: parent.verticalCenter }
                     echoMode: TextInput.Password
-                    passwordCharacter: "•"
-                    color: root.hi
-                    selectionColor: root.red
-                    font.family: root.mono
-                    font.pixelSize: 17 * root.s
-                    font.letterSpacing: 3 * root.s
+                    passwordCharacter: "●"
+                    color: P.hi
+                    selectionColor: P.accent
+                    font.family: P.body
+                    font.pixelSize: 13 * root.s
+                    font.letterSpacing: 4 * root.s
                     focus: true
                     clip: true
                     Keys.onReturnPressed: root.doLogin()
@@ -203,118 +253,96 @@ Rectangle {
                 Text {
                     anchors { left: password.left; verticalCenter: parent.verticalCenter }
                     visible: password.text.length === 0
-                    text: root.failed ? "wrong password, try again" : "password"
-                    color: root.failed ? root.red2 : root.mute
-                    font.family: root.mono
+                    text: root.failed ? "falsches Passwort" : "Passwort"
+                    color: root.failed ? P.error : P.dim
+                    font.family: P.body
                     font.pixelSize: 13 * root.s
                 }
-                Rectangle {
-                    id: enterKey
-                    anchors { right: parent.right; rightMargin: 9 * root.s; verticalCenter: parent.verticalCenter }
-                    width: 30 * root.s; height: 24 * root.s; radius: 4 * root.s
-                    color: ek.containsMouse ? root.red : "transparent"
-                    border.width: 1; border.color: root.line2
-                    Text { anchors.centerIn: parent; text: root.busy ? "…" : "↵"; color: root.dim; font.family: root.mono; font.pixelSize: 12 * root.s }
-                    MouseArea { id: ek; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.doLogin() }
-                }
-                SequentialAnimation {
-                    id: shake
-                    NumberAnimation { target: shakeT; property: "x"; to: -10 * root.s; duration: 50 }
-                    NumberAnimation { target: shakeT; property: "x"; to: 10 * root.s; duration: 70 }
-                    NumberAnimation { target: shakeT; property: "x"; to: -6 * root.s; duration: 60 }
-                    NumberAnimation { target: shakeT; property: "x"; to: 0; duration: 50 }
+                Text {
+                    id: go
+                    anchors { right: parent.right; rightMargin: 14 * root.s; verticalCenter: parent.verticalCenter }
+                    text: root.busy ? "…" : "➜"
+                    color: gm.containsMouse ? P.hi : P.accent
+                    font.pixelSize: 15 * root.s
+                    MouseArea { id: gm; anchors.fill: parent; anchors.margins: -8 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.doLogin() }
                 }
             }
-
-            // session + keyboard
+            Item { width: 1; height: 18 * root.s }
+            // session and keyboard layout, click to change
             Row {
-                id: opts
-                anchors { top: field.bottom; topMargin: 12 * root.s; left: parent.left; right: parent.right }
-                spacing: 9 * root.s
-                Rectangle {
-                    width: opts.width - kb.width - opts.spacing
-                    height: 38 * root.s; radius: 6 * root.s
-                    color: sm.containsMouse ? root.bg2 : "transparent"
-                    border.width: 1; border.color: root.line2
-                    Canvas {
-                        id: monIcon
-                        x: 12 * root.s; anchors.verticalCenter: parent.verticalCenter
-                        width: 15 * root.s; height: width
-                        onPaint: {
-                            var c = getContext("2d"); c.reset()
-                            var w = width
-                            c.strokeStyle = root.dim; c.lineWidth = Math.max(1, w * 0.09); c.lineJoin = "round"
-                            c.strokeRect(w * 0.08, w * 0.14, w * 0.84, w * 0.56)
-                            c.beginPath(); c.moveTo(w * 0.32, w * 0.9); c.lineTo(w * 0.68, w * 0.9); c.moveTo(w * 0.5, w * 0.7); c.lineTo(w * 0.5, w * 0.9); c.stroke()
-                        }
-                    }
-                    Text { anchors { left: monIcon.right; leftMargin: 10 * root.s; verticalCenter: parent.verticalCenter } text: root.sessionName(); color: root.fg; font.family: root.mono; font.pixelSize: 13 * root.s }
-                    Text { anchors { right: parent.right; rightMargin: 12 * root.s; verticalCenter: parent.verticalCenter } text: root.wanted.length > 1 ? "⇄" : ""; color: root.mute; font.family: root.mono; font.pixelSize: 13 * root.s }
-                    MouseArea { id: sm; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { root.nextSession(); password.forceActiveFocus() } }
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 14 * root.s
+                Text {
+                    text: root.sessionName().toUpperCase()
+                    color: sm.containsMouse ? P.hi : P.dim
+                    font.family: P.body; font.pixelSize: 10.5 * root.s; font.letterSpacing: 2.5 * root.s
+                    MouseArea { id: sm; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { root.nextSession(); password.forceActiveFocus() } }
                 }
-                Rectangle {
-                    id: kb
-                    width: 69 * root.s; height: 38 * root.s; radius: 6 * root.s
-                    color: km.containsMouse ? root.bg2 : "transparent"
-                    border.width: 1; border.color: root.line2
-                    Text {
-                        anchors.centerIn: parent
-                        text: {
-                            var l = keyboard.layouts[keyboard.currentLayout]
-                            return l ? l.shortName.toUpperCase() : "DE"
-                        }
-                        color: root.fg; font.family: root.mono; font.pixelSize: 13 * root.s
-                    }
+                Text { text: P.kanji; color: P.accent; font.family: "Noto Serif CJK JP"; font.pixelSize: 11 * root.s }
+                Text {
+                    text: { var l = keyboard.layouts[keyboard.currentLayout]; return l ? l.shortName.toUpperCase() : "DE" }
+                    color: km.containsMouse ? P.hi : P.dim
+                    font.family: P.body; font.pixelSize: 10.5 * root.s; font.letterSpacing: 2.5 * root.s
                     MouseArea {
-                        id: km; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        id: km; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                         onClicked: { if (keyboard.layouts.length > 1) keyboard.currentLayout = (keyboard.currentLayout + 1) % keyboard.layouts.length; password.forceActiveFocus() }
                     }
                 }
             }
+        }
+        SequentialAnimation {
+            id: shake
+            NumberAnimation { target: shakeT; property: "x"; to: -12 * root.s; duration: 50 }
+            NumberAnimation { target: shakeT; property: "x"; to: 12 * root.s; duration: 70 }
+            NumberAnimation { target: shakeT; property: "x"; to: -7 * root.s; duration: 60 }
+            NumberAnimation { target: shakeT; property: "x"; to: 0; duration: 50 }
+        }
+    }
 
-            // bottom: power buttons + clock
-            Row {
-                anchors { left: parent.left; bottom: parent.bottom }
-                spacing: 10 * root.s
-                Repeater {
-                    model: ["reboot", "power"]
-                    delegate: Rectangle {
-                        width: 39 * root.s; height: width; radius: 6 * root.s
-                        color: pa.containsMouse ? root.bg2 : "transparent"
-                        border.width: 1; border.color: root.line2
-                        Canvas {
-                            id: ic
-                            anchors.centerIn: parent
-                            width: 17 * root.s; height: width
-                            property color c: modelData === "power" ? root.red : root.dim
-                            onPaint: {
-                                var ctx = getContext("2d"); ctx.reset()
-                                var w = width, cx = w / 2, cy = w / 2 + w * 0.05, r = w * 0.36
-                                ctx.strokeStyle = ic.c; ctx.lineWidth = Math.max(1.4, w * 0.1); ctx.lineCap = "round"; ctx.lineJoin = "round"
-                                ctx.beginPath()
-                                if (modelData === "power") {
-                                    ctx.arc(cx, cy, r, -Math.PI / 2 + 0.6, 1.5 * Math.PI - 0.6, false)
-                                    ctx.moveTo(cx, cy - r * 1.25); ctx.lineTo(cx, cy - r * 0.3)
-                                } else {
-                                    var e = 1.5 * Math.PI - 0.15
-                                    ctx.arc(cx, cy, r, -Math.PI / 2 + 0.75, e, false)
-                                    var px = cx + r * Math.cos(e), py = cy + r * Math.sin(e)
-                                    var dx = -Math.sin(e), dy = Math.cos(e), L = w * 0.26
-                                    ctx.moveTo(px, py); ctx.lineTo(px - L * (dx * Math.cos(0.6) - dy * Math.sin(0.6)), py - L * (dx * Math.sin(0.6) + dy * Math.cos(0.6)))
-                                    ctx.moveTo(px, py); ctx.lineTo(px - L * (dx * Math.cos(-0.6) - dy * Math.sin(-0.6)), py - L * (dx * Math.sin(-0.6) + dy * Math.cos(-0.6)))
-                                }
-                                ctx.stroke()
-                            }
+    // ---------------- bottom: host on the left, sleep / restart / power on the right ----------------
+    Text {
+        anchors { left: parent.left; leftMargin: 58 * root.s; bottom: parent.bottom; bottomMargin: 46 * root.s }
+        text: (sddm.hostName || "nixos") + "  ·  " + P.label.toUpperCase()
+        color: P.dim; font.family: P.body; font.pixelSize: 12 * root.s; font.letterSpacing: 2 * root.s
+    }
+    Row {
+        anchors { right: parent.right; rightMargin: 50 * root.s; bottom: parent.bottom; bottomMargin: 40 * root.s }
+        spacing: 20 * root.s
+        Repeater {
+            model: sddm.canSuspend ? ["sleep", "reboot", "power"] : ["reboot", "power"]
+            delegate: Item {
+                width: 26 * root.s; height: width
+                Canvas {
+                    id: ic
+                    anchors.fill: parent
+                    property color c: modelData === "power" ? P.accent : (pa.containsMouse ? P.hi : P.fg)
+                    onCChanged: requestPaint()
+                    onPaint: {
+                        var ctx = getContext("2d"); ctx.reset()
+                        var w = width, cx = w / 2, cy = w / 2 + w * 0.04, r = w * 0.34
+                        ctx.strokeStyle = ic.c; ctx.lineWidth = Math.max(1.4, w * 0.08); ctx.lineCap = "round"; ctx.lineJoin = "round"
+                        ctx.beginPath()
+                        if (modelData === "power") {
+                            ctx.arc(cx, cy, r, -Math.PI / 2 + 0.6, 1.5 * Math.PI - 0.6, false)
+                            ctx.moveTo(cx, cy - r * 1.25); ctx.lineTo(cx, cy - r * 0.3)
+                        } else if (modelData === "sleep") {
+                            ctx.arc(cx, cy, r, 0.45 * Math.PI, 1.85 * Math.PI, false)
+                            ctx.arc(cx + r * 0.55, cy - r * 0.35, r * 0.78, 1.62 * Math.PI, 0.72 * Math.PI, true)
+                        } else {
+                            var e = 1.5 * Math.PI - 0.15
+                            ctx.arc(cx, cy, r, -Math.PI / 2 + 0.75, e, false)
+                            var px = cx + r * Math.cos(e), py = cy + r * Math.sin(e)
+                            var dx = -Math.sin(e), dy = Math.cos(e), L = w * 0.24
+                            ctx.moveTo(px, py); ctx.lineTo(px - L * (dx * Math.cos(0.6) - dy * Math.sin(0.6)), py - L * (dx * Math.sin(0.6) + dy * Math.cos(0.6)))
+                            ctx.moveTo(px, py); ctx.lineTo(px - L * (dx * Math.cos(-0.6) - dy * Math.sin(-0.6)), py - L * (dx * Math.sin(-0.6) + dy * Math.cos(-0.6)))
                         }
-                        MouseArea { id: pa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: modelData === "power" ? sddm.powerOff() : sddm.reboot() }
+                        ctx.stroke()
                     }
                 }
-            }
-            Column {
-                anchors { right: parent.right; bottom: parent.bottom }
-                spacing: 2 * root.s
-                Text { id: clock; anchors.right: parent.right; color: root.hi; font.family: root.mono; font.pixelSize: 21 * root.s }
-                Text { id: dateText; anchors.right: parent.right; color: root.mute; font.family: root.mono; font.pixelSize: 11 * root.s }
+                MouseArea {
+                    id: pa; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                    onClicked: modelData === "power" ? sddm.powerOff() : (modelData === "sleep" ? sddm.suspend() : sddm.reboot())
+                }
             }
         }
     }
@@ -324,9 +352,9 @@ Rectangle {
         onTriggered: {
             var d = new Date()
             clock.text = Qt.formatTime(d, "hh:mm")
-            var wd = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"][d.getDay()]
-            var mo = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"][d.getMonth()]
-            dateText.text = wd + " " + Qt.formatDate(d, "dd") + " " + mo + " · " + ["日", "月", "火", "水", "木", "金", "土"][d.getDay()]
+            var wd = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"][d.getDay()]
+            var mo = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"][d.getMonth()]
+            dateText.text = wd + ", " + d.getDate() + ". " + mo
         }
     }
 
@@ -334,19 +362,16 @@ Rectangle {
     Rectangle {
         id: launchCover
         anchors.fill: parent
-        color: root.bg
+        color: P.bg
         opacity: 0
         visible: opacity > 0
-        Behavior on opacity { NumberAnimation { duration: 300 } }
-        Image { anchors.fill: parent; source: "wall.jpg"; fillMode: Image.PreserveAspectCrop; smooth: true }
+        Behavior on opacity { NumberAnimation { duration: 350 } }
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: parent.height * 0.62
-            text: "起動中"
-            color: root.hi
-            font.family: root.jp
-            font.pixelSize: 22 * root.s
-            font.letterSpacing: 10 * root.s
+            anchors.centerIn: parent
+            text: P.kanji
+            color: P.accent
+            font.family: "Noto Serif CJK JP"
+            font.pixelSize: 54 * root.s
             SequentialAnimation on opacity {
                 loops: Animation.Infinite
                 running: launchCover.visible

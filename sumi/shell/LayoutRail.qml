@@ -28,14 +28,21 @@ Scope {
             }
             Text { text: Theme.label.toUpperCase(); color: Theme.fg; font.family: Theme.body; font.pixelSize: Theme.px(10.5); font.letterSpacing: Theme.px(2.2); anchors.verticalCenter: parent.verticalCenter }
             Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
+            Item { width: Theme.px(10); height: 1 }
+            ModMedia {
+                anchors.verticalCenter: parent.verticalCenter
+                implicitHeight: BarStyle.itemH; coverSize: Theme.px(14); coverRadius: Theme.px(2)
+                barW: Theme.px(50); barColor: Theme.hi; maxTitle: Theme.px(150)
+                fontFamily: Theme.body; fontSize: Theme.px(10.5)
+            }
         }
         ModClock { anchors.centerIn: parent; timeSize: Theme.px(11.5); timeFont: Theme.body }
         Row {
             anchors { right: parent.right; rightMargin: Theme.px(10); verticalCenter: parent.verticalCenter }
             spacing: Theme.px(2)
-            ModFan {} ModCpu {} ModAgent {} ModVol {} ModMic {} ModNet {} ModBt {} ModDnd {}
+            ModFan {} ModCpuCurve { curveColor: Theme.hi; curveFill: false; curveWidth: Theme.px(46) } ModAgent {} ModVol {} ModMic {} ModNet {} ModBt {} ModDnd {}
             KbdLayout { anchors.verticalCenter: parent.verticalCenter }
-            ModBat {} ModPower {}
+            ModBatRing { ringSize: Theme.px(15); showPct: true; labels: false; textColor: Theme.accent } ModPower {}
         }
     }
 }

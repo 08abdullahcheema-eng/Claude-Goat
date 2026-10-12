@@ -43,9 +43,9 @@ Scope {
         Row {
             anchors { right: parent.right; rightMargin: Theme.px(18); verticalCenter: parent.verticalCenter }
             spacing: Theme.px(2)
-            ModFan {} ModCpu {} ModAgent {} ModNet {} ModBt {} ModVol {} ModMic {} ModDnd {}
+            ModFan {} ModCpuCurve {} ModAgent {} ModNet {} ModBt {} ModVol {} ModMic {} ModDnd {}
             KbdLayout { anchors.verticalCenter: parent.verticalCenter }
-            ModBat {}
+            ModBatRing { showPct: true }
             // the red dot is the power button
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter

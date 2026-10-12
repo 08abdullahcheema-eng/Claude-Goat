@@ -37,8 +37,10 @@ Scope {
                 Sep { anchors.verticalCenter: parent.verticalCenter }
                 ModClock { anchors.verticalCenter: parent.verticalCenter; showDate: false; timeFont: Theme.head; timeSize: Theme.px(16); timeWeight: Font.Bold }
                 Sep { anchors.verticalCenter: parent.verticalCenter }
+                ModMedia { anchors.verticalCenter: parent.verticalCenter; maxTitle: Theme.px(120); barW: Theme.px(44) }
+                Sep { anchors.verticalCenter: parent.verticalCenter; visible: Media.active }
                 ModFan { anchors.verticalCenter: parent.verticalCenter }
-                ModCpu { anchors.verticalCenter: parent.verticalCenter }
+                ModCpuCurve { anchors.verticalCenter: parent.verticalCenter }
                 ModAgent { anchors.verticalCenter: parent.verticalCenter }
                 ModNet { anchors.verticalCenter: parent.verticalCenter }
                 ModBt { anchors.verticalCenter: parent.verticalCenter }

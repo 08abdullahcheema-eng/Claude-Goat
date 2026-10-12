@@ -13,6 +13,7 @@ Singleton {
     property bool dnd: false
     property var barWindows: []   // bar windows, clicks there must not count as "outside"
     property real anchorX: -1   // screen x of the bar icon that opened the panel, so it drops down under it
+    property real anchorY: -1   // its centre y, for a bar on the left edge (the panel opens beside the icon)
 
     // OSD
     property string osdKind: ""      // "volume" | "brightness"
@@ -30,14 +31,19 @@ Singleton {
         toggle(name);
     }
     // y for a dropdown card: under a top bar, or above a bottom bar
-    function dropY(h, sh) { return Theme.barEdge === "bottom" ? sh - h - Theme.px(8) : Theme.px(8); }
+    function dropY(h, sh) {
+        const m = Theme.px(8);
+        if (Theme.barEdge === "left") return anchorX < 0 || anchorY < 0 ? m : Math.max(m, Math.min(sh - h - m, anchorY - h / 2));
+        return Theme.barEdge === "bottom" ? sh - h - m : m;
+    }
     // x for a dropdown card of width w in a screen of width sw, centred under anchorX
     function dropX(w, sw, fallback) {
         const m = Theme.px(10);
+        if (Theme.barEdge === "left") return anchorX < 0 ? Math.max(m, Math.min(sw - w - m, fallback)) : m;
         if (anchorX < 0) return Math.max(m, Math.min(sw - w - m, fallback));
         return Math.max(m, Math.min(sw - w - m, anchorX - w / 2));
     }
-    function open(name) { anchorX = -1; panel = name; }
+    function open(name) { anchorX = -1; anchorY = -1; panel = name; }
     function close() { panel = ""; }
 
     function showOsd(kind, value, muted) {

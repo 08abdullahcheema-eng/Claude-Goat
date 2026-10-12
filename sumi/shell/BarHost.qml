@@ -11,4 +11,7 @@ Scope {
     LazyLoader { active: Theme.layout === "notch"; LayoutNotch { screenRef: host.modelData } }
     LazyLoader { active: Theme.layout === "rail"; LayoutRail { screenRef: host.modelData } }
     LazyLoader { active: Theme.layout === "pill"; LayoutPill { screenRef: host.modelData } }
+    LazyLoader { active: Theme.layout === "capsule"; LayoutCapsule { screenRef: host.modelData } }
+    LazyLoader { active: Theme.layout === "dune"; LayoutDune { screenRef: host.modelData } }
+    LazyLoader { active: Theme.layout === "side"; LayoutSide { screenRef: host.modelData } }
 }

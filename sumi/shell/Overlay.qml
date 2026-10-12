@@ -15,6 +15,7 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     margins.top: Ui.panelIsFull || Theme.barEdge !== "top" ? 0 : Theme.barReserve
     margins.bottom: Ui.panelIsFull || Theme.barEdge !== "bottom" ? 0 : Theme.barReserve
+    margins.left: Ui.panelIsFull || Theme.barEdge !== "left" ? 0 : Theme.barReserve
     color: "transparent"
     WlrLayershell.namespace: "sumi-overlay"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -77,7 +78,8 @@ PanelWindow {
         ParallelAnimation {
             id: enterAnim
             NumberAnimation { target: loader; property: "opacity"; from: 0; to: 1; duration: 190; easing.type: Easing.OutCubic }
-            NumberAnimation { target: slide; property: "y"; from: Ui.panelIsFull ? 0 : (Theme.barEdge === "bottom" ? Theme.px(10) : -Theme.px(10)); to: 0; duration: 280; easing.type: Easing.OutQuint }
+            NumberAnimation { target: slide; property: "y"; from: Ui.panelIsFull || Theme.barEdge === "left" ? 0 : (Theme.barEdge === "bottom" ? Theme.px(10) : -Theme.px(10)); to: 0; duration: 280; easing.type: Easing.OutQuint }
+            NumberAnimation { target: slide; property: "x"; from: !Ui.panelIsFull && Theme.barEdge === "left" ? -Theme.px(12) : 0; to: 0; duration: 280; easing.type: Easing.OutQuint }
         }
     }
 
