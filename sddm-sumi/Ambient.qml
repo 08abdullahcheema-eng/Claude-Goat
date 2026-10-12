@@ -113,25 +113,29 @@ Item {
     }
 
     // ---- a shooting star now and then (ginga) ----
-    Rectangle {
-        id: meteor
+    // the lane jumps to a random spot, the streak runs a fixed path inside it
+    Item {
+        id: lane
         visible: amb.name === "ginga"
-        width: 190 * amb.s; height: Math.max(1.5, 1.6 * amb.s)
-        rotation: 28
-        transformOrigin: Item.Right
-        opacity: 0
-        gradient: Gradient { orientation: Gradient.Horizontal
-            GradientStop { position: 0; color: "transparent" }
-            GradientStop { position: 1; color: "#ffffff" } }
+        Rectangle {
+            id: meteor
+            width: 190 * amb.s; height: Math.max(1.5, 1.6 * amb.s)
+            rotation: 28
+            transformOrigin: Item.Right
+            opacity: 0
+            gradient: Gradient { orientation: Gradient.Horizontal
+                GradientStop { position: 0; color: "transparent" }
+                GradientStop { position: 1; color: "#ffffff" } }
+        }
         SequentialAnimation {
-            running: meteor.visible && amb.visible
+            running: lane.visible && amb.visible
             loops: Animation.Infinite
             PauseAnimation { duration: 5200 }
-            ScriptAction { script: { meteor.x = amb.width * (0.15 + Math.random() * 0.55); meteor.y = amb.height * (0.05 + Math.random() * 0.25); } }
+            ScriptAction { script: { lane.x = amb.width * (0.15 + Math.random() * 0.55); lane.y = amb.height * (0.05 + Math.random() * 0.25); meteor.x = 0; meteor.y = 0; } }
             ParallelAnimation {
                 NumberAnimation { target: meteor; property: "opacity"; from: 0; to: 0.95; duration: 160 }
-                NumberAnimation { target: meteor; property: "x"; by: 260 * amb.s; duration: 850; easing.type: Easing.InQuad }
-                NumberAnimation { target: meteor; property: "y"; by: 140 * amb.s; duration: 850; easing.type: Easing.InQuad }
+                NumberAnimation { target: meteor; property: "x"; from: 0; to: 260 * amb.s; duration: 850; easing.type: Easing.InQuad }
+                NumberAnimation { target: meteor; property: "y"; from: 0; to: 140 * amb.s; duration: 850; easing.type: Easing.InQuad }
             }
             NumberAnimation { target: meteor; property: "opacity"; to: 0; duration: 260 }
             PauseAnimation { duration: 3600 }
