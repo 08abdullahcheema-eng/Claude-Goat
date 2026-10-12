@@ -26,6 +26,8 @@ Singleton {
     property real freqMax: Theme.demo ? 5.1 : 0
     property real memTotal: Theme.demo ? 32 * 1048576 : 0     // kB
     property real memAvail: Theme.demo ? 21.4 * 1048576 : 0   // kB
+    readonly property int memPct: memTotal > 0 ? Math.round((1 - memAvail / memTotal) * 100) : 0
+    readonly property string memUsed: memTotal > 0 ? ((memTotal - memAvail) / 1048576).toFixed(1) : "0"
     property real swapTotal: 0
     property real swapFree: 0
     property string load: Theme.demo ? "0.62 0.48 0.40" : ""
@@ -37,6 +39,20 @@ Singleton {
 
     Timer { interval: 3000; running: !Theme.demo; repeat: true; triggeredOnStart: true; onTriggered: statProc.running = true }
     Timer { interval: 4000; running: !Theme.demo; repeat: true; triggeredOnStart: true; onTriggered: kbProc.running = true }
+    // the bar shows RAM too, so read it every few seconds even with the panel closed
+    Timer { interval: 5000; running: !Theme.demo && !root.detail; repeat: true; triggeredOnStart: true; onTriggered: memProc.running = true }
+    Process {
+        id: memProc
+        command: ["grep", "-E", "^(MemTotal|MemAvailable):", "/proc/meminfo"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                for (const l of this.text.split("\n")) {
+                    if (l.startsWith("MemTotal:")) root.memTotal = parseInt(l.split(/\s+/)[1]);
+                    else if (l.startsWith("MemAvailable:")) root.memAvail = parseInt(l.split(/\s+/)[1]);
+                }
+            }
+        }
+    }
     Timer { interval: 2000; running: root.detail && !Theme.demo; repeat: true; triggeredOnStart: true; onTriggered: detProc.running = true }
 
     Process {

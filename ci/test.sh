@@ -93,7 +93,7 @@ run_qs network SUMI_DEMO=1 SUMI_OPEN=network
 run_qs agents SUMI_DEMO=1 SUMI_OPEN=agents
 run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
-for t in kiri hagane suna iso sumi; do
+for t in kiri hagane suna iso dune summit unkai ginga sumi; do
   sumi-theme $t >/dev/null 2>&1
   WAIT=4 run_qs themes-$t SUMI_DEMO=1 SUMI_OPEN=themes
   WAIT=4 run_qs bar-$t SUMI_DEMO=1
@@ -103,12 +103,16 @@ for t in kiri hagane suna iso sumi; do
 done
 grep -A4 "== verify" $OUT/verify-themes.log | grep -E "== verify|config ok|rror" | tee -a $OUT/summary.txt
 # every bar layout with the sumi theme, and a panel above a bottom bar
-for l in islands capsule rail dune side notch pill bottom corners; do WAIT=4 run_qs layout-$l SUMI_DEMO=1 SUMI_LAYOUT=$l; done
+for l in islands capsule rail dune side horizon ridge float stars notch pill bottom corners; do WAIT=4 run_qs layout-$l SUMI_DEMO=1 SUMI_LAYOUT=$l; done
 WAIT=4 run_qs pill-audio SUMI_DEMO=1 SUMI_LAYOUT=pill SUMI_OPEN=audio
 WAIT=4 run_qs bottom-calendar SUMI_DEMO=1 SUMI_LAYOUT=bottom SUMI_OPEN=calendar
 WAIT=4 run_qs rail-system SUMI_DEMO=1 SUMI_LAYOUT=rail SUMI_OPEN=system
 WAIT=4 run_qs side-audio SUMI_DEMO=1 SUMI_LAYOUT=side SUMI_OPEN=audio
 WAIT=4 run_qs dune-calendar SUMI_DEMO=1 SUMI_LAYOUT=dune SUMI_OPEN=calendar
+WAIT=4 run_qs horizon-system SUMI_DEMO=1 SUMI_LAYOUT=horizon SUMI_OPEN=system
+WAIT=4 run_qs ridge-calendar SUMI_DEMO=1 SUMI_LAYOUT=ridge SUMI_OPEN=calendar
+WAIT=4 run_qs float-audio SUMI_DEMO=1 SUMI_LAYOUT=float SUMI_OPEN=audio
+WAIT=4 run_qs stars-battery SUMI_DEMO=1 SUMI_LAYOUT=stars SUMI_OPEN=battery
 run_qs calendar SUMI_DEMO=1 SUMI_OPEN=calendar
 run_qs system SUMI_DEMO=1 SUMI_OPEN=system
 run_qs battery SUMI_DEMO=1 SUMI_OPEN=battery
@@ -160,12 +164,13 @@ export SUMI_LOGIN_DIR=/tmp/sumi-login; mkdir -p $SUMI_LOGIN_DIR
 rm -rf /tmp/sddm-test; cp -r $PWD/sddm-sumi /tmp/sddm-test; chmod -R u+w /tmp/sddm-test
 printf '[General]\nstateDir=/tmp/sumi-login\n' > /tmp/sddm-test/theme.conf
 QTSVG=$(B qtsvg)
-for t in sumi kiri hagane suna iso; do
+for t in sumi kiri hagane suna iso dune summit unkai ginga; do
   sumi-theme $t >/dev/null 2>&1
   [ $t = sumi ] && cat $SUMI_LOGIN_DIR/palette.qml >> $OUT/summary.txt
   (timeout 14 env QML_DISABLE_DISK_CACHE=1 QT_QPA_PLATFORM=wayland QT_PLUGIN_PATH=$QTSVG/lib/qt-6/plugins $SDDM/bin/$GREETER --test-mode --theme /tmp/sddm-test > $OUT/sddm-$t.log 2>&1 &)
   sleep 9; $GRIM $OUT/shot-sddm-$t.png
-  sleep 6
+  sleep 2.5; $GRIM $OUT/shot-sddm-$t-b.png
+  sleep 3.5
 done
 grep -hiE "error|warn|cannot|unable" $OUT/sddm-*.log | sort | uniq -c | head -20 >> $OUT/summary.txt
 unset SUMI_LOGIN_DIR
@@ -183,7 +188,7 @@ $DBR -- bash -c "
 
 # lock screen of every theme
 HL=$(B hyprlock)/bin/hyprlock
-for t in sumi kiri hagane suna iso; do
+for t in sumi kiri hagane suna iso dune summit unkai ginga; do
   sumi-theme $t >/dev/null 2>&1
   (timeout 9 $HL -c $HF/.config/hypr/hyprlock.conf --immediate-render > $OUT/hyprlock-$t.log 2>&1 &)
   sleep 5; $GRIM $OUT/shot-lock-$t.png 2>>$OUT/hyprlock-$t.log

@@ -1,4 +1,6 @@
 # small text snippets for the lock screen
+# moon illumination in percent (days since the new moon of 2024-01-11 11:57 UTC)
+moon_pct() { awk -v t="$(date +%s)" 'BEGIN { p = ((t - 1704974220) / 86400) / 29.530588853; p -= int(p); printf "%d\n", (1 - cos(2 * 3.14159265 * p)) / 2 * 100 + 0.5 }'; }
 case "${1:-status}" in
   date)
     days=(SONNTAG MONTAG DIENSTAG MITTWOCH DONNERSTAG FREITAG SAMSTAG)
@@ -31,6 +33,28 @@ case "${1:-status}" in
     days=(SONNTAG MONTAG DIENSTAG MITTWOCH DONNERSTAG FREITAG SAMSTAG)
     months=(JANUAR FEBRUAR MÄRZ APRIL MAI JUNI JULI AUGUST SEPTEMBER OKTOBER NOVEMBER DEZEMBER)
     echo "${days[$(date +%w)]} · $(date +%-d). ${months[$(( $(date +%-m) - 1 ))]}"
+    ;;
+  moon)
+    moon_pct
+    ;;
+  roman)
+    # SONNTAG · XII · OKTOBER
+    days=(SONNTAG MONTAG DIENSTAG MITTWOCH DONNERSTAG FREITAG SAMSTAG)
+    months=(JANUAR FEBRUAR MÄRZ APRIL MAI JUNI JULI AUGUST SEPTEMBER OKTOBER NOVEMBER DEZEMBER)
+    r=(I II III IV V VI VII VIII IX X XI XII XIII XIV XV XVI XVII XVIII XIX XX XXI XXII XXIII XXIV XXV XXVI XXVII XXVIII XXIX XXX XXXI)
+    echo "${days[$(date +%w)]} · ${r[$(( $(date +%-d) - 1 ))]} · ${months[$(( $(date +%-m) - 1 ))]}"
+    ;;
+  words)
+    # Montag, der zwölfte Oktober
+    days=(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag)
+    months=(Januar Februar März April Mai Juni Juli August September Oktober November Dezember)
+    o=(erste zweite dritte vierte fünfte sechste siebte achte neunte zehnte elfte zwölfte dreizehnte vierzehnte fünfzehnte sechzehnte siebzehnte achtzehnte neunzehnte zwanzigste einundzwanzigste zweiundzwanzigste dreiundzwanzigste vierundzwanzigste fünfundzwanzigste sechsundzwanzigste siebenundzwanzigste achtundzwanzigste neunundzwanzigste dreißigste einunddreißigste)
+    echo "${days[$(date +%w)]}, der ${o[$(( $(date +%-d) - 1 ))]} ${months[$(( $(date +%-m) - 1 ))]}"
+    ;;
+  sky)
+    # SO 12 OKT · MOND 64 %
+    d=(SO MO DI MI DO FR SA); m=(JAN FEB MÄR APR MAI JUN JUL AUG SEP OKT NOV DEZ)
+    echo "${d[$(date +%w)]} $(date +%d) ${m[$(( $(date +%-m) - 1 ))]} · MOND $(moon_pct) %"
     ;;
   music)
     t=$(playerctl metadata --format '{{title}} · {{artist}}' 2>/dev/null | cut -c1-60 || true)

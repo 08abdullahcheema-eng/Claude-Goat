@@ -1,6 +1,8 @@
 .pragma library
 // generated: 24x24 stroke paths
 var paths = {
+  "mem": "M5 7h14a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1H5a1 1 0 0 1 -1 -1V8a1 1 0 0 1 1 -1zM8 10v4M12 10v4M16 10v4M7 17v3M12 17v3M17 17v3",
+  "star": "M12 3l2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z",
   "play": "M8 5.5l10 6.5-10 6.5z",
   "pause": "M8.5 5.5v13M15.5 5.5v13",
   "next": "M6 6l8 6-8 6zM18 6v12",

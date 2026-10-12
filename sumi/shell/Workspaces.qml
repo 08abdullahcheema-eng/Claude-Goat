@@ -9,7 +9,7 @@ Row {
     property string screenName: ""
     property string mode: BarStyle.wsMode
     property real h: BarStyle.itemH
-    spacing: mode === "dots" ? Theme.px(6) : mode === "text" ? Theme.px(13) : mode === "blocks" ? 0 : Theme.px(3)
+    spacing: mode === "dots" ? Theme.px(6) : (mode === "text" || isRoman) ? Theme.px(14) : mode === "blocks" ? 0 : Theme.px(3)
 
     readonly property var kanji: ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
     readonly property int focusedId: Theme.demo ? 1 : (Hyprland.focusedWorkspace?.id ?? 1)
@@ -20,7 +20,12 @@ Row {
         const w = wsList.find(x => x.id === id);
         return { exists: !!w, windows: w ? w.toplevels.values.length : 0 };
     }
-    function label(id) { return (Theme.wsKanji && id <= 10) ? kanji[id - 1] : String(id); }
+    readonly property var roman: ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
+    readonly property bool isRoman: mode === "roman" || mode === "romanlow"
+    function label(id) {
+        if (isRoman && id <= 10) return mode === "romanlow" ? roman[id - 1].toLowerCase() : roman[id - 1];
+        return (Theme.wsKanji && id <= 10) ? kanji[id - 1] : String(id);
+    }
     readonly property var ids: {
         const base = [1, 2, 3, 4, 5];
         for (const w of wsList) if (w.id > 5 && base.indexOf(w.id) < 0) base.push(w.id);
@@ -40,7 +45,7 @@ Row {
             width: root.mode === "dots" ? (on ? Theme.px(26) : Theme.px(9))
                  : root.mode === "circles" ? Theme.px(22)
                  : root.mode === "blocks" ? Theme.px(34)
-                 : root.mode === "text" ? txt.implicitWidth
+                 : (root.mode === "text" || root.isRoman) ? txt.implicitWidth
                  : (on ? Theme.px(36) : Theme.px(27))
             Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
@@ -64,6 +69,13 @@ Row {
             Rectangle { visible: root.mode === "blocks" && cell.on; anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: Theme.px(3); color: Theme.accent }
             // text mode: underline
             Rectangle { visible: root.mode === "text" && cell.on; anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(1) } width: parent.width + Theme.px(8); height: 2; color: Theme.accent }
+            // roman mode: a short accent line with a soft glow under the active one
+            Rectangle {
+                visible: root.isRoman && cell.on
+                anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(3) }
+                width: parent.width + Theme.px(6); height: Theme.px(1.5); radius: height / 2; color: Theme.accent
+                Rectangle { anchors.centerIn: parent; width: parent.width + Theme.px(10); height: Theme.px(6); radius: height / 2; color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) }
+            }
 
             Text {
                 id: txt
@@ -71,8 +83,10 @@ Row {
                 anchors.centerIn: parent
                 anchors.verticalCenterOffset: root.mode === "pill" && cell.used ? -Theme.px(1.5) : 0
                 text: root.label(cell.modelData)
-                font.family: (Theme.wsKanji && cell.modelData <= 10) ? Theme.serif : BarStyle.fontFamily
-                font.pixelSize: root.mode === "circles" ? Theme.px(11) : root.mode === "blocks" ? Theme.px(18) : root.mode === "text" ? Theme.px(12) : Theme.fmd
+                font.family: root.isRoman ? Theme.head : (Theme.wsKanji && cell.modelData <= 10) ? Theme.serif : BarStyle.fontFamily
+                font.italic: root.mode === "romanlow"
+                font.letterSpacing: root.mode === "roman" ? Theme.px(1.5) : 0
+                font.pixelSize: root.mode === "circles" ? Theme.px(11) : root.mode === "blocks" ? Theme.px(18) : root.mode === "text" ? Theme.px(12) : root.mode === "roman" ? Theme.px(15) : root.mode === "romanlow" ? Theme.px(17) : Theme.fmd
                 font.weight: root.mode === "circles" || root.mode === "blocks" ? Font.Bold : Font.Normal
                 color: root.mode === "circles" && cell.on ? Theme.onAccent
                      : cell.on ? (root.mode === "blocks" ? ((Theme.p.barFx ?? "") === "fire" ? Theme.onAccent : Theme.accent) : Theme.hi)

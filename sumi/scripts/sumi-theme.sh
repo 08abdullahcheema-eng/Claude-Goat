@@ -1,7 +1,7 @@
-# sumi-theme <name> [wall.jpg] [layout]   switch theme (sumi, kiri, hagane, suna, iso),
+# sumi-theme <name> [wall.jpg] [layout]   switch theme (sumi kiri hagane suna iso dune summit unkai ginga),
 #                                        optionally with one of its wallpapers and a bar layout
 # sumi-theme --wall <wall.jpg>   change only the wallpaper of the current theme
-# sumi-theme --layout <layout>   change only the bar layout: islands capsule rail dune side notch pill bottom corners, or auto
+# sumi-theme --layout <layout>   change only the bar layout: islands capsule rail dune side horizon ridge float stars notch pill bottom corners, or auto
 # sumi-theme --restore  re-apply the saved theme (wallpaper, borders, kitty, lock screen)
 # sumi-theme --init     write the theme files if missing, touch nothing that is running
 set -u
@@ -18,9 +18,9 @@ case "$mode" in
     ;;
   --layout)
     case "${2:-auto}" in
-      islands|capsule|rail|dune|side|notch|pill|bottom|corners) printf '%s' "$2" > "$CONF/layout" ;;
+      islands|capsule|rail|dune|side|horizon|ridge|float|stars|notch|pill|bottom|corners) printf '%s' "$2" > "$CONF/layout" ;;
       auto|"") rm -f "$CONF/layout" ;;
-      *) echo "unknown layout: $2 (islands capsule rail dune side notch pill bottom corners auto)" >&2; exit 1 ;;
+      *) echo "unknown layout: $2 (islands capsule rail dune side horizon ridge float stars notch pill bottom corners auto)" >&2; exit 1 ;;
     esac
     exit 0
     ;;
@@ -33,7 +33,7 @@ case "$mode" in
     if [ -n "${2:-}" ]; then printf '%s' "$2" > "$CONF/wall"; else rm -f "$CONF/wall"; fi
     # and the bar layout: a named one, or the theme's own
     case "${3:-}" in
-      islands|capsule|rail|dune|side|notch|pill|bottom|corners) printf '%s' "$3" > "$CONF/layout" ;;
+      islands|capsule|rail|dune|side|horizon|ridge|float|stars|notch|pill|bottom|corners) printf '%s' "$3" > "$CONF/layout" ;;
       *) rm -f "$CONF/layout" ;;
     esac
     mode="--restore"
@@ -54,9 +54,10 @@ fi
 w0=$(jq -r '.walls[0] // empty' "$t")
 wall="$SHELL_DIR/assets/walls/${w0:-wall-$name.jpg}"
 wf=$(cat "$CONF/wall" 2>/dev/null || true)
-case "$wf" in
-  wall-"$name"*.jpg) [ -f "$SHELL_DIR/assets/walls/$wf" ] && wall="$SHELL_DIR/assets/walls/$wf" ;;
-esac
+# only one of the theme's own wallpapers (so "sumi" never picks up a "summit" picture)
+if [ -n "$wf" ] && jq -e --arg w "$wf" '.walls | index($w)' "$t" >/dev/null 2>&1 && [ -f "$SHELL_DIR/assets/walls/$wf" ]; then
+  wall="$SHELL_DIR/assets/walls/$wf"
+fi
 [ -f "$wall" ] || wall="$SHELL_DIR/assets/walls/wall-sumi-ink.jpg"
 hex() { get "$1" | tr -d '#'; }
 dark=$(get dark)
@@ -120,7 +121,7 @@ if [ -d "$L" ] && [ -w "$L" ]; then
   cp "$wall" "$L/login-wall.jpg.tmp" 2>/dev/null && mv "$L/login-wall.jpg.tmp" "$L/login-wall.jpg"
   logo="$SHELL_DIR/assets/$(get logo)"; [ -f "$logo" ] || logo="$SHELL_DIR/assets/logo-sumi.svg"
   cp "$logo" "$L/logo.svg.tmp" 2>/dev/null && mv "$L/logo.svg.tmp" "$L/logo.svg"
-  case "$name" in hagane) rad=4 ;; sumi) rad=16 ;; *) rad=24 ;; esac
+  case "$name" in hagane) rad=4 ;; sumi|summit) rad=16 ;; dune) rad=0 ;; unkai) rad=30 ;; *) rad=24 ;; esac
   q() { get "$1" | sed 's/"/\\"/g'; }
   cat > "$L/palette.qml.tmp" <<EOQ
 import QtQuick

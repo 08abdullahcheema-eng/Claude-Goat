@@ -20,7 +20,8 @@ in
     wayland.enable = lib.mkDefault true;
     package = lib.mkDefault pkgs.kdePackages.sddm;
     theme = "sumi";
-    extraPackages = [ pkgs.kdePackages.qtsvg ];
+    # qtsvg for the logo, qtdeclarative brings QtQuick.Particles for the moving login background
+    extraPackages = [ pkgs.kdePackages.qtsvg pkgs.kdePackages.qtdeclarative ];
   };
   environment.systemPackages = [ sumi-sddm ];
 
@@ -29,7 +30,7 @@ in
     inter
     nerd-fonts.jetbrains-mono
     noto-fonts-cjk-serif
-    (google-fonts.override { fonts = [ "ShipporiMincho" "SpaceGrotesk" ]; })
+    (google-fonts.override { fonts = [ "ShipporiMincho" "SpaceGrotesk" "SpaceMono" "Cinzel" "Fraunces" ]; })
   ];
 
   # shared folder: written by you (sumi-theme), readable by the login screen
