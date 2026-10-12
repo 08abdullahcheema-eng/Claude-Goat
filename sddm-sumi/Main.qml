@@ -9,7 +9,7 @@ Rectangle {
     id: root
     width: 1600
     height: 1000
-    color: P.bg
+    color: pal.bg
 
     readonly property real s: Math.min(width / 1600, height / 1000)
     readonly property string stateDir: (config.stateDir && config.stateDir !== "") ? config.stateDir : "/var/lib/sumi"
@@ -17,7 +17,7 @@ Rectangle {
     // palette of the active theme, Sumi when nothing has been written yet
     Loader { id: palLoader; source: "file://" + root.stateDir + "/palette.qml" }
     QtObject {
-        id: P
+        id: pal
         readonly property var t: palLoader.status === Loader.Ready ? palLoader.item : null
         readonly property string name: t ? t.name : "sumi"
         readonly property string label: t ? t.label : "Sumi"
@@ -38,7 +38,7 @@ Rectangle {
     }
 
     // which layout: the four landscape themes have their own, the rest share the glass card
-    readonly property string variant: ["dune", "summit", "unkai", "ginga"].indexOf(P.name) >= 0 ? P.name : "card"
+    readonly property string variant: ["dune", "summit", "unkai", "ginga"].indexOf(pal.name) >= 0 ? pal.name : "card"
     // the password field of the active layout
     readonly property var pw: variant === "dune" ? duneScene.field : variant === "summit" ? summitScene.field
         : variant === "unkai" ? unkaiScene.field : variant === "ginga" ? gingaScene.field : password
@@ -62,29 +62,29 @@ Rectangle {
         property alias input: ti
         property string look: "line"
         property string placeholder: "Passwort"
-        property string fontFamily: P.body
+        property string fontFamily: pal.body
         property bool italic: false
         property real ls: 0
-        property color edge: P.accent
+        property color edge: pal.accent
         height: 42 * root.s
         radius: look === "box" ? height / 2 : 0
         color: look === "box" ? Qt.rgba(1, 1, 1, 0.07) : "transparent"
         border.width: look === "box" ? Math.max(1, 1.2 * root.s) : 0
-        border.color: root.failed ? P.error : f.edge
+        border.color: root.failed ? pal.error : f.edge
         Rectangle {
             visible: f.look === "line"
             anchors.bottom: parent.bottom
             width: parent.width; height: Math.max(1, 1.5 * root.s)
-            color: root.failed ? P.error : f.edge
+            color: root.failed ? pal.error : f.edge
         }
         TextInput {
             id: ti
             anchors { left: parent.left; leftMargin: f.look === "box" ? 18 * root.s : 2 * root.s; right: go.left; rightMargin: 8 * root.s; verticalCenter: parent.verticalCenter }
             echoMode: TextInput.Password
             passwordCharacter: "●"
-            color: P.hi
-            selectionColor: P.accent
-            font.family: P.body
+            color: pal.hi
+            selectionColor: pal.accent
+            font.family: pal.body
             font.pixelSize: 13 * root.s
             font.letterSpacing: 4 * root.s
             clip: true
@@ -95,7 +95,7 @@ Rectangle {
             anchors { left: ti.left; verticalCenter: parent.verticalCenter }
             visible: ti.text.length === 0
             text: root.failed ? (f.ls > 0 ? "FALSCHES PASSWORT" : "falsches Passwort") : f.placeholder
-            color: root.failed ? P.error : P.dim
+            color: root.failed ? pal.error : pal.dim
             font.family: f.fontFamily; font.italic: f.italic
             font.pixelSize: 13 * root.s; font.letterSpacing: f.ls
         }
@@ -103,7 +103,7 @@ Rectangle {
             id: go
             anchors { right: parent.right; rightMargin: (f.look === "box" ? 16 : 2) * root.s; verticalCenter: parent.verticalCenter }
             text: root.busy ? "…" : "➜"
-            color: gm2.containsMouse ? P.hi : P.accent
+            color: gm2.containsMouse ? pal.hi : pal.accent
             font.pixelSize: 15 * root.s
             MouseArea { id: gm2; anchors.fill: parent; anchors.margins: -8 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.doLogin() }
         }
@@ -114,9 +114,9 @@ Rectangle {
     component Avatar: Item {
         id: av
         property real size: 96 * root.s
-        property color ring: P.accent
+        property color ring: pal.accent
         width: size; height: size
-        Rectangle { anchors.fill: parent; radius: width / 2; color: Qt.rgba(P.bg.r, P.bg.g, P.bg.b, 0.7); border.width: Math.max(1.5, 2 * root.s); border.color: av.ring }
+        Rectangle { anchors.fill: parent; radius: width / 2; color: Qt.rgba(pal.bg.r, pal.bg.g, pal.bg.b, 0.7); border.width: Math.max(1.5, 2 * root.s); border.color: av.ring }
         Image {
             anchors.centerIn: parent
             width: parent.width - 8 * root.s; height: width
@@ -131,21 +131,21 @@ Rectangle {
     // session and keyboard layout, click to change
     component SessionRow: Row {
         id: sr
-        property string fontFamily: P.body
+        property string fontFamily: pal.body
         property bool caps: true
         property bool italic: false
         property real ls: 2.5 * root.s
         spacing: 14 * root.s
         Text {
             text: sr.caps ? root.sessionName().toUpperCase() : root.sessionName()
-            color: srm.containsMouse ? P.hi : P.dim
+            color: srm.containsMouse ? pal.hi : pal.dim
             font.family: sr.fontFamily; font.italic: sr.italic; font.pixelSize: 11 * root.s; font.letterSpacing: sr.ls
             MouseArea { id: srm; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { root.nextSession(); root.pw.forceActiveFocus() } }
         }
-        Text { text: "·"; color: P.mute; font.pixelSize: 11 * root.s }
+        Text { text: "·"; color: pal.mute; font.pixelSize: 11 * root.s }
         Text {
             text: { var l = keyboard.layouts[keyboard.currentLayout]; return l ? (sr.caps ? l.shortName.toUpperCase() : l.shortName) : "DE" }
-            color: skm.containsMouse ? P.hi : P.dim
+            color: skm.containsMouse ? pal.hi : pal.dim
             font.family: sr.fontFamily; font.italic: sr.italic; font.pixelSize: 11 * root.s; font.letterSpacing: sr.ls
             MouseArea {
                 id: skm; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
@@ -257,7 +257,7 @@ Rectangle {
     }
     Ambient {
         anchors.fill: parent
-        name: P.name; accent: P.accent; accent2: P.accent2; fg: P.fg; s: root.s
+        name: pal.name; accent: pal.accent; accent2: pal.accent2; fg: pal.fg; s: root.s
     }
 
     Item {
@@ -269,8 +269,8 @@ Rectangle {
         Column {
             x: 56 * root.s; y: 46 * root.s
             spacing: 2 * root.s
-            Text { id: clock; color: P.hi; font.family: P.head; font.pixelSize: 68 * root.s; font.weight: Font.Bold }
-            Text { id: dateText; x: 3 * root.s; color: P.fg; font.family: P.body; font.pixelSize: 16 * root.s; font.letterSpacing: 2.5 * root.s }
+            Text { id: clock; color: pal.hi; font.family: pal.head; font.pixelSize: 68 * root.s; font.weight: Font.Bold }
+            Text { id: dateText; x: 3 * root.s; color: pal.fg; font.family: pal.body; font.pixelSize: 16 * root.s; font.letterSpacing: 2.5 * root.s }
         }
 
         // ---------------- glass card ----------------
@@ -308,11 +308,11 @@ Rectangle {
                 anchors.fill: parent
                 layer.enabled: true
                 visible: false
-                Rectangle { anchors.fill: parent; radius: Math.min(P.radius, 24) * root.s; color: "black" }
+                Rectangle { anchors.fill: parent; radius: Math.min(pal.radius, 24) * root.s; color: "black" }
             }
             Rectangle {
                 anchors.fill: parent
-                radius: Math.min(P.radius, 24) * root.s
+                radius: Math.min(pal.radius, 24) * root.s
                 color: "transparent"
                 border.width: 1
                 border.color: Qt.rgba(1, 1, 1, 0.14)
@@ -337,9 +337,9 @@ Rectangle {
                     Rectangle {
                         anchors.fill: parent
                         radius: width / 2
-                        color: P.bg
+                        color: pal.bg
                         border.width: 2 * root.s
-                        border.color: P.accent
+                        border.color: pal.accent
                     }
                     Image {
                         anchors.centerIn: parent
@@ -355,8 +355,8 @@ Rectangle {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: root.userName
-                    color: P.hi
-                    font.family: P.head
+                    color: pal.hi
+                    font.family: pal.head
                     font.pixelSize: 27 * root.s
                     font.weight: Font.Bold
                 }
@@ -367,18 +367,18 @@ Rectangle {
                     id: field
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: 276 * root.s; height: 40 * root.s
-                    radius: Math.min(P.radius, 20) * root.s
+                    radius: Math.min(pal.radius, 20) * root.s
                     color: Qt.rgba(1, 1, 1, 0.07)
                     border.width: Math.max(1, 1.5 * root.s)
-                    border.color: root.failed ? P.error : (password.activeFocus ? P.accent : Qt.rgba(P.accent.r, P.accent.g, P.accent.b, 0.7))
+                    border.color: root.failed ? pal.error : (password.activeFocus ? pal.accent : Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.7))
                     TextInput {
                         id: password
                         anchors { left: parent.left; leftMargin: 16 * root.s; right: go.left; rightMargin: 8 * root.s; verticalCenter: parent.verticalCenter }
                         echoMode: TextInput.Password
                         passwordCharacter: "●"
-                        color: P.hi
-                        selectionColor: P.accent
-                        font.family: P.body
+                        color: pal.hi
+                        selectionColor: pal.accent
+                        font.family: pal.body
                         font.pixelSize: 13 * root.s
                         font.letterSpacing: 4 * root.s
                         focus: true
@@ -390,15 +390,15 @@ Rectangle {
                         anchors { left: password.left; verticalCenter: parent.verticalCenter }
                         visible: password.text.length === 0
                         text: root.failed ? "falsches Passwort" : "Passwort"
-                        color: root.failed ? P.error : P.dim
-                        font.family: P.body
+                        color: root.failed ? pal.error : pal.dim
+                        font.family: pal.body
                         font.pixelSize: 13 * root.s
                     }
                     Text {
                         id: go
                         anchors { right: parent.right; rightMargin: 14 * root.s; verticalCenter: parent.verticalCenter }
                         text: root.busy ? "…" : "➜"
-                        color: gm.containsMouse ? P.hi : P.accent
+                        color: gm.containsMouse ? pal.hi : pal.accent
                         font.pixelSize: 15 * root.s
                         MouseArea { id: gm; anchors.fill: parent; anchors.margins: -8 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.doLogin() }
                     }
@@ -410,15 +410,15 @@ Rectangle {
                     spacing: 14 * root.s
                     Text {
                         text: root.sessionName().toUpperCase()
-                        color: sm.containsMouse ? P.hi : P.dim
-                        font.family: P.body; font.pixelSize: 10.5 * root.s; font.letterSpacing: 2.5 * root.s
+                        color: sm.containsMouse ? pal.hi : pal.dim
+                        font.family: pal.body; font.pixelSize: 10.5 * root.s; font.letterSpacing: 2.5 * root.s
                         MouseArea { id: sm; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { root.nextSession(); password.forceActiveFocus() } }
                     }
-                    Text { text: P.kanji; color: P.accent; font.family: "Noto Serif CJK JP"; font.pixelSize: 11 * root.s }
+                    Text { text: pal.kanji; color: pal.accent; font.family: "Noto Serif CJK JP"; font.pixelSize: 11 * root.s }
                     Text {
                         text: { var l = keyboard.layouts[keyboard.currentLayout]; return l ? l.shortName.toUpperCase() : "DE" }
-                        color: km.containsMouse ? P.hi : P.dim
-                        font.family: P.body; font.pixelSize: 10.5 * root.s; font.letterSpacing: 2.5 * root.s
+                        color: km.containsMouse ? pal.hi : pal.dim
+                        font.family: pal.body; font.pixelSize: 10.5 * root.s; font.letterSpacing: 2.5 * root.s
                         MouseArea {
                             id: km; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                             onClicked: { if (keyboard.layouts.length > 1) keyboard.currentLayout = (keyboard.currentLayout + 1) % keyboard.layouts.length; password.forceActiveFocus() }
@@ -438,8 +438,8 @@ Rectangle {
         // ---------------- bottom: host on the left, sleep / restart / power on the right ----------------
         Text {
             anchors { left: parent.left; leftMargin: 58 * root.s; bottom: parent.bottom; bottomMargin: 46 * root.s }
-            text: (sddm.hostName || "nixos") + "  ·  " + P.label.toUpperCase()
-            color: P.dim; font.family: P.body; font.pixelSize: 12 * root.s; font.letterSpacing: 2 * root.s
+            text: (sddm.hostName || "nixos") + "  ·  " + pal.label.toUpperCase()
+            color: pal.dim; font.family: pal.body; font.pixelSize: 12 * root.s; font.letterSpacing: 2 * root.s
         }
     }
 
@@ -453,24 +453,24 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 118 * root.s
             textFormat: Text.StyledText
-            text: root.hhmm.slice(0, 2) + "<font color='" + P.accent2 + "'>:</font>" + root.hhmm.slice(3)
-            color: P.hi; font.family: P.head; font.pixelSize: 74 * root.s; font.letterSpacing: 8 * root.s
+            text: root.hhmm.slice(0, 2) + "<font color='" + pal.accent2 + "'>:</font>" + root.hhmm.slice(3)
+            color: pal.hi; font.family: pal.head; font.pixelSize: 74 * root.s; font.letterSpacing: 8 * root.s
         }
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 222 * root.s
             text: root.romanDate
-            color: P.fg; font.family: P.head; font.pixelSize: 15 * root.s; font.letterSpacing: 7 * root.s
+            color: pal.fg; font.family: pal.head; font.pixelSize: 15 * root.s; font.letterSpacing: 7 * root.s
         }
         Column {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 345 * root.s
             spacing: 18 * root.s
             transform: Translate { x: root.shakeX }
-            Avatar { anchors.horizontalCenter: parent.horizontalCenter; size: 92 * root.s; ring: P.accent2 }
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName.toUpperCase(); color: P.hi; font.family: P.head; font.pixelSize: 28 * root.s; font.letterSpacing: 6 * root.s }
-            Field { id: dField; anchors.horizontalCenter: parent.horizontalCenter; width: 330 * root.s; look: "line"; fontFamily: P.head; placeholder: "PASSWORT"; ls: 4 * root.s }
-            SessionRow { anchors.horizontalCenter: parent.horizontalCenter; fontFamily: P.head; ls: 3.5 * root.s }
+            Avatar { anchors.horizontalCenter: parent.horizontalCenter; size: 92 * root.s; ring: pal.accent2 }
+            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName.toUpperCase(); color: pal.hi; font.family: pal.head; font.pixelSize: 28 * root.s; font.letterSpacing: 6 * root.s }
+            Field { id: dField; anchors.horizontalCenter: parent.horizontalCenter; width: 330 * root.s; look: "line"; fontFamily: pal.head; placeholder: "PASSWORT"; ls: 4 * root.s }
+            SessionRow { anchors.horizontalCenter: parent.horizontalCenter; fontFamily: pal.head; ls: 3.5 * root.s }
         }
     }
 
@@ -484,9 +484,9 @@ Rectangle {
             id: sPanel
             width: 520 * root.s; height: parent.height
             gradient: Gradient { orientation: Gradient.Horizontal
-                GradientStop { position: 0; color: Qt.rgba(P.bg.r, P.bg.g, P.bg.b, 0.88) }
-                GradientStop { position: 1; color: Qt.rgba(P.bg.r, P.bg.g, P.bg.b, 0.55) } }
-            Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: Qt.rgba(P.accent.r, P.accent.g, P.accent.b, 0.2) }
+                GradientStop { position: 0; color: Qt.rgba(pal.bg.r, pal.bg.g, pal.bg.b, 0.88) }
+                GradientStop { position: 1; color: Qt.rgba(pal.bg.r, pal.bg.g, pal.bg.b, 0.55) } }
+            Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.2) }
             Canvas {
                 anchors.fill: parent
                 opacity: 0.13
@@ -501,23 +501,23 @@ Rectangle {
         }
         Text {
             x: 70 * root.s; y: 72 * root.s
-            text: P.kanji + "  ·  " + P.label.toUpperCase()
-            color: P.accent; font.family: P.head; font.pixelSize: 15 * root.s; font.letterSpacing: 7 * root.s
+            text: pal.kanji + "  ·  " + pal.label.toUpperCase()
+            color: pal.accent; font.family: pal.head; font.pixelSize: 15 * root.s; font.letterSpacing: 7 * root.s
         }
         Column {
             x: 70 * root.s; y: 320 * root.s
             spacing: 18 * root.s
             transform: Translate { x: root.shakeX }
-            Avatar { size: 82 * root.s; ring: P.accent }
-            Text { text: root.userName; color: P.hi; font.family: P.head; font.weight: Font.Light; font.pixelSize: 46 * root.s; font.letterSpacing: 2.5 * root.s }
-            Field { id: sField; width: 375 * root.s; look: "line"; fontFamily: P.head; placeholder: "PASSWORT"; ls: 4 * root.s; edge: Qt.rgba(P.hi.r, P.hi.g, P.hi.b, 0.6) }
-            SessionRow { fontFamily: P.head; ls: 3 * root.s }
+            Avatar { size: 82 * root.s; ring: pal.accent }
+            Text { text: root.userName; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 46 * root.s; font.letterSpacing: 2.5 * root.s }
+            Field { id: sField; width: 375 * root.s; look: "line"; fontFamily: pal.head; placeholder: "PASSWORT"; ls: 4 * root.s; edge: Qt.rgba(pal.hi.r, pal.hi.g, pal.hi.b, 0.6) }
+            SessionRow { fontFamily: pal.head; ls: 3 * root.s }
         }
         Column {
             anchors { right: parent.right; rightMargin: 70 * root.s }
             y: 56 * root.s
-            Text { anchors.right: parent.right; text: root.hhmm; color: P.hi; font.family: P.head; font.weight: Font.Light; font.pixelSize: 84 * root.s; font.letterSpacing: 4 * root.s }
-            Text { anchors.right: parent.right; text: root.shortDate; color: P.accent; font.family: P.head; font.pixelSize: 16 * root.s; font.letterSpacing: 7.5 * root.s }
+            Text { anchors.right: parent.right; text: root.hhmm; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 84 * root.s; font.letterSpacing: 4 * root.s }
+            Text { anchors.right: parent.right; text: root.shortDate; color: pal.accent; font.family: pal.head; font.pixelSize: 16 * root.s; font.letterSpacing: 7.5 * root.s }
         }
     }
 
@@ -533,28 +533,28 @@ Rectangle {
             spacing: 2 * root.s
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: root.hhmm; color: P.hi; font.family: P.head; font.italic: true; font.weight: Font.Light; font.pixelSize: 96 * root.s
+                text: root.hhmm; color: pal.hi; font.family: pal.head; font.italic: true; font.weight: Font.Light; font.pixelSize: 96 * root.s
                 layer.enabled: true
-                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: P.accent; shadowOpacity: 0.45; shadowBlur: 1.0; shadowHorizontalOffset: 0; shadowVerticalOffset: 0 }
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: pal.accent; shadowOpacity: 0.45; shadowBlur: 1.0; shadowHorizontalOffset: 0; shadowVerticalOffset: 0 }
             }
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.wordsDate; color: P.accent2; font.family: P.head; font.italic: true; font.pixelSize: 19 * root.s }
+            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.wordsDate; color: pal.accent2; font.family: pal.head; font.italic: true; font.pixelSize: 19 * root.s }
         }
         Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 530 * root.s
             width: 400 * root.s; height: uCol.implicitHeight + 56 * root.s
             radius: 26 * root.s
-            color: Qt.rgba(P.bg1.r, P.bg1.g, P.bg1.b, 0.55)
-            border.width: 1; border.color: Qt.rgba(P.hi.r, P.hi.g, P.hi.b, 0.18)
+            color: Qt.rgba(pal.bg1.r, pal.bg1.g, pal.bg1.b, 0.55)
+            border.width: 1; border.color: Qt.rgba(pal.hi.r, pal.hi.g, pal.hi.b, 0.18)
             transform: Translate { x: root.shakeX }
             Column {
                 id: uCol
                 anchors { top: parent.top; topMargin: 30 * root.s; horizontalCenter: parent.horizontalCenter }
                 spacing: 14 * root.s
-                Avatar { anchors.horizontalCenter: parent.horizontalCenter; size: 76 * root.s; ring: P.accent }
-                Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName; color: P.hi; font.family: P.head; font.italic: true; font.pixelSize: 34 * root.s }
-                Field { id: uField; anchors.horizontalCenter: parent.horizontalCenter; width: 300 * root.s; look: "box"; fontFamily: P.head; italic: true; placeholder: "Passwort"; edge: Qt.rgba(P.accent.r, P.accent.g, P.accent.b, 0.7) }
-                SessionRow { anchors.horizontalCenter: parent.horizontalCenter; fontFamily: P.head; italic: true; caps: false; ls: 0.5 * root.s }
+                Avatar { anchors.horizontalCenter: parent.horizontalCenter; size: 76 * root.s; ring: pal.accent }
+                Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName; color: pal.hi; font.family: pal.head; font.italic: true; font.pixelSize: 34 * root.s }
+                Field { id: uField; anchors.horizontalCenter: parent.horizontalCenter; width: 300 * root.s; look: "box"; fontFamily: pal.head; italic: true; placeholder: "Passwort"; edge: Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.7) }
+                SessionRow { anchors.horizontalCenter: parent.horizontalCenter; fontFamily: pal.head; italic: true; caps: false; ls: 0.5 * root.s }
             }
         }
     }
@@ -576,14 +576,14 @@ Rectangle {
                 var cx = width / 2, rs = [94, 150, 212, 288], dots = [[0.6, 1], [2.2, 2], [4.1, 3], [5.3, 0], [3.1, 2], [1.4, 3]]
                 for (var i = 0; i < rs.length; i++) {
                     c.beginPath(); c.lineWidth = 1
-                    c.globalAlpha = 0.4 - i * 0.07; c.strokeStyle = String(P.accent)
+                    c.globalAlpha = 0.4 - i * 0.07; c.strokeStyle = String(pal.accent)
                     if (i % 2) c.setLineDash([3, 8]); else c.setLineDash([])
                     c.arc(cx, cx, rs[i] * root.s, 0, 2 * Math.PI); c.stroke()
                 }
                 c.setLineDash([]); c.globalAlpha = 1
                 for (var k = 0; k < dots.length; k++) {
                     var r = rs[dots[k][1]] * root.s, a = dots[k][0]
-                    c.beginPath(); c.fillStyle = k === 3 ? String(P.accent2) : "#ffffff"
+                    c.beginPath(); c.fillStyle = k === 3 ? String(pal.accent2) : "#ffffff"
                     c.arc(cx + r * Math.cos(a), cx + r * Math.sin(a), 3.2 * root.s, 0, 2 * Math.PI); c.fill()
                 }
             }
@@ -595,14 +595,14 @@ Rectangle {
             y: 705 * root.s
             spacing: 16 * root.s
             transform: Translate { x: root.shakeX }
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName; color: P.hi; font.family: P.head; font.weight: Font.Light; font.pixelSize: 38 * root.s; font.letterSpacing: 6 * root.s }
-            Field { id: gField; anchors.horizontalCenter: parent.horizontalCenter; width: 330 * root.s; look: "box"; edge: Qt.rgba(P.accent.r, P.accent.g, P.accent.b, 0.6) }
+            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 38 * root.s; font.letterSpacing: 6 * root.s }
+            Field { id: gField; anchors.horizontalCenter: parent.horizontalCenter; width: 330 * root.s; look: "box"; edge: Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.6) }
             SessionRow { anchors.horizontalCenter: parent.horizontalCenter }
         }
         Column {
             x: 56 * root.s; y: 48 * root.s
-            Text { text: root.hhmm; color: P.hi; font.family: P.head; font.weight: Font.Light; font.pixelSize: 62 * root.s; font.letterSpacing: 3 * root.s }
-            Text { text: root.shortDate + "  ·  " + P.kanji; color: P.accent; font.family: P.body; font.pixelSize: 12.5 * root.s; font.letterSpacing: 2.5 * root.s }
+            Text { text: root.hhmm; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 62 * root.s; font.letterSpacing: 3 * root.s }
+            Text { text: root.shortDate + "  ·  " + pal.kanji; color: pal.accent; font.family: pal.body; font.pixelSize: 12.5 * root.s; font.letterSpacing: 2.5 * root.s }
         }
     }
 
@@ -616,7 +616,7 @@ Rectangle {
                 Canvas {
                     id: ic
                     anchors.fill: parent
-                    property color c: modelData === "power" ? P.accent : (pa.containsMouse ? P.hi : P.fg)
+                    property color c: modelData === "power" ? pal.accent : (pa.containsMouse ? pal.hi : pal.fg)
                     onCChanged: requestPaint()
                     onPaint: {
                         var ctx = getContext("2d"); ctx.reset()
@@ -664,14 +664,14 @@ Rectangle {
     Rectangle {
         id: launchCover
         anchors.fill: parent
-        color: P.bg
+        color: pal.bg
         opacity: 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 350 } }
         Text {
             anchors.centerIn: parent
-            text: P.kanji
-            color: P.accent
+            text: pal.kanji
+            color: pal.accent
             font.family: "Noto Serif CJK JP"
             font.pixelSize: 54 * root.s
             SequentialAnimation on opacity {

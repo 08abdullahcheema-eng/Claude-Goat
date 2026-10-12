@@ -15,7 +15,7 @@ Scope {
             id: band
             anchors.horizontalCenter: parent.horizontalCenter
             y: Theme.px(8)
-            width: Math.min(parent.width - Theme.px(24), Theme.px(1240)); height: Theme.px(38)
+            width: Math.min(parent.width - Theme.px(24), Theme.px(1500)); height: Theme.px(38)
             radius: height / 2
             color: Qt.rgba(Theme.bg1.r, Theme.bg1.g, Theme.bg1.b, 0.52)
             border.width: 1

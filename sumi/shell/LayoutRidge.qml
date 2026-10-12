@@ -30,9 +30,9 @@ Scope {
 
         readonly property real x0: Theme.px(64)        // first peak
         readonly property real step: Theme.px(52)      // distance between peaks
-        readonly property real base: Theme.px(52)      // ridge height at the valleys
+        readonly property real base: Theme.px(58)      // ridge height at the valleys
         // peak heights (distance from the top), a fixed irregular pattern
-        readonly property var tops: [Theme.px(34), Theme.px(26), Theme.px(38), Theme.px(24), Theme.px(36), Theme.px(30), Theme.px(37), Theme.px(28), Theme.px(35)]
+        readonly property var tops: [Theme.px(40), Theme.px(32), Theme.px(44), Theme.px(30), Theme.px(42), Theme.px(36), Theme.px(43), Theme.px(34), Theme.px(41)]
         function peakX(i) { return x0 + i * step; }
         function peakY(i) { return tops[i % tops.length]; }
 
@@ -131,6 +131,14 @@ Scope {
         }
         WheelHandler { onWheel: (e) => Hyprland.dispatch(e.angleDelta.y > 0 ? "workspace e-1" : "workspace e+1") }
 
+        // music, after the last peak
+        ModMedia {
+            x: bw.peakX(bw.ids.length - 1) + Theme.px(34); y: Theme.px(4)
+            height: Theme.px(28)
+            fontSize: Theme.px(11.5); maxTitle: Theme.px(150); coverSize: Theme.px(18); coverRadius: Theme.px(4)
+            barW: Theme.px(46); barColor: Theme.accent
+        }
+
         // clock
         Item {
             id: clock
@@ -161,12 +169,6 @@ Scope {
             y: Theme.px(3)
             height: Theme.px(30)
             spacing: Theme.px(1)
-            ModMedia {
-                anchors.verticalCenter: parent.verticalCenter
-                fontSize: Theme.px(11.5); maxTitle: Theme.px(160); coverSize: Theme.px(18); coverRadius: Theme.px(4)
-                barW: Theme.px(46); barColor: Theme.accent
-            }
-            Sep { anchors.verticalCenter: parent.verticalCenter; visible: Media.active }
             ModCpu { anchors.verticalCenter: parent.verticalCenter }
             ModMem { anchors.verticalCenter: parent.verticalCenter }
             Pill {   // moon phase

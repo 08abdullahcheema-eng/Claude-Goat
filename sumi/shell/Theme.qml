@@ -79,7 +79,7 @@ Singleton {
         case "dune": return px(66);
         case "side": return px(70);
         case "horizon": return px(58);
-        case "ridge": return px(64);
+        case "ridge": return px(70);
         case "float": return px(52);
         case "stars": return px(66);
         }
