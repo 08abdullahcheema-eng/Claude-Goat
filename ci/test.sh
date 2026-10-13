@@ -12,10 +12,16 @@ for k in linuwu-default linuwu-latest; do
   if P=$(nix build --no-link --print-out-paths ./ci#$k 2>>$OUT/build-$k.log); then log "$k OK: $(find $P -name '*.ko*' | head -1)"; modinfo $(find $P -name '*.ko*' | head -1) 2>/dev/null | grep -E "^(vermagic|alias)" | head -3 | tee -a $OUT/summary.txt
   else log "$k FAILED"; tail -40 $OUT/build-$k.log | tee -a $OUT/summary.txt; fi
 done
-if D=$(nix eval --raw ./ci#nixosConfigurations.test.config.system.build.toplevel.drvPath 2>>$OUT/build.log); then log "nixos eval OK"; else log "nixos eval FAILED"; tail -30 $OUT/build.log | tee -a $OUT/summary.txt; fi
+if D=$(nix eval --raw ./ci#nixosConfigurations.test.config.system.build.toplevel.drvPath 2>$OUT/nixos-eval.log); then log "nixos eval OK"; else log "nixos eval FAILED"; tail -30 $OUT/nixos-eval.log | tee -a $OUT/summary.txt; fi
+grep -i "warning" $OUT/nixos-eval.log | sort -u | head -20 | tee -a $OUT/summary.txt
+# build the parts that are new and could fail to build (nvidia driver, steam, nix-ld env)
+for a in config.hardware.nvidia.package config.programs.nix-ld.package config.system.path; do
+  if nix build --no-link ./ci#nixosConfigurations.test.$a 2>$OUT/build-sys.log; then log "build $a OK"; else log "build $a FAILED"; tail -25 $OUT/build-sys.log | tee -a $OUT/summary.txt; fi
+done
 nix eval --json ./ci#nixosConfigurations.test.config.hardware.bluetooth.enable 2>/dev/null | xargs -I{} echo "bluetooth enabled: {}" | tee -a $OUT/summary.txt
 nix eval --raw ./ci#nixosConfigurations.test.config.boot.extraModprobeConfig 2>/dev/null | tee -a $OUT/summary.txt
 nix eval --raw ./ci#nixosConfigurations.test.config.environment.etc.\"bluetooth/main.conf\".source 2>/dev/null | xargs cat 2>/dev/null | tee -a $OUT/summary.txt
+for o in hardware.nvidia.prime.offload.enable programs.steam.enable programs.nix-ld.enable services.flatpak.enable services.power-profiles-daemon.enable zramSwap.enable time.hardwareClockInLocalTime nix.gc.automatic; do echo "$o = $(nix eval --json ./ci#nixosConfigurations.test.config.$o 2>&1 | tail -1)" | tee -a $OUT/summary.txt; done
 nix eval --json ./ci#nixosConfigurations.test.config.services.blueman.enable 2>/dev/null | xargs -I{} echo "blueman enabled: {}" | tee -a $OUT/summary.txt
 nix eval --json ./ci#nixosConfigurations.test.config.boot.blacklistedKernelModules 2>/dev/null | tee -a $OUT/summary.txt
 log "build home-manager config"

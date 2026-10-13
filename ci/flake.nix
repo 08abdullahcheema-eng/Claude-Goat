@@ -40,6 +40,9 @@
           ../predator.nix
           ../bluetooth.nix
           ../sumi-login.nix
+          ../nvidia.nix
+          ../gaming.nix
+          ../smooth.nix
           {
             boot.loader.grub.device = "nodev";
             fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };

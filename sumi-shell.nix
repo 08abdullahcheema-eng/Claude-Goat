@@ -74,6 +74,26 @@ in
   programs.hyprlock.settings = lib.mkForce { };
   programs.hyprlock.extraConfig = lib.mkForce (builtins.readFile ./sumi/hyprlock.conf);
 
+  # idle: dim after 4 min, lock after 5, screen off after 5.5, sleep after 20.
+  # Closing the lid suspends (systemd default) and the screen is locked before it sleeps.
+  services.hypridle = {
+    enable = true;
+    settings = {
+      general = {
+        lock_cmd = "pidof hyprlock || hyprlock";
+        before_sleep_cmd = "loginctl lock-session";
+        after_sleep_cmd = "hyprctl dispatch dpms on";
+        ignore_dbus_inhibit = false;      # videos and games keep the screen awake
+      };
+      listener = [
+        { timeout = 240; on-timeout = "brightnessctl -s set 15%"; on-resume = "brightnessctl -r"; }
+        { timeout = 300; on-timeout = "loginctl lock-session"; }
+        { timeout = 330; on-timeout = "hyprctl dispatch dpms off"; on-resume = "hyprctl dispatch dpms on"; }
+        { timeout = 1200; on-timeout = "systemctl suspend"; }
+      ];
+    };
+  };
+
   wayland.windowManager.hyprland.settings = {
     exec-once = lib.mkForce [
       "sumi-theme --restore"
