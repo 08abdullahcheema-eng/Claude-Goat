@@ -9,6 +9,9 @@ Scope {
     id: root
     property bool shown: Theme.demo && Quickshell.env("SUMI_DEMO_OSD") === "1"
     property bool ready: false
+    // 0 = gone, 1 = on screen; the window stays mapped while it animates out
+    property real k: shown ? 1 : 0
+    Behavior on k { NumberAnimation { duration: root.shown ? Theme.mIn : Theme.mOut + 80; easing.type: root.shown ? Theme.mEase : Theme.mEaseOut; easing.overshoot: Theme.mOvershoot } }
 
     readonly property var sink: Pipewire.defaultAudioSink
     PwObjectTracker { objects: [root.sink] }
@@ -27,19 +30,24 @@ Scope {
     }
 
     PanelWindow {
-        visible: root.shown
+        visible: root.k > 0.001
         screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
         anchors.bottom: true
-        margins.bottom: Theme.barEdge === "bottom" ? Theme.barReserve + Theme.px(24) : Theme.px(56)
-        implicitWidth: Theme.px(350)
-        implicitHeight: Theme.px(52)
+        // a little taller than the pill so it can move in without being cut off
+        margins.bottom: (Theme.barEdge === "bottom" ? Theme.barReserve + Theme.px(24) : Theme.px(56)) - Theme.px(20)
+        implicitWidth: Theme.px(380)
+        implicitHeight: Theme.px(92)
         exclusiveZone: 0
         color: "transparent"
         WlrLayershell.namespace: "sumi-osd"
         WlrLayershell.layer: WlrLayer.Overlay
 
         Rectangle {
-            anchors.fill: parent
+            anchors.centerIn: parent
+            width: Theme.px(350); height: Theme.px(52)
+            opacity: Math.max(0, Math.min(1, root.k * 1.4))
+            scale: Theme.mStyle === "bloom" || Theme.mStyle === "mist" ? (Theme.mScale + (1 - Theme.mScale) * root.k) : 1
+            transform: Translate { y: (1 - root.k) * (Theme.mStyle === "descend" ? -Theme.px(14) : Theme.px(18)) }
             radius: height / 2
             color: Theme.panelBg
             border.width: 1; border.color: Theme.line2
@@ -60,7 +68,7 @@ Scope {
                     Rectangle {
                         width: parent.width * Math.min(1, parent.parent.parent.v); height: parent.height; radius: parent.radius
                         color: Ui.osdMuted ? Theme.mute : (parent.parent.parent.bright ? Theme.gold : Theme.accent)
-                        Behavior on width { NumberAnimation { duration: 90 } }
+                        Behavior on width { NumberAnimation { duration: Theme.mFast; easing.type: Easing.OutCubic } }
                     }
                 }
                 T { anchors.verticalCenter: parent.verticalCenter; width: Theme.px(36); horizontalAlignment: Text.AlignRight; text: Math.round(parent.parent.v * 100); color: Theme.hi }

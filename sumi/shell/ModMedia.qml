@@ -19,7 +19,7 @@ Rectangle {
     implicitWidth: row.implicitWidth + Theme.px(16)
     radius: BarStyle.radius
     color: ma.containsMouse ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.6) : "transparent"
-    Behavior on color { ColorAnimation { duration: 120 } }
+    Behavior on color { ColorAnimation { duration: Theme.mFast } }
 
     Row {
         id: row

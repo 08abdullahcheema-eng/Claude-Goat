@@ -32,7 +32,7 @@ Item {
         text: lg.badge
         rotation: lg.hanko ? -4 : 0
         color: Theme.accent
-        font.family: Theme.head === "Bebas Neue" || Theme.head === "Space Grotesk" || Theme.head === "Inter" ? Theme.serif : Theme.head
+        font.family: Theme.head === "Space Grotesk" || Theme.head === "Inter" ? Theme.serif : Theme.head
         font.pixelSize: lg.size * (lg.hanko ? 0.62 : 0.86)
         font.weight: Font.Bold
     }

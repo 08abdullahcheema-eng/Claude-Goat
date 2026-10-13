@@ -130,7 +130,7 @@ Item {
                                 height: Math.max(width, parent.height * parent.modelData / 100)
                                 radius: width / 2
                                 color: root.loadColor(parent.modelData)
-                                Behavior on height { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                                Behavior on height { NumberAnimation { duration: Theme.mMed; easing.type: Easing.OutCubic } }
                             }
                         }
                     }

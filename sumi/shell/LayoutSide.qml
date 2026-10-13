@@ -60,7 +60,7 @@ Scope {
                             color: on ? Theme.accent : (ws.used(modelData) ? Theme.dim : "transparent")
                             border.width: on || ws.used(modelData) ? 0 : 1
                             border.color: Theme.mute
-                            Behavior on height { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+                            Behavior on height { NumberAnimation { duration: Theme.mMed; easing.type: Theme.mEaseSmall } }
                             MouseArea { anchors.fill: parent; anchors.margins: -Theme.px(6); cursorShape: Qt.PointingHandCursor; onClicked: Hyprland.dispatch("workspace " + parent.modelData) }
                         }
                     }

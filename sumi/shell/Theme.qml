@@ -57,7 +57,7 @@ Singleton {
     readonly property bool wsKanji: p.wsKanji ?? false
 
     // bar layout: the user's choice in ~/.config/sumi/layout, else the theme's own layout
-    readonly property var layouts: ["islands", "capsule", "rail", "dune", "side", "horizon", "ridge", "float", "stars", "notch", "pill", "bottom", "corners"]
+    readonly property var layouts: ["islands", "capsule", "rail", "side", "ridge", "notch", "pill", "bottom", "corners"]
     property string userLayout: ""
     property string previewLayout: ""          // set by the theme picker while browsing
     readonly property string envLayout: Quickshell.env("SUMI_LAYOUT") ?? ""
@@ -66,7 +66,7 @@ Singleton {
             if (c && layouts.indexOf(c) >= 0) return c;
         return "islands";
     }
-    function edgeOf(l) { return (l === "bottom" || l === "pill" || l === "dune" || l === "horizon") ? "bottom" : (l === "side" ? "left" : "top"); }
+    function edgeOf(l) { return (l === "bottom" || l === "pill") ? "bottom" : (l === "side" ? "left" : "top"); }
     function reserveOf(l) {
         switch (l) {
         case "islands": return barH + barM;
@@ -76,12 +76,8 @@ Singleton {
         case "rail": return px(26);
         case "pill": return px(58);
         case "capsule": return px(47);
-        case "dune": return px(66);
         case "side": return px(70);
-        case "horizon": return px(58);
         case "ridge": return px(70);
-        case "float": return px(52);
-        case "stars": return px(66);
         }
         return barH + barM;
     }
@@ -89,6 +85,44 @@ Singleton {
     readonly property int barReserve: reserveOf(layout)
 
     function px(v) { return Math.round(v * s); }
+
+    // motion of the theme ("motion" in the theme json): how panels, cards and small
+    // state changes move. Sumi blooms out of the icon, Iso rolls in like a wave, Kiri
+    // condenses out of the mist, Hagane cuts in hard, Summit descends from above.
+    readonly property var mo: p.motion ?? ({})
+    readonly property string mStyle: mo.style ?? "drop"
+    readonly property int mIn: mo["in"] ?? 280
+    readonly property int mOut: mo.out ?? 150
+    readonly property int mFast: mo.fast ?? 120
+    readonly property int mMed: mo.med ?? 220
+    readonly property int mStagger: mo.stagger ?? 0
+    readonly property real mDist: px(mo.dist ?? 10)
+    readonly property real mScale: mo.scale ?? 1
+    readonly property real mOvershoot: mo.overshoot ?? 1.2
+    readonly property int mEase: curve(mo.ease ?? "OutQuint")
+    readonly property int mEaseOut: curve(mo.easeOut ?? "InCubic")
+    // the theme's curve for small state changes (hover, toggles, workspace indicator)
+    readonly property int mEaseSmall: mStyle === "wipe" ? Easing.OutCubic : mStyle === "mist" ? Easing.InOutSine : mStyle === "wave" ? Easing.OutBack : Easing.OutQuint
+    function curve(n) {
+        switch (n) {
+        case "Linear": return Easing.Linear;
+        case "OutQuad": return Easing.OutQuad;
+        case "InQuad": return Easing.InQuad;
+        case "OutCubic": return Easing.OutCubic;
+        case "InCubic": return Easing.InCubic;
+        case "InOutCubic": return Easing.InOutCubic;
+        case "OutQuart": return Easing.OutQuart;
+        case "OutQuint": return Easing.OutQuint;
+        case "OutExpo": return Easing.OutExpo;
+        case "InExpo": return Easing.InExpo;
+        case "OutSine": return Easing.OutSine;
+        case "InOutSine": return Easing.InOutSine;
+        case "OutBack": return Easing.OutBack;
+        case "InBack": return Easing.InBack;
+        case "OutElastic": return Easing.OutElastic;
+        }
+        return Easing.OutQuint;
+    }
 
     // font sizes
     readonly property int fxs: px(10)

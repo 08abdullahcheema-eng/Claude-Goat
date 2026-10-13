@@ -16,7 +16,7 @@ Item {
     property int sel: 0
     property var wv: ({})              // theme name -> wallpaper index
     property var lv: ({})              // theme name -> chosen bar layout
-    readonly property var layoutNames: ({ islands: "Inseln", capsule: "Glas-Kapsel", rail: "Haarlinie", dune: "Düne", side: "Seitenleiste", horizon: "Horizont", ridge: "Grat", float: "Schwebeband", stars: "Sternbild", notch: "Notch", pill: "Pille", bottom: "Leiste unten", corners: "Ecken" })
+    readonly property var layoutNames: ({ islands: "Inseln", capsule: "Glas-Kapsel", rail: "Haarlinie", side: "Seitenleiste", ridge: "Grat", notch: "Notch", pill: "Pille", bottom: "Leiste unten", corners: "Ecken" })
     function layoutOf(t) {
         if (!t) return "islands";
         const c = lv[t.name];
@@ -96,7 +96,7 @@ Item {
 
     Process {
         running: true
-        command: ["sh", "-c", "for f in sumi kiri hagane suna iso dune summit unkai ginga; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
+        command: ["sh", "-c", "for f in sumi iso kiri hagane summit; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
         stdout: StdioCollector {
             onStreamFinished: {
                 const parts = this.text.split("WALL:");

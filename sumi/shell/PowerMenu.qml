@@ -121,7 +121,7 @@ Item {
                     border.width: on ? Theme.px(2) : 1
                     border.color: on ? Theme.accent : Theme.line2
                     scale: tm.pressed ? 0.97 : 1
-                    Behavior on scale { NumberAnimation { duration: 80 } }
+                    Behavior on scale { NumberAnimation { duration: Theme.mFast; easing.type: Theme.mEaseSmall } }
                     Column {
                         anchors.centerIn: parent
                         spacing: Theme.px(12)

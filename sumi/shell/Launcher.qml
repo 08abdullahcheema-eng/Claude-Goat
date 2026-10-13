@@ -160,6 +160,14 @@ Item {
                     width: parent.width
                     readonly property bool first: index === 0 || root.results[index - 1].kind !== modelData.kind
                     readonly property bool on: index === root.sel
+                    property real k: root.settled || Theme.mStagger === 0 || index > 7 ? 1 : 0
+                    opacity: Math.max(0, Math.min(1, k * 1.3))
+                    transform: Translate { y: (1 - rowD.k) * Theme.mDist * (Theme.mStyle === "descend" ? -0.8 : 0.8) }
+                    SequentialAnimation {
+                        running: rowD.k < 1
+                        PauseAnimation { duration: Theme.mStagger + rowD.index * Math.round(Theme.mStagger * 0.45) }
+                        NumberAnimation { target: rowD; property: "k"; to: 1; duration: Theme.mMed; easing.type: Theme.mEase; easing.overshoot: Theme.mOvershoot }
+                    }
 
                     Label {
                         visible: rowD.first
@@ -170,8 +178,15 @@ Item {
                         width: parent.width
                         height: Theme.px(46)
                         radius: Theme.px(6)
-                        color: rowD.on ? Theme.bg2 : (rm.containsMouse ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.5) : "transparent")
-                        Rectangle { visible: rowD.on; width: Theme.px(2); height: parent.height; color: Theme.accent }
+                        color: rowD.on ? Theme.bg2 : (rm.containsMouse ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.5) : Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0))
+                        Behavior on color { ColorAnimation { duration: Theme.mFast } }
+                        // the accent mark grows out of the middle of the selected row
+                        Rectangle {
+                            visible: height > 0.5
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: Theme.px(2); height: rowD.on ? parent.height : 0; color: Theme.accent
+                            Behavior on height { NumberAnimation { duration: Theme.mMed; easing.type: Theme.mEaseSmall } }
+                        }
 
                         Item {
                             id: ico
@@ -247,4 +262,7 @@ Item {
         }
     }
     function focusFirst() { input.forceActiveFocus(); }
+    // the first rows cascade in once when the launcher opens, not on every keystroke
+    property bool settled: false
+    Timer { interval: 700; running: true; onTriggered: root.settled = true }
 }

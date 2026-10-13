@@ -1,7 +1,7 @@
-# sumi-theme <name> [wall.jpg] [layout]   switch theme (sumi kiri hagane suna iso dune summit unkai ginga),
+# sumi-theme <name> [wall.jpg] [layout]   switch theme (sumi iso kiri hagane summit),
 #                                        optionally with one of its wallpapers and a bar layout
 # sumi-theme --wall <wall.jpg>   change only the wallpaper of the current theme
-# sumi-theme --layout <layout>   change only the bar layout: islands capsule rail dune side horizon ridge float stars notch pill bottom corners, or auto
+# sumi-theme --layout <layout>   change only the bar layout: islands capsule rail side ridge notch pill bottom corners, or auto
 # sumi-theme --restore  re-apply the saved theme (wallpaper, borders, kitty, lock screen)
 # sumi-theme --init     write the theme files if missing, touch nothing that is running
 set -u
@@ -18,9 +18,9 @@ case "$mode" in
     ;;
   --layout)
     case "${2:-auto}" in
-      islands|capsule|rail|dune|side|horizon|ridge|float|stars|notch|pill|bottom|corners) printf '%s' "$2" > "$CONF/layout" ;;
+      islands|capsule|rail|side|ridge|notch|pill|bottom|corners) printf '%s' "$2" > "$CONF/layout" ;;
       auto|"") rm -f "$CONF/layout" ;;
-      *) echo "unknown layout: $2 (islands capsule rail dune side horizon ridge float stars notch pill bottom corners auto)" >&2; exit 1 ;;
+      *) echo "unknown layout: $2 (islands capsule rail side ridge notch pill bottom corners auto)" >&2; exit 1 ;;
     esac
     exit 0
     ;;
@@ -33,7 +33,7 @@ case "$mode" in
     if [ -n "${2:-}" ]; then printf '%s' "$2" > "$CONF/wall"; else rm -f "$CONF/wall"; fi
     # and the bar layout: a named one, or the theme's own
     case "${3:-}" in
-      islands|capsule|rail|dune|side|horizon|ridge|float|stars|notch|pill|bottom|corners) printf '%s' "$3" > "$CONF/layout" ;;
+      islands|capsule|rail|side|ridge|notch|pill|bottom|corners) printf '%s' "$3" > "$CONF/layout" ;;
       *) rm -f "$CONF/layout" ;;
     esac
     mode="--restore"
@@ -102,11 +102,14 @@ mv "$CONF/kitty.conf.tmp" "$CONF/kitty.conf"
 lock="$SHELL_DIR/locks/$name.conf"; [ -f "$lock" ] || lock="$SHELL_DIR/locks/sumi.conf"
 cp "$lock" "$CONF/hyprlock-theme.conf.tmp" && chmod u+w "$CONF/hyprlock-theme.conf.tmp" && mv "$CONF/hyprlock-theme.conf.tmp" "$CONF/hyprlock-theme.conf"
 
+# active window border: the theme's gradient (it turns on focus changes, see borderangle), else the accent
+border=$(jq -r '.border // empty' "$t"); [ -n "$border" ] || border="rgb($(hex accent))"
+
 # Hyprland part of the theme (sourced by hyprland.conf): borders and the theme's animations
 {
   echo "# written by sumi-theme ($name)"
   echo "general {"
-  echo "  col.active_border = rgb($(hex accent))"
+  echo "  col.active_border = $border"
   echo "  col.inactive_border = rgb($(hex line))"
   echo "}"
   jq -r '.bezier[]? | "bezier = " + .' "$t"
@@ -121,7 +124,7 @@ if [ -d "$L" ] && [ -w "$L" ]; then
   cp "$wall" "$L/login-wall.jpg.tmp" 2>/dev/null && mv "$L/login-wall.jpg.tmp" "$L/login-wall.jpg"
   logo="$SHELL_DIR/assets/$(get logo)"; [ -f "$logo" ] || logo="$SHELL_DIR/assets/logo-sumi.svg"
   cp "$logo" "$L/logo.svg.tmp" 2>/dev/null && mv "$L/logo.svg.tmp" "$L/logo.svg"
-  case "$name" in hagane) rad=4 ;; sumi|summit) rad=16 ;; dune) rad=0 ;; unkai) rad=30 ;; *) rad=24 ;; esac
+  case "$name" in hagane) rad=4 ;; sumi|summit) rad=16 ;; *) rad=24 ;; esac
   q() { get "$1" | sed 's/"/\\"/g'; }
   cat > "$L/palette.qml.tmp" <<EOQ
 import QtQuick
@@ -153,7 +156,7 @@ if [ "$mode" = "--init" ]; then exit 0; fi
 
 # live parts: only when a Hyprland session is running
 if [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
-  hyprctl keyword general:col.active_border "rgb($(hex accent))" >/dev/null 2>&1 || true
+  hyprctl keyword general:col.active_border "$border" >/dev/null 2>&1 || true
   hyprctl keyword general:col.inactive_border "rgb($(hex line))" >/dev/null 2>&1 || true
   batch=$( { jq -r '.bezier[]? | "keyword bezier " + .' "$t"; jq -r '.animation[]? | "keyword animation " + .' "$t"; } | paste -sd ';' - )
   [ -n "$batch" ] && hyprctl --batch "$batch" >/dev/null 2>&1 || true

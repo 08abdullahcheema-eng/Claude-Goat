@@ -45,10 +45,9 @@ in
     yazi
     btop
     claude-code
-    # theme fonts: Shippori Mincho (Sumi, Suna, Iso), Space Grotesk (Kiri, Summit, Ginga), Inter (Hagane),
-    # Cinzel (Dune), Fraunces (Unkai), Space Mono (Ginga)
+    # theme fonts: Shippori Mincho (Sumi, Iso), Space Grotesk (Kiri, Summit), Inter (Hagane, Iso)
     inter
-    (google-fonts.override { fonts = [ "ShipporiMincho" "BebasNeue" "SpaceGrotesk" "SpaceMono" "Cinzel" "Fraunces" ]; })
+    (google-fonts.override { fonts = [ "ShipporiMincho" "SpaceGrotesk" ]; })
   ]) ++ [ sumi-theme sumi-agents sumi-lockinfo ];
 
   # the shell itself

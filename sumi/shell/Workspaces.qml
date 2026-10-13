@@ -47,7 +47,7 @@ Row {
                  : root.mode === "blocks" ? Theme.px(34)
                  : (root.mode === "text" || root.isRoman) ? txt.implicitWidth
                  : (on ? Theme.px(36) : Theme.px(27))
-            Behavior on width { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+            Behavior on width { NumberAnimation { duration: Theme.mMed; easing.type: Theme.mEaseSmall } }
 
             Rectangle {
                 id: bg
@@ -63,12 +63,22 @@ Row {
                 }
                 border.width: (root.mode === "pill" && cell.on) || (root.mode === "circles" && !cell.on && cell.used) ? 1 : 0
                 border.color: root.mode === "pill" ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.6) : Theme.dim
-                Behavior on color { ColorAnimation { duration: 140 } }
+                Behavior on color { ColorAnimation { duration: Theme.mFast } }
             }
             // block mode: accent line under the active workspace
-            Rectangle { visible: root.mode === "blocks" && cell.on; anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: Theme.px(3); color: Theme.accent }
+            Rectangle {
+                visible: root.mode === "blocks" && width > 0.5
+                anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom }
+                width: cell.on ? parent.width : 0; height: Theme.px(3); color: Theme.accent
+                Behavior on width { NumberAnimation { duration: Theme.mMed; easing.type: Theme.mEaseSmall } }
+            }
             // text mode: underline
-            Rectangle { visible: root.mode === "text" && cell.on; anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(1) } width: parent.width + Theme.px(8); height: 2; color: Theme.accent }
+            Rectangle {
+                visible: root.mode === "text" && width > 0.5
+                anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(1) }
+                width: cell.on ? parent.width + Theme.px(8) : 0; height: 2; color: Theme.accent
+                Behavior on width { NumberAnimation { duration: Theme.mMed; easing.type: Theme.mEaseSmall } }
+            }
             // roman mode: a short accent line with a soft glow under the active one
             Rectangle {
                 visible: root.isRoman && cell.on

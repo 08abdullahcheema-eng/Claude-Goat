@@ -36,7 +36,7 @@ Rectangle {
          : (ma.containsMouse && activeStyle !== "none" ? Qt.rgba(Theme.bg2.r, Theme.bg2.g, Theme.bg2.b, 0.6) : "transparent")
     border.width: active && activeStyle === "box" ? 1 : 0
     border.color: Theme.line2
-    Behavior on color { ColorAnimation { duration: 120 } }
+    Behavior on color { ColorAnimation { duration: Theme.mFast } }
 
     // accent mark under an open panel's item
     Rectangle {

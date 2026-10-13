@@ -9,6 +9,9 @@ Scope {
     id: root
 
     property var demoList: []
+    // notifications already shown once: those don't slide in again when the list changes
+    property var seen: ({})
+    function key(n) { return n.id !== undefined ? "id" + n.id : (n.appName || "") + "|" + (n.summary || ""); }
 
     NotificationServer {
         id: server
@@ -53,6 +56,7 @@ Scope {
             id: col
             width: parent.width
             spacing: Theme.px(8)
+            move: Transition { NumberAnimation { properties: "y"; duration: Theme.mMed; easing.type: Easing.OutCubic } }
             Repeater {
                 model: root.items
                 delegate: Rectangle {
@@ -63,6 +67,31 @@ Scope {
                     readonly property color stripe: crit ? Theme.accent : (n.accent === "gold" || (n.appName || "").toLowerCase().indexOf("claude") >= 0 ? Theme.gold : (n.accent === "green" ? Theme.green : Theme.line2))
                     width: col.width
                     height: body.implicitHeight + Theme.px(26)
+
+                    // in: the theme's motion (Summit drops from above, the others come in from the right edge);
+                    // out: slides back before the notification really goes away
+                    property real k: 1
+                    property var after: null
+                    readonly property real offX: Theme.mStyle === "descend" ? 0 : (Theme.mStyle === "wipe" ? Theme.px(24) : Theme.px(56))
+                    readonly property real offY: Theme.mStyle === "descend" ? -Theme.px(22) : 0
+                    opacity: Math.max(0, Math.min(1, Theme.mStyle === "mist" ? k * k : k * 1.4))
+                    transform: Translate { x: (1 - nd.k) * nd.offX; y: (1 - nd.k) * nd.offY }
+                    function leave(fn) {
+                        if (nd.after) return;
+                        nd.after = fn;
+                        inAnim.stop(); outAnim.start();
+                    }
+                    Component.onCompleted: {
+                        const id = root.key(nd.n);
+                        if (root.seen[id]) return;
+                        const m = Object.assign({}, root.seen); m[id] = true; root.seen = m;
+                        nd.k = 0; inAnim.start();
+                    }
+                    NumberAnimation { id: inAnim; target: nd; property: "k"; to: 1; duration: Theme.mIn; easing.type: Theme.mEase; easing.overshoot: Theme.mOvershoot }
+                    NumberAnimation {
+                        id: outAnim; target: nd; property: "k"; to: 0; duration: Theme.mOut + 60; easing.type: Theme.mEaseOut
+                        onFinished: if (nd.after) nd.after()
+                    }
                     radius: Theme.px(9)
                     color: Theme.panelBg
                     border.width: 1; border.color: Theme.line2
@@ -72,7 +101,7 @@ Scope {
                     Timer {
                         running: !Theme.demo && !nd.crit && !hover.containsMouse
                         interval: (nd.n.expireTimeout > 0 ? nd.n.expireTimeout : 6000)
-                        onTriggered: nd.n.expire()
+                        onTriggered: nd.leave(() => nd.n.expire())
                     }
                     MouseArea {
                         id: hover
@@ -83,7 +112,7 @@ Scope {
                             if (Theme.demo) return;
                             const def = (nd.n.actions || []).find(a => a.identifier === "default");
                             if (m.button === Qt.LeftButton && def) def.invoke();
-                            nd.n.dismiss();
+                            nd.leave(() => nd.n.dismiss());
                         }
                     }
 
@@ -125,7 +154,7 @@ Scope {
                                         required property int index
                                         text: modelData.text
                                         primary: Theme.demo ? !!modelData.primary : index === 0
-                                        onClicked: { if (!Theme.demo) { modelData.invoke(); nd.n.dismiss(); } }
+                                        onClicked: { if (!Theme.demo) { modelData.invoke(); nd.leave(() => nd.n.dismiss()); } }
                                     }
                                 }
                             }

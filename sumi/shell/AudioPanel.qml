@@ -173,7 +173,7 @@ Item {
             color: on ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.08) : (dm.containsMouse ? Theme.bg2 : Theme.bg)
             border.width: 1
             border.color: on ? Theme.accent : (dm.containsMouse ? Theme.line2 : Theme.line)
-            Behavior on color { ColorAnimation { duration: 120 } }
+            Behavior on color { ColorAnimation { duration: Theme.mFast } }
             Row {
                 anchors { left: parent.left; leftMargin: Theme.px(12); verticalCenter: parent.verticalCenter }
                 spacing: Theme.px(10)

@@ -61,17 +61,36 @@
  "bezier": [
   "crisp, 0.4, 0, 0.2, 1",
   "steel, 0.7, 0, 0.1, 1",
+  "snap, 0.2, 1, 0.3, 1",
   "linear, 0, 0, 1, 1"
  ],
  "animation": [
-  "global, 1, 6, default",
-  "border, 1, 3, linear",
-  "windows, 1, 3, crisp",
-  "windowsIn, 1, 3, steel, popin 96%",
-  "windowsOut, 1, 2, crisp, popin 96%",
-  "windowsMove, 1, 3, crisp",
-  "fade, 1, 2.5, linear",
-  "layers, 1, 2.5, crisp, fade",
-  "workspaces, 1, 3.5, steel, slidevert"
- ]
+  "global, 1, 5, default",
+  "border, 1, 2.5, linear",
+  "borderangle, 1, 12, steel, once",
+  "windowsIn, 1, 2.6, snap, popin 97%",
+  "windowsOut, 1, 1.6, crisp, popin 98%",
+  "windowsMove, 1, 2.6, steel",
+  "fadeIn, 1, 2.2, crisp",
+  "fadeOut, 1, 1.4, linear",
+  "fadeSwitch, 1, 2.5, crisp",
+  "fadeDim, 1, 3, crisp",
+  "layersIn, 1, 2, snap, fade",
+  "layersOut, 1, 1.4, linear, fade",
+  "workspaces, 1, 3, steel, slide",
+  "specialWorkspace, 1, 2.6, steel, slidevert"
+ ],
+ "border": "rgb(a9d1ff) rgb(ffffff) 90deg",
+ "motion": {
+  "style": "wipe",
+  "in": 170,
+  "out": 90,
+  "ease": "OutCubic",
+  "easeOut": "Linear",
+  "dist": 3,
+  "scale": 1.0,
+  "fast": 70,
+  "med": 130,
+  "stagger": 0
+ }
 }

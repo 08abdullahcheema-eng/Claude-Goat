@@ -12,10 +12,6 @@ Scope {
     LazyLoader { active: Theme.layout === "rail"; LayoutRail { screenRef: host.modelData } }
     LazyLoader { active: Theme.layout === "pill"; LayoutPill { screenRef: host.modelData } }
     LazyLoader { active: Theme.layout === "capsule"; LayoutCapsule { screenRef: host.modelData } }
-    LazyLoader { active: Theme.layout === "dune"; LayoutDune { screenRef: host.modelData } }
     LazyLoader { active: Theme.layout === "side"; LayoutSide { screenRef: host.modelData } }
-    LazyLoader { active: Theme.layout === "horizon"; LayoutHorizon { screenRef: host.modelData } }
     LazyLoader { active: Theme.layout === "ridge"; LayoutRidge { screenRef: host.modelData } }
-    LazyLoader { active: Theme.layout === "float"; LayoutFloat { screenRef: host.modelData } }
-    LazyLoader { active: Theme.layout === "stars"; LayoutStars { screenRef: host.modelData } }
 }

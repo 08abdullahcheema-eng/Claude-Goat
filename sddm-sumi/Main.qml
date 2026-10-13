@@ -2,8 +2,8 @@ import QtQuick 2.15
 import QtQuick.Effects
 
 // Sumi login: the wallpaper of the active theme with slow motion over it (Ambient.qml), the
-// theme's colours and fonts and its own layout: a glass card for Sumi, Kiri, Hagane, Suna and
-// Iso, own scenes for Dune, Summit, Unkai and Ginga.
+// theme's colours, fonts and motion. Sumi, Iso, Kiri and Hagane share the glass card, each
+// with its own way of arriving, refusing and leaving; Summit has its own scene.
 // sumi-theme writes the theme to /var/lib/sumi on every theme switch.
 Rectangle {
     id: root
@@ -37,24 +37,74 @@ Rectangle {
         readonly property real radius: t ? t.radius : 22
     }
 
-    // which layout: the four landscape themes have their own, the rest share the glass card
-    readonly property string variant: ["dune", "summit", "unkai", "ginga"].indexOf(pal.name) >= 0 ? pal.name : "card"
-    // the password field of the active layout
-    readonly property var pw: variant === "dune" ? duneScene.field : variant === "summit" ? summitScene.field
-        : variant === "unkai" ? unkaiScene.field : variant === "ginga" ? gingaScene.field : password
-    onVariantChanged: Qt.callLater(function () { root.pw.forceActiveFocus() })
+    // ---------------- motion of the theme ----------------
+    // How the screen arrives, how it refuses a wrong password and how it leaves after login.
+    //   sumi    ink: everything seeps in slowly, an ensō is brushed around the avatar, ink floods the screen
+    //   iso     waves: the pieces roll up from below and overshoot, a wrong password wobbles, the tide rises
+    //   kiri    fog: the scene condenses out of a blur, the card drifts, fog swallows the screen
+    //   hagane  steel: hard, short cuts from the side, a scan line runs over the card, shutters close
+    //   summit  cold air: the panel slides in, the clock descends, contour lines widen, the night settles
+    readonly property var motions: ({
+        sumi:   { dur: 1300, ease: Easing.OutQuint, dx: 0,   dy: 18,  s0: 0.96, stag: 150, delay: 350, wall: 1400, amp: 12, cyc: 2.5, sdur: 460 },
+        iso:    { dur: 1100, ease: Easing.OutBack,  dx: 0,   dy: 48,  s0: 1.0,  stag: 120, delay: 250, wall: 1200, amp: 16, cyc: 4.5, sdur: 760 },
+        kiri:   { dur: 2000, ease: Easing.OutCubic, dx: 0,   dy: 10,  s0: 1.04, stag: 240, delay: 300, wall: 2400, amp: 6,  cyc: 2,   sdur: 620 },
+        hagane: { dur: 420,  ease: Easing.OutCubic, dx: -28, dy: 0,   s0: 1.0,  stag: 80,  delay: 150, wall: 350,  amp: 7,  cyc: 3,   sdur: 240 },
+        summit: { dur: 1400, ease: Easing.OutExpo,  dx: 0,   dy: -28, s0: 1.0,  stag: 130, delay: 300, wall: 1600, amp: 12, cyc: 3,   sdur: 500 }
+    })
+    readonly property var m: motions[pal.name] || motions.sumi
 
-    // ---------------- pieces the landscape scenes share ----------------
+    // the screen arrives piece by piece: put an Rv inside an item and it fades and moves into place
+    // (order = its place in the sequence). With shake: true it also follows the wrong-password shake.
+    component Rv: Item {
+        id: rv
+        property int order: 0
+        property real dx: root.m.dx * root.s
+        property real dy: root.m.dy * root.s
+        property real s0: root.m.s0
+        property int dur: root.m.dur
+        property int ease: root.m.ease
+        property bool shake: false
+        property real k: 0
+        visible: false
+        width: 0; height: 0
+        Translate { id: rvT; x: (1 - rv.k) * rv.dx + (rv.shake ? root.shakeX : 0); y: (1 - rv.k) * rv.dy - root.lift }
+        Scale {
+            id: rvS
+            origin.x: rv.parent ? rv.parent.width / 2 : 0; origin.y: rv.parent ? rv.parent.height / 2 : 0
+            xScale: rv.s0 + (1 - rv.s0) * rv.k; yScale: xScale
+        }
+        Binding { target: rv.parent; property: "opacity"; value: Math.max(0, Math.min(1, rv.k * 1.25)) }
+        Component.onCompleted: parent.transform = [rvS, rvT]
+        SequentialAnimation {
+            running: true
+            PauseAnimation { duration: root.m.delay + rv.order * root.m.stag }
+            NumberAnimation { target: rv; property: "k"; to: 1; duration: rv.dur; easing.type: rv.ease; easing.overshoot: 1.5 }
+        }
+    }
+
+    // wrong password: a decaying shake, its size and rhythm come from the theme
+    property real shakeT: 1
+    readonly property real shakeX: m.amp * root.s * Math.sin(shakeT * m.cyc * 2 * Math.PI) * (1 - shakeT)
+    NumberAnimation { id: shake; target: root; property: "shakeT"; from: 0; to: 1; duration: root.m.sdur; easing.type: Easing.Linear }
+    // after login everything rises a little while the outro covers it (summit)
+    property real lift: 0
+
+    // a soft pulse on every key press, the field glows a little brighter
+    property real typed: 0
+    NumberAnimation { id: typePulse; target: root; property: "typed"; from: 1; to: 0; duration: pal.name === "hagane" ? 160 : 520; easing.type: Easing.OutCubic }
+
+    // ---------------- pieces the scenes share ----------------
     property var now: new Date()
-    property real shakeX: 0
-    readonly property var romanN: ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX", "XXXI"]
     readonly property var dayNames: ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"]
     readonly property var monthNames: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
-    readonly property var ordinals: ["erste", "zweite", "dritte", "vierte", "fünfte", "sechste", "siebte", "achte", "neunte", "zehnte", "elfte", "zwölfte", "dreizehnte", "vierzehnte", "fünfzehnte", "sechzehnte", "siebzehnte", "achtzehnte", "neunzehnte", "zwanzigste", "einundzwanzigste", "zweiundzwanzigste", "dreiundzwanzigste", "vierundzwanzigste", "fünfundzwanzigste", "sechsundzwanzigste", "siebenundzwanzigste", "achtundzwanzigste", "neunundzwanzigste", "dreißigste", "einunddreißigste"]
     readonly property string hhmm: Qt.formatTime(now, "hh:mm")
-    readonly property string romanDate: (dayNames[now.getDay()] + " · " + romanN[now.getDate() - 1] + " · " + monthNames[now.getMonth()]).toUpperCase()
-    readonly property string wordsDate: dayNames[now.getDay()] + ", der " + ordinals[now.getDate() - 1] + " " + monthNames[now.getMonth()]
+    readonly property string longDate: dayNames[now.getDay()] + ", " + now.getDate() + ". " + monthNames[now.getMonth()]
     readonly property string shortDate: (dayNames[now.getDay()].slice(0, 2) + " " + String(now.getDate()).padStart(2, "0") + " " + monthNames[now.getMonth()].slice(0, 3)).toUpperCase()
+
+    // the password field of the active layout
+    readonly property bool ownScene: pal.name === "summit"
+    readonly property var pw: ownScene ? summitScene.field : password
+    onOwnSceneChanged: Qt.callLater(function () { root.pw.forceActiveFocus() })
 
     // password field: an underline ("line") or a rounded box ("box")
     component Field: Rectangle {
@@ -71,11 +121,20 @@ Rectangle {
         color: look === "box" ? Qt.rgba(1, 1, 1, 0.07) : "transparent"
         border.width: look === "box" ? Math.max(1, 1.2 * root.s) : 0
         border.color: root.failed ? pal.error : f.edge
+        Behavior on border.color { ColorAnimation { duration: 220 } }
+        // underline: dim at rest, it fills with the accent from the left when focused
         Rectangle {
             visible: f.look === "line"
             anchors.bottom: parent.bottom
             width: parent.width; height: Math.max(1, 1.5 * root.s)
+            color: Qt.rgba(f.edge.r, f.edge.g, f.edge.b, 0.35)
+        }
+        Rectangle {
+            visible: f.look === "line"
+            anchors.bottom: parent.bottom
+            width: ti.activeFocus ? parent.width : 0; height: Math.max(1, (1.5 + root.typed) * root.s)
             color: root.failed ? pal.error : f.edge
+            Behavior on width { NumberAnimation { duration: 700; easing.type: Easing.OutQuint } }
         }
         TextInput {
             id: ti
@@ -88,6 +147,7 @@ Rectangle {
             font.pixelSize: 13 * root.s
             font.letterSpacing: 4 * root.s
             clip: true
+            onTextChanged: if (text.length > 0) typePulse.restart()
             Keys.onReturnPressed: root.doLogin()
             Keys.onEnterPressed: root.doLogin()
         }
@@ -139,6 +199,7 @@ Rectangle {
         Text {
             text: sr.caps ? root.sessionName().toUpperCase() : root.sessionName()
             color: srm.containsMouse ? pal.hi : pal.dim
+            Behavior on color { ColorAnimation { duration: 160 } }
             font.family: sr.fontFamily; font.italic: sr.italic; font.pixelSize: 11 * root.s; font.letterSpacing: sr.ls
             MouseArea { id: srm; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { root.nextSession(); root.pw.forceActiveFocus() } }
         }
@@ -146,6 +207,7 @@ Rectangle {
         Text {
             text: { var l = keyboard.layouts[keyboard.currentLayout]; return l ? (sr.caps ? l.shortName.toUpperCase() : l.shortName) : "DE" }
             color: skm.containsMouse ? pal.hi : pal.dim
+            Behavior on color { ColorAnimation { duration: 160 } }
             font.family: sr.fontFamily; font.italic: sr.italic; font.pixelSize: 11 * root.s; font.letterSpacing: sr.ls
             MouseArea {
                 id: skm; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
@@ -219,7 +281,7 @@ Rectangle {
 
     Connections {
         target: sddm
-        function onLoginSucceeded() { launchCover.opacity = 1 }
+        function onLoginSucceeded() { outro.start() }
         function onLoginFailed() {
             root.busy = false
             root.failed = true
@@ -244,12 +306,18 @@ Rectangle {
         id: wallFx
         anchors.fill: parent
         source: wallSrc
-        blurEnabled: root.variant === "card"; blur: 0.25; blurMax: 32
-        brightness: root.variant === "card" ? -0.32 : root.variant === "unkai" ? -0.08 : root.variant === "ginga" ? -0.12 : -0.16
-        saturation: root.variant === "card" ? 0.05 : 0.0
-        // the picture breathes: a very slow zoom in and out
+        blurEnabled: !root.ownScene; blur: 0.25; blurMax: 32
+        brightness: root.ownScene ? -0.16 : -0.32
+        saturation: root.ownScene ? 0.0 : 0.05
+        // the picture comes up out of the theme's background, then breathes: a very slow zoom
+        opacity: 0
+        NumberAnimation on opacity { from: 0; to: 1; duration: root.m.wall; easing.type: Easing.InOutSine }
         transformOrigin: Item.Center
-        SequentialAnimation on scale {
+        scale: zIntro * zBreath
+        property real zIntro: 1
+        property real zBreath: 1
+        NumberAnimation on zIntro { from: pal.name === "summit" ? 1.08 : 1.03; to: 1.0; duration: 4000; easing.type: Easing.OutCubic }
+        SequentialAnimation on zBreath {
             loops: Animation.Infinite
             NumberAnimation { from: 1.0; to: 1.06; duration: 45000; easing.type: Easing.InOutSine }
             NumberAnimation { from: 1.06; to: 1.0; duration: 45000; easing.type: Easing.InOutSine }
@@ -258,19 +326,60 @@ Rectangle {
     Ambient {
         anchors.fill: parent
         name: pal.name; accent: pal.accent; accent2: pal.accent2; fg: pal.fg; s: root.s
+        opacity: 0
+        NumberAnimation on opacity { from: 0; to: 1; duration: root.m.wall * 1.5; easing.type: Easing.InOutSine }
     }
 
+    // ================= the glass card: sumi, iso, kiri, hagane =================
     Item {
         id: cardScene
         anchors.fill: parent
-        visible: root.variant === "card"
+        visible: !root.ownScene
+
+        // kiri: the whole scene condenses out of the fog
+        property real fogBlur: pal.name === "kiri" ? 1 : 0
+        NumberAnimation on fogBlur { running: pal.name === "kiri"; from: 1; to: 0; duration: 2600; easing.type: Easing.OutCubic }
+        layer.enabled: fogBlur > 0.002
+        layer.effect: MultiEffect { blurEnabled: true; blurMax: 48; blur: cardScene.fogBlur }
+        // kiri: the card floats, very slowly
+        property real floatY: 0
+        SequentialAnimation on floatY {
+            running: pal.name === "kiri"; loops: Animation.Infinite
+            NumberAnimation { from: 0; to: 8; duration: 7000; easing.type: Easing.InOutSine }
+            NumberAnimation { from: 8; to: 0; duration: 7000; easing.type: Easing.InOutSine }
+        }
 
         // ---------------- clock ----------------
         Column {
             x: 56 * root.s; y: 46 * root.s
             spacing: 2 * root.s
-            Text { id: clock; color: pal.hi; font.family: pal.head; font.pixelSize: 68 * root.s; font.weight: Font.Bold }
-            Text { id: dateText; x: 3 * root.s; color: pal.fg; font.family: pal.body; font.pixelSize: 16 * root.s; font.letterSpacing: 2.5 * root.s }
+            Text {
+                id: clock
+                textFormat: Text.StyledText
+                text: pal.name === "sumi" ? root.hhmm.slice(0, 2) + "<font color='" + pal.accent + "'>:</font>" + root.hhmm.slice(3) : root.hhmm
+                color: pal.hi; font.family: pal.head; font.pixelSize: 68 * root.s
+                font.weight: pal.name === "hagane" || pal.name === "iso" ? Font.Light : Font.Bold
+                Rv { order: 0; dx: pal.name === "hagane" ? -40 * root.s : 0; dy: pal.name === "iso" ? 30 * root.s : (pal.name === "hagane" ? 0 : -14 * root.s) }
+            }
+            Text {
+                x: 3 * root.s
+                text: root.longDate
+                color: pal.fg; font.family: pal.body; font.pixelSize: 16 * root.s; font.letterSpacing: 2.5 * root.s
+                Rv { order: 1; dx: pal.name === "hagane" ? -40 * root.s : 0; dy: pal.name === "iso" ? 30 * root.s : (pal.name === "hagane" ? 0 : -10 * root.s) }
+            }
+            // hagane: the seconds of the minute as a hairline under the date
+            Item {
+                visible: pal.name === "hagane"
+                width: 230 * root.s; height: 10 * root.s
+                Rectangle { y: 8 * root.s; width: parent.width; height: 1; color: Qt.rgba(1, 1, 1, 0.18) }
+                Rectangle {
+                    id: secBar
+                    y: 8 * root.s; height: 1; color: pal.accent
+                    width: parent.width * (root.now.getSeconds() + 1) / 60
+                    Behavior on width { enabled: root.now.getSeconds() > 0; NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
+                }
+                Rv { order: 2; dx: -40 * root.s }
+            }
         }
 
         // ---------------- glass card ----------------
@@ -279,8 +388,8 @@ Rectangle {
             width: 388 * root.s
             height: cardCol.implicitHeight + 64 * root.s
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: 10 * root.s
-            transform: Translate { x: root.shakeX }
+            anchors.verticalCenterOffset: (10 - cardScene.floatY) * root.s
+            Rv { order: 1; shake: true }
 
             // frosted glass: the wallpaper behind the card, blurred hard, cut to the rounded card
             Item {
@@ -302,6 +411,22 @@ Rectangle {
                     saturation: 0.15
                 }
                 Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, 0.28) }
+                // hagane: a scan line runs down the card once when it appears
+                Rectangle {
+                    id: scanLine
+                    visible: pal.name === "hagane" && y < card.height
+                    width: parent.width; height: 2 * root.s
+                    y: -10
+                    gradient: Gradient { orientation: Gradient.Horizontal
+                        GradientStop { position: 0; color: "transparent" }
+                        GradientStop { position: 0.5; color: pal.accent }
+                        GradientStop { position: 1; color: "transparent" } }
+                    SequentialAnimation on y {
+                        running: pal.name === "hagane"
+                        PauseAnimation { duration: 420 }
+                        NumberAnimation { from: -10; to: card.height + 10; duration: 620; easing.type: Easing.InOutCubic }
+                    }
+                }
             }
             Item {
                 id: glassMask
@@ -318,15 +443,18 @@ Rectangle {
                 border.color: Qt.rgba(1, 1, 1, 0.14)
             }
 
+
             Column {
                 id: cardCol
                 anchors { top: parent.top; topMargin: 38 * root.s; horizontalCenter: parent.horizontalCenter }
                 spacing: 0
 
-                // avatar: the λ logo in a ring of the accent
+                // avatar: the logo in a ring of the accent
                 Item {
+                    id: avatarBox
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: 96 * root.s; height: width
+                    Rv { order: 2; s0: pal.name === "sumi" ? 0.8 : (pal.name === "kiri" ? 1.1 : 1); dy: pal.name === "iso" ? 36 * root.s : 0; dx: 0 }
                     Rectangle {
                         anchors.centerIn: parent
                         width: parent.width + 14 * root.s; height: width; radius: width / 2
@@ -334,12 +462,33 @@ Rectangle {
                         border.width: 5 * root.s
                         border.color: Qt.rgba(0, 0, 0, 0.28)
                     }
+                    // iso: rings spread out from the avatar like ripples, now and then
+                    Repeater {
+                        model: pal.name === "iso" ? 2 : 0
+                        delegate: Rectangle {
+                            id: ripple
+                            required property int index
+                            anchors.centerIn: parent
+                            width: avatarBox.width; height: width; radius: width / 2
+                            color: "transparent"; border.width: Math.max(1, 1.2 * root.s); border.color: pal.accent
+                            opacity: 0
+                            SequentialAnimation {
+                                running: true; loops: Animation.Infinite
+                                PauseAnimation { duration: 2200 + ripple.index * 900 }
+                                ParallelAnimation {
+                                    NumberAnimation { target: ripple; property: "scale"; from: 1; to: 1.9; duration: 2600; easing.type: Easing.OutCubic }
+                                    NumberAnimation { target: ripple; property: "opacity"; from: 0.6; to: 0; duration: 2600; easing.type: Easing.OutCubic }
+                                }
+                                PauseAnimation { duration: 3200 - ripple.index * 900 }
+                            }
+                        }
+                    }
                     Rectangle {
                         anchors.fill: parent
                         radius: width / 2
                         color: pal.bg
                         border.width: 2 * root.s
-                        border.color: pal.accent
+                        border.color: pal.name === "sumi" ? Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.35) : pal.accent
                     }
                     Image {
                         anchors.centerIn: parent
@@ -349,7 +498,38 @@ Rectangle {
                         cache: false
                         onStatusChanged: if (status === Image.Error) source = "logo.svg"
                     }
-                    MouseArea { anchors.fill: parent; cursorShape: root.userNames.length > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor; onClicked: { root.nextUser(); root.pw.forceActiveFocus() } }
+                    // sumi: an ensō is brushed around the avatar, thick where the brush lands, thin where it lifts
+                    Canvas {
+                        id: enso
+                        visible: pal.name === "sumi"
+                        anchors.centerIn: parent
+                        width: parent.width + 30 * root.s; height: width
+                        property real p: 0
+                        onPChanged: requestPaint()
+                        SequentialAnimation on p {
+                            running: pal.name === "sumi"
+                            PauseAnimation { duration: 900 }
+                            NumberAnimation { from: 0; to: 1; duration: 1500; easing.type: Easing.InOutCubic }
+                        }
+                        onPaint: {
+                            var c = getContext("2d"); c.reset()
+                            var cx = width / 2, r = width / 2 - 5 * root.s
+                            var a0 = -Math.PI * 0.62, sweep = Math.PI * 1.86 * p
+                            var steps = Math.max(2, Math.round(120 * p))
+                            c.strokeStyle = String(pal.accent); c.lineCap = "round"
+                            for (var i = 0; i < steps; i++) {
+                                var t0 = i / steps, t1 = (i + 1) / steps
+                                var u = t0 * p                               // position along the whole stroke
+                                c.lineWidth = Math.max(0.8, (5.2 - 4.2 * u + Math.sin(u * 19) * 0.5) * root.s)
+                                c.globalAlpha = 0.95 - 0.35 * u
+                                var rr = r + Math.sin(u * 7) * 1.2 * root.s
+                                c.beginPath()
+                                c.arc(cx, cx, rr, a0 + sweep * t0, a0 + sweep * t1 + 0.01, false)
+                                c.stroke()
+                            }
+                        }
+                    }
+                    MouseArea { anchors.fill: parent; cursorShape: root.userNames.length > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor; onClicked: { root.nextUser(); password.forceActiveFocus() } }
                 }
                 Item { width: 1; height: 16 * root.s }
                 Text {
@@ -358,7 +538,8 @@ Rectangle {
                     color: pal.hi
                     font.family: pal.head
                     font.pixelSize: 27 * root.s
-                    font.weight: Font.Bold
+                    font.weight: pal.name === "hagane" ? Font.Light : Font.Bold
+                    Rv { order: 3; dx: 0; dy: pal.name === "iso" ? 30 * root.s : (pal.name === "hagane" ? 0 : 10 * root.s) }
                 }
                 Item { width: 1; height: 22 * root.s }
 
@@ -366,11 +547,24 @@ Rectangle {
                 Rectangle {
                     id: field
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: 276 * root.s; height: 40 * root.s
+                    width: (password.activeFocus ? 284 : 268) * root.s; height: 40 * root.s
+                    Behavior on width { NumberAnimation { duration: pal.name === "hagane" ? 140 : 600; easing.type: pal.name === "iso" ? Easing.OutBack : Easing.OutQuint } }
                     radius: Math.min(pal.radius, 20) * root.s
-                    color: Qt.rgba(1, 1, 1, 0.07)
-                    border.width: Math.max(1, 1.5 * root.s)
-                    border.color: root.failed ? pal.error : (password.activeFocus ? pal.accent : Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.7))
+                    color: Qt.rgba(1, 1, 1, 0.07 + 0.05 * root.typed)
+                    border.width: Math.max(1, (1.5 + 0.8 * root.typed) * root.s)
+                    border.color: root.failed ? pal.error : (password.activeFocus ? pal.accent : Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.55))
+                    Behavior on border.color { ColorAnimation { duration: pal.name === "hagane" ? 80 : 260 } }
+                    Rv { order: 4; dx: 0; dy: pal.name === "iso" ? 30 * root.s : (pal.name === "hagane" ? 0 : 10 * root.s) }
+                    // a soft glow around the field that lights up with each key
+                    Rectangle {
+                        z: -1
+                        anchors.fill: parent; anchors.margins: -4 * root.s
+                        radius: parent.radius + 4 * root.s
+                        color: "transparent"
+                        border.width: 3 * root.s
+                        border.color: pal.accent
+                        opacity: 0.35 * root.typed
+                    }
                     TextInput {
                         id: password
                         anchors { left: parent.left; leftMargin: 16 * root.s; right: go.left; rightMargin: 8 * root.s; verticalCenter: parent.verticalCenter }
@@ -383,6 +577,7 @@ Rectangle {
                         font.letterSpacing: 4 * root.s
                         focus: true
                         clip: true
+                        onTextChanged: if (text.length > 0) typePulse.restart()
                         Keys.onReturnPressed: root.doLogin()
                         Keys.onEnterPressed: root.doLogin()
                     }
@@ -400,7 +595,12 @@ Rectangle {
                         text: root.busy ? "…" : "➜"
                         color: gm.containsMouse ? pal.hi : pal.accent
                         font.pixelSize: 15 * root.s
-                        MouseArea { id: gm; anchors.fill: parent; anchors.margins: -8 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.doLogin() }
+                        Behavior on anchors.rightMargin { NumberAnimation { duration: 160 } }
+                        MouseArea {
+                            id: gm; anchors.fill: parent; anchors.margins: -8 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: root.doLogin()
+                            onContainsMouseChanged: go.anchors.rightMargin = (containsMouse ? 10 : 14) * root.s
+                        }
                     }
                 }
                 Item { width: 1; height: 18 * root.s }
@@ -408,9 +608,11 @@ Rectangle {
                 Row {
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 14 * root.s
+                    Rv { order: 5; dx: 0; dy: pal.name === "iso" ? 24 * root.s : (pal.name === "hagane" ? 0 : 8 * root.s) }
                     Text {
                         text: root.sessionName().toUpperCase()
                         color: sm.containsMouse ? pal.hi : pal.dim
+                        Behavior on color { ColorAnimation { duration: 160 } }
                         font.family: pal.body; font.pixelSize: 10.5 * root.s; font.letterSpacing: 2.5 * root.s
                         MouseArea { id: sm; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { root.nextSession(); password.forceActiveFocus() } }
                     }
@@ -418,6 +620,7 @@ Rectangle {
                     Text {
                         text: { var l = keyboard.layouts[keyboard.currentLayout]; return l ? l.shortName.toUpperCase() : "DE" }
                         color: km.containsMouse ? pal.hi : pal.dim
+                        Behavior on color { ColorAnimation { duration: 160 } }
                         font.family: pal.body; font.pixelSize: 10.5 * root.s; font.letterSpacing: 2.5 * root.s
                         MouseArea {
                             id: km; anchors.fill: parent; anchors.margins: -6 * root.s; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
@@ -426,75 +629,53 @@ Rectangle {
                     }
                 }
             }
-            SequentialAnimation {
-                id: shake
-                NumberAnimation { target: root; property: "shakeX"; to: -12 * root.s; duration: 50 }
-                NumberAnimation { target: root; property: "shakeX"; to: 12 * root.s; duration: 70 }
-                NumberAnimation { target: root; property: "shakeX"; to: -7 * root.s; duration: 60 }
-                NumberAnimation { target: root; property: "shakeX"; to: 0; duration: 50 }
-            }
         }
 
-        // ---------------- bottom: host on the left, sleep / restart / power on the right ----------------
+        // ---------------- bottom left: host and theme ----------------
         Text {
             anchors { left: parent.left; leftMargin: 58 * root.s; bottom: parent.bottom; bottomMargin: 46 * root.s }
             text: (sddm.hostName || "nixos") + "  ·  " + pal.label.toUpperCase()
             color: pal.dim; font.family: pal.body; font.pixelSize: 12 * root.s; font.letterSpacing: 2 * root.s
+            Rv { order: 6; dy: pal.name === "iso" ? 20 * root.s : 0 }
         }
     }
 
-    // ---------------- Dune: a Roman clock over the desert, everything on one axis ----------------
-    Item {
-        id: duneScene
-        anchors.fill: parent
-        visible: root.variant === "dune"
-        property alias field: dField.input
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 118 * root.s
-            textFormat: Text.StyledText
-            text: root.hhmm.slice(0, 2) + "<font color='" + pal.accent2 + "'>:</font>" + root.hhmm.slice(3)
-            color: pal.hi; font.family: pal.head; font.pixelSize: 74 * root.s; font.letterSpacing: 8 * root.s
-        }
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 222 * root.s
-            text: root.romanDate
-            color: pal.fg; font.family: pal.head; font.pixelSize: 15 * root.s; font.letterSpacing: 7 * root.s
-        }
-        Column {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 345 * root.s
-            spacing: 18 * root.s
-            transform: Translate { x: root.shakeX }
-            Avatar { anchors.horizontalCenter: parent.horizontalCenter; size: 92 * root.s; ring: pal.accent2 }
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName.toUpperCase(); color: pal.hi; font.family: pal.head; font.pixelSize: 28 * root.s; font.letterSpacing: 6 * root.s }
-            Field { id: dField; anchors.horizontalCenter: parent.horizontalCenter; width: 330 * root.s; look: "line"; fontFamily: pal.head; placeholder: "PASSWORT"; ls: 4 * root.s }
-            SessionRow { anchors.horizontalCenter: parent.horizontalCenter; fontFamily: pal.head; ls: 3.5 * root.s }
-        }
-    }
-
-    // ---------------- Summit: a glass panel on the left with contour lines, the clock up right ----------------
+    // ================= Summit: a glass panel on the left with contour lines, the clock up right =================
     Item {
         id: summitScene
         anchors.fill: parent
-        visible: root.variant === "summit"
+        visible: root.ownScene
         property alias field: sField.input
         Rectangle {
             id: sPanel
             width: 520 * root.s; height: parent.height
+            clip: true
             gradient: Gradient { orientation: Gradient.Horizontal
                 GradientStop { position: 0; color: Qt.rgba(pal.bg.r, pal.bg.g, pal.bg.b, 0.88) }
                 GradientStop { position: 1; color: Qt.rgba(pal.bg.r, pal.bg.g, pal.bg.b, 0.55) } }
+            Rv { order: 0; dx: -520 * root.s; dy: 0; dur: 1500 }
             Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.2) }
-            Canvas {
+            // contour lines that slowly widen outwards, like height lines read from the summit down
+            Item {
+                id: contours
                 anchors.fill: parent
-                opacity: 0.13
-                onWidthChanged: requestPaint()
-                onPaint: {
-                    var c = getContext("2d"); c.reset(); c.strokeStyle = "#d6e2f5"; c.lineWidth = 1
-                    for (var i = 0; i < 16; i++) {
-                        c.beginPath(); c.ellipse(190 * root.s - (75 + i * 44) * root.s, 810 * root.s - (50 + i * 29) * root.s, 2 * (75 + i * 44) * root.s, 2 * (50 + i * 29) * root.s); c.stroke()
+                opacity: 0.16
+                readonly property real cx: 190 * root.s
+                readonly property real cy: 810 * root.s
+                property real phase: 0
+                NumberAnimation on phase { running: summitScene.visible; from: 0; to: 1; duration: 9000; loops: Animation.Infinite }
+                Repeater {
+                    model: 16
+                    delegate: Rectangle {
+                        required property int index
+                        readonly property real f: index + contours.phase
+                        readonly property real rx: (75 + f * 44) * root.s
+                        x: contours.cx - rx; y: contours.cy - rx
+                        width: rx * 2; height: rx * 2; radius: rx
+                        color: "transparent"; border.width: 1; border.color: "#d6e2f5"
+                        // the innermost line fades in, the outermost fades out, so the loop has no seam
+                        opacity: Math.min(1, f) * Math.min(1, (16 - f) / 2)
+                        transform: Scale { origin.x: rx; origin.y: rx; yScale: 0.66 }
                     }
                 }
             }
@@ -503,112 +684,40 @@ Rectangle {
             x: 70 * root.s; y: 72 * root.s
             text: pal.kanji + "  ·  " + pal.label.toUpperCase()
             color: pal.accent; font.family: pal.head; font.pixelSize: 15 * root.s; font.letterSpacing: 7 * root.s
+            Rv { order: 3; dy: -16 * root.s }
         }
         Column {
             x: 70 * root.s; y: 320 * root.s
             spacing: 18 * root.s
-            transform: Translate { x: root.shakeX }
-            Avatar { size: 82 * root.s; ring: pal.accent }
-            Text { text: root.userName; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 46 * root.s; font.letterSpacing: 2.5 * root.s }
-            Field { id: sField; width: 375 * root.s; look: "line"; fontFamily: pal.head; placeholder: "PASSWORT"; ls: 4 * root.s; edge: Qt.rgba(pal.hi.r, pal.hi.g, pal.hi.b, 0.6) }
-            SessionRow { fontFamily: pal.head; ls: 3 * root.s }
+            Avatar { size: 82 * root.s; ring: pal.accent; Rv { order: 4; shake: true } }
+            Text {
+                text: root.userName; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 46 * root.s; font.letterSpacing: 2.5 * root.s
+                Rv { order: 5; shake: true }
+            }
+            Field {
+                id: sField; width: 375 * root.s; look: "line"; fontFamily: pal.head; placeholder: "PASSWORT"; ls: 4 * root.s; edge: Qt.rgba(pal.hi.r, pal.hi.g, pal.hi.b, 0.6)
+                Rv { order: 6; shake: true }
+            }
+            SessionRow { fontFamily: pal.head; ls: 3 * root.s; Rv { order: 7 } }
         }
         Column {
             anchors { right: parent.right; rightMargin: 70 * root.s }
             y: 56 * root.s
-            Text { anchors.right: parent.right; text: root.hhmm; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 84 * root.s; font.letterSpacing: 4 * root.s }
-            Text { anchors.right: parent.right; text: root.shortDate; color: pal.accent; font.family: pal.head; font.pixelSize: 16 * root.s; font.letterSpacing: 7.5 * root.s }
-        }
-    }
-
-    // ---------------- Unkai: an italic clock above the clouds, a card resting on the cloud sea ----------------
-    Item {
-        id: unkaiScene
-        anchors.fill: parent
-        visible: root.variant === "unkai"
-        property alias field: uField.input
-        Column {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 62 * root.s
-            spacing: 2 * root.s
             Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.hhmm; color: pal.hi; font.family: pal.head; font.italic: true; font.weight: Font.Light; font.pixelSize: 96 * root.s
-                layer.enabled: true
-                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: pal.accent; shadowOpacity: 0.45; shadowBlur: 1.0; shadowHorizontalOffset: 0; shadowVerticalOffset: 0 }
+                anchors.right: parent.right; text: root.hhmm; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 84 * root.s; font.letterSpacing: 4 * root.s
+                Rv { order: 1; dy: -40 * root.s }
             }
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.wordsDate; color: pal.accent2; font.family: pal.head; font.italic: true; font.pixelSize: 19 * root.s }
-        }
-        Rectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 530 * root.s
-            width: 400 * root.s; height: uCol.implicitHeight + 56 * root.s
-            radius: 26 * root.s
-            color: Qt.rgba(pal.bg1.r, pal.bg1.g, pal.bg1.b, 0.55)
-            border.width: 1; border.color: Qt.rgba(pal.hi.r, pal.hi.g, pal.hi.b, 0.18)
-            transform: Translate { x: root.shakeX }
-            Column {
-                id: uCol
-                anchors { top: parent.top; topMargin: 30 * root.s; horizontalCenter: parent.horizontalCenter }
-                spacing: 14 * root.s
-                Avatar { anchors.horizontalCenter: parent.horizontalCenter; size: 76 * root.s; ring: pal.accent }
-                Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName; color: pal.hi; font.family: pal.head; font.italic: true; font.pixelSize: 34 * root.s }
-                Field { id: uField; anchors.horizontalCenter: parent.horizontalCenter; width: 300 * root.s; look: "box"; fontFamily: pal.head; italic: true; placeholder: "Passwort"; edge: Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.7) }
-                SessionRow { anchors.horizontalCenter: parent.horizontalCenter; fontFamily: pal.head; italic: true; caps: false; ls: 0.5 * root.s }
+            Text {
+                anchors.right: parent.right; text: root.shortDate; color: pal.accent; font.family: pal.head; font.pixelSize: 16 * root.s; font.letterSpacing: 7.5 * root.s
+                Rv { order: 2; dy: -30 * root.s }
             }
-        }
-    }
-
-    // ---------------- Ginga: the avatar at the centre of slowly turning orbits ----------------
-    Item {
-        id: gingaScene
-        anchors.fill: parent
-        visible: root.variant === "ginga"
-        property alias field: gField.input
-        readonly property real cy: 400 * root.s
-        Canvas {
-            id: orbits
-            width: 620 * root.s; height: width
-            x: parent.width / 2 - width / 2; y: gingaScene.cy - height / 2
-            onWidthChanged: requestPaint()
-            onPaint: {
-                var c = getContext("2d"); c.reset()
-                var cx = width / 2, rs = [94, 150, 212, 288], dots = [[0.6, 1], [2.2, 2], [4.1, 3], [5.3, 0], [3.1, 2], [1.4, 3]]
-                for (var i = 0; i < rs.length; i++) {
-                    c.beginPath(); c.lineWidth = 1
-                    c.globalAlpha = 0.4 - i * 0.07; c.strokeStyle = String(pal.accent)
-                    if (i % 2) c.setLineDash([3, 8]); else c.setLineDash([])
-                    c.arc(cx, cx, rs[i] * root.s, 0, 2 * Math.PI); c.stroke()
-                }
-                c.setLineDash([]); c.globalAlpha = 1
-                for (var k = 0; k < dots.length; k++) {
-                    var r = rs[dots[k][1]] * root.s, a = dots[k][0]
-                    c.beginPath(); c.fillStyle = k === 3 ? String(pal.accent2) : "#ffffff"
-                    c.arc(cx + r * Math.cos(a), cx + r * Math.sin(a), 3.2 * root.s, 0, 2 * Math.PI); c.fill()
-                }
-            }
-            RotationAnimation on rotation { from: 0; to: 360; duration: 240000; loops: Animation.Infinite; running: gingaScene.visible }
-        }
-        Avatar { x: parent.width / 2 - width / 2; y: gingaScene.cy - height / 2; size: 106 * root.s; ring: "#ffffff" }
-        Column {
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 705 * root.s
-            spacing: 16 * root.s
-            transform: Translate { x: root.shakeX }
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.userName; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 38 * root.s; font.letterSpacing: 6 * root.s }
-            Field { id: gField; anchors.horizontalCenter: parent.horizontalCenter; width: 330 * root.s; look: "box"; edge: Qt.rgba(pal.accent.r, pal.accent.g, pal.accent.b, 0.6) }
-            SessionRow { anchors.horizontalCenter: parent.horizontalCenter }
-        }
-        Column {
-            x: 56 * root.s; y: 48 * root.s
-            Text { text: root.hhmm; color: pal.hi; font.family: pal.head; font.weight: Font.Light; font.pixelSize: 62 * root.s; font.letterSpacing: 3 * root.s }
-            Text { text: root.shortDate + "  ·  " + pal.kanji; color: pal.accent; font.family: pal.body; font.pixelSize: 12.5 * root.s; font.letterSpacing: 2.5 * root.s }
         }
     }
 
     Row {
         anchors { right: parent.right; rightMargin: 50 * root.s; bottom: parent.bottom; bottomMargin: 40 * root.s }
         spacing: 20 * root.s
+        Rv { order: 7; dy: 0; dx: 0 }
         Repeater {
             model: sddm.canSuspend ? ["sleep", "reboot", "power"] : ["reboot", "power"]
             delegate: Item {
@@ -648,39 +757,115 @@ Rectangle {
         }
     }
 
-    Timer {
-        interval: 1000; running: true; repeat: true; triggeredOnStart: true
-        onTriggered: {
-            var d = new Date()
-            root.now = d
-            clock.text = Qt.formatTime(d, "hh:mm")
-            var wd = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"][d.getDay()]
-            var mo = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"][d.getMonth()]
-            dateText.text = wd + ", " + d.getDate() + ". " + mo
+    // ---------------- after a successful login: the theme's way out, then the kanji until Hyprland is up ----------------
+    Item {
+        id: outroLayer
+        anchors.fill: parent
+        visible: false
+        readonly property real diag: Math.sqrt(width * width + height * height)
+
+        // sumi: ink spreads out of the avatar until it fills the screen
+        Rectangle {
+            id: inkDot
+            visible: pal.name === "sumi"
+            property real cx: root.width / 2
+            property real cy: root.height / 2
+            width: 0; height: width; radius: width / 2
+            x: cx - width / 2; y: cy - width / 2
+            color: pal.bg
+        }
+        // iso: the tide comes in from below, with a soft foam edge
+        Item {
+            id: tide
+            visible: pal.name === "iso"
+            width: parent.width; height: parent.height + edge.height
+            y: parent.height
+            Image { id: edge; source: "blob.png"; width: parent.width * 1.6; x: -parent.width * 0.3; height: 260 * root.s; y: 0
+                layer.enabled: true; layer.effect: MultiEffect { colorization: 1.0; colorizationColor: pal.bg } }
+            Rectangle { y: edge.height / 2; width: parent.width; height: parent.height; color: pal.bg }
+        }
+        // kiri: the fog thickens to white, then darkens to the theme's night
+        Rectangle { id: whiteout; anchors.fill: parent; visible: pal.name === "kiri"; color: "#dfe6e3"; opacity: 0 }
+        // hagane: two steel shutters close on a bright seam
+        Rectangle { id: shutTop; visible: pal.name === "hagane"; width: parent.width; height: 0; color: pal.bg }
+        Rectangle { id: shutBot; visible: pal.name === "hagane"; width: parent.width; height: 0; y: parent.height - height; color: pal.bg }
+        Rectangle { id: seam; visible: pal.name === "hagane" && width > 0; anchors.centerIn: parent; width: 0; height: 1; color: pal.accent }
+
+        Rectangle {
+            id: launchCover
+            anchors.fill: parent
+            color: pal.bg
+            opacity: 0
+            Text {
+                id: coverKanji
+                anchors.centerIn: parent
+                text: pal.kanji
+                color: pal.accent
+                font.family: "Noto Serif CJK JP"
+                font.pixelSize: 54 * root.s
+                opacity: 0
+                SequentialAnimation {
+                    running: launchCover.opacity > 0.99; loops: Animation.Infinite
+                    NumberAnimation { target: coverKanji; property: "opacity"; to: 1; duration: 700; easing.type: Easing.InOutSine }
+                    NumberAnimation { target: coverKanji; property: "opacity"; to: 0.35; duration: 700; easing.type: Easing.InOutSine }
+                }
+            }
         }
     }
 
-    // shown after a successful login, until Hyprland takes over
-    Rectangle {
-        id: launchCover
-        anchors.fill: parent
-        color: pal.bg
-        opacity: 0
-        visible: opacity > 0
-        Behavior on opacity { NumberAnimation { duration: 350 } }
-        Text {
-            anchors.centerIn: parent
-            text: pal.kanji
-            color: pal.accent
-            font.family: "Noto Serif CJK JP"
-            font.pixelSize: 54 * root.s
-            SequentialAnimation on opacity {
-                loops: Animation.Infinite
-                running: launchCover.visible
-                NumberAnimation { to: 0.35; duration: 700 }
-                NumberAnimation { to: 1; duration: 700 }
-            }
+    NumberAnimation { id: coverIn; target: launchCover; property: "opacity"; to: 1; duration: 350; easing.type: Easing.OutCubic }
+    SequentialAnimation {
+        id: outroSumi
+        NumberAnimation { target: inkDot; property: "width"; from: 0; to: outroLayer.diag * 2.2; duration: 1100; easing.type: Easing.InCubic }
+        ScriptAction { script: coverIn.start() }
+    }
+    SequentialAnimation {
+        id: outroIso
+        NumberAnimation { target: tide; property: "y"; to: -edge.height; duration: 950; easing.type: Easing.InOutCubic }
+        ScriptAction { script: coverIn.start() }
+    }
+    SequentialAnimation {
+        id: outroKiri
+        NumberAnimation { target: whiteout; property: "opacity"; to: 1; duration: 900; easing.type: Easing.InOutSine }
+        ColorAnimation { target: whiteout; property: "color"; to: pal.bg; duration: 700; easing.type: Easing.InOutSine }
+        ScriptAction { script: coverIn.start() }
+    }
+    SequentialAnimation {
+        id: outroHagane
+        ParallelAnimation {
+            NumberAnimation { target: shutTop; property: "height"; to: root.height / 2; duration: 260; easing.type: Easing.InCubic }
+            NumberAnimation { target: shutBot; property: "height"; to: root.height / 2; duration: 260; easing.type: Easing.InCubic }
         }
+        NumberAnimation { target: seam; property: "width"; to: root.width; duration: 180; easing.type: Easing.OutCubic }
+        NumberAnimation { target: seam; property: "opacity"; to: 0; duration: 220 }
+        ScriptAction { script: coverIn.start() }
+    }
+    SequentialAnimation {
+        id: outroSummit
+        ParallelAnimation {
+            NumberAnimation { target: root; property: "lift"; to: 40 * root.s; duration: 900; easing.type: Easing.InCubic }
+            NumberAnimation { target: launchCover; property: "opacity"; to: 1; duration: 900; easing.type: Easing.InCubic }
+        }
+    }
+    // "start" so Connections can call outro.start() like an animation
+    QtObject {
+        id: outro
+        function start() {
+            outroLayer.visible = true
+            if (pal.name === "sumi") {
+                var p = avatarBox.mapToItem(root, avatarBox.width / 2, avatarBox.height / 2)
+                inkDot.cx = p.x; inkDot.cy = p.y
+                outroSumi.start()
+            } else if (pal.name === "iso") outroIso.start()
+            else if (pal.name === "kiri") outroKiri.start()
+            else if (pal.name === "hagane") outroHagane.start()
+            else outroSummit.start()
+        }
+    }
+
+    Timer {
+        interval: 1000; running: true; repeat: true; triggeredOnStart: true
+        onTriggered: root.now = new Date()
     }
 
     Component.onCompleted: { root.pw.forceActiveFocus(); Qt.callLater(root.pickSessions) }

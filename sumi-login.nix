@@ -30,9 +30,13 @@ in
     inter
     nerd-fonts.jetbrains-mono
     noto-fonts-cjk-serif
-    (google-fonts.override { fonts = [ "ShipporiMincho" "SpaceGrotesk" "SpaceMono" "Cinzel" "Fraunces" ]; })
+    (google-fonts.override { fonts = [ "ShipporiMincho" "SpaceGrotesk" ]; })
   ];
 
   # shared folder: written by you (sumi-theme), readable by the login screen
-  systemd.tmpfiles.rules = [ "d /var/lib/sumi 0755 ${user} users -" ];
+  systemd.tmpfiles.rules = [
+    "d /var/lib/sumi 0755 ${user} users -"
+    # SDDM caches compiled QML; clear it on boot so a theme update shows up
+    "R /var/lib/sddm/.cache - - - - -"
+  ];
 }

@@ -61,18 +61,35 @@
  "bezier": [
   "mist, 0.22, 1, 0.36, 1",
   "drift, 0.45, 0, 0.2, 1",
-  "soft, 0.25, 0.1, 0.25, 1"
+  "veil, 0.37, 0, 0.63, 1"
  ],
  "animation": [
   "global, 1, 10, default",
-  "border, 1, 12, soft",
-  "windows, 1, 6, mist",
-  "windowsIn, 1, 6, mist, popin 90%",
-  "windowsOut, 1, 4, soft, popin 90%",
-  "windowsMove, 1, 5.5, mist",
-  "fade, 1, 6, soft",
-  "fadeIn, 1, 6, soft",
-  "layers, 1, 5, mist, fade",
-  "workspaces, 1, 6, drift, slidefade 18%"
- ]
+  "border, 1, 14, veil",
+  "borderangle, 1, 80, veil, once",
+  "windowsIn, 1, 7, mist, popin 95%",
+  "windowsOut, 1, 5, veil, popin 97%",
+  "windowsMove, 1, 6, mist",
+  "fadeIn, 1, 8, veil",
+  "fadeOut, 1, 5, veil",
+  "fadeSwitch, 1, 9, veil",
+  "fadeDim, 1, 10, veil",
+  "layersIn, 1, 5, mist, fade",
+  "layersOut, 1, 4, veil, fade",
+  "workspaces, 1, 7, drift, slidefade 10%",
+  "specialWorkspace, 1, 7, mist, slidefadevert 12%"
+ ],
+ "border": "rgb(a6d4ad) rgb(e9dcae) 135deg",
+ "motion": {
+  "style": "mist",
+  "in": 620,
+  "out": 320,
+  "ease": "OutCubic",
+  "easeOut": "InOutSine",
+  "dist": 4,
+  "scale": 1.035,
+  "fast": 200,
+  "med": 380,
+  "stagger": 90
+ }
 }
