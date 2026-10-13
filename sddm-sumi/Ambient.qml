@@ -41,7 +41,7 @@ Item {
     component Bloom: Image {
         id: bl
         property color tint: "black"
-        property real top: 0.5          // where on the screen (fraction of the height) it may appear
+        property real band: 0.5         // where on the screen (fraction of the height) it may appear
         property real peak: 0.4
         property int period: 11000
         property int offset: 0
@@ -53,7 +53,7 @@ Item {
         SequentialAnimation {
             running: bl.visible; loops: Animation.Infinite
             PauseAnimation { duration: bl.offset }
-            ScriptAction { script: { bl.x = amb.width * (0.05 + Math.random() * 0.8) - bl.width / 2; bl.y = amb.height * (bl.top + Math.random() * (0.95 - bl.top)) - bl.height / 2; } }
+            ScriptAction { script: { bl.x = amb.width * (0.05 + Math.random() * 0.8) - bl.width / 2; bl.y = amb.height * (bl.band + Math.random() * (0.95 - bl.band)) - bl.height / 2; } }
             ParallelAnimation {
                 NumberAnimation { target: bl; property: "scale"; from: 0.15; to: 1.5; duration: bl.period; easing.type: Easing.OutCubic }
                 SequentialAnimation {
@@ -77,9 +77,9 @@ Item {
         anchors.fill: parent
         visible: amb.name === "sumi"
         // dark ink seeping through the lower half, now and then a thread of red
-        Bloom { tint: "#000000"; top: 0.45; peak: 0.55; period: 12000; offset: 0 }
-        Bloom { tint: "#000000"; top: 0.55; peak: 0.5; period: 14000; offset: 4200 }
-        Bloom { tint: amb.accent; top: 0.5; peak: 0.16; period: 13000; offset: 8000; width: 380 * amb.s }
+        Bloom { tint: "#000000"; band: 0.45; peak: 0.55; period: 12000; offset: 0 }
+        Bloom { tint: "#000000"; band: 0.55; peak: 0.5; period: 14000; offset: 4200 }
+        Bloom { tint: amb.accent; band: 0.5; peak: 0.16; period: 13000; offset: 8000; width: 380 * amb.s }
         Fog { y: amb.height * 0.7; height: amb.height * 0.32; speed: 260000; tint: "#000000"; opacity: 0.45 }
     }
     Emitter {
