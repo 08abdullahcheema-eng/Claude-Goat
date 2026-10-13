@@ -170,7 +170,8 @@ QTSVG=$(B qtsvg)
 for t in sumi iso kiri hagane summit; do
   sumi-theme $t >/dev/null 2>&1
   [ $t = sumi ] && cat $SUMI_LOGIN_DIR/palette.qml >> $OUT/summary.txt
-  (timeout 14 env QML_DISABLE_DISK_CACHE=1 QT_QPA_PLATFORM=wayland QT_PLUGIN_PATH=$QTSVG/lib/qt-6/plugins $SDDM/bin/$GREETER --test-mode --theme /tmp/sddm-test > $OUT/sddm-$t.log 2>&1 &)
+  (timeout 14 env QML_DISABLE_DISK_CACHE=1 QT_FORCE_STDERR_LOGGING=1 QT_QPA_PLATFORM=wayland QT_PLUGIN_PATH=$QTSVG/lib/qt-6/plugins $SDDM/bin/$GREETER --test-mode --theme /tmp/sddm-test > $OUT/sddm-$t.log 2>&1; echo "greeter rc=$? after ${SECONDS}s" >> $OUT/sddm-$t.log) &
+  echo "greeter $t started at ${SECONDS}s" >> $OUT/sddm-$t.log
   sleep 2.2; $GRIM $OUT/shot-sddm-$t-intro1.png
   sleep 0.6; $GRIM $OUT/shot-sddm-$t-intro2.png
   sleep 6.2; $GRIM $OUT/shot-sddm-$t.png
@@ -178,6 +179,7 @@ for t in sumi iso kiri hagane summit; do
   sleep 3.5
 done
 grep -hiE "error|warn|cannot|unable" $OUT/sddm-*.log | sort | uniq -c | head -20 >> $OUT/summary.txt
+grep -h "greeter" $OUT/sddm-*.log >> $OUT/summary.txt
 unset SUMI_LOGIN_DIR
 # real notifications over a private D-Bus session
 NS=$(B libnotify)/bin/notify-send; DBR=$(B dbus)/bin/dbus-run-session
