@@ -22,7 +22,7 @@ let
   sumi-grub = pkgs.runCommand "sumi-grub-themes" { nativeBuildInputs = [ pkgs.grub2 pkgs.python3 pkgs.findutils ]; } ''
     cp -r ${./sumi/grub} $out; chmod -R u+w $out; mkdir -p $out/fonts
     pick() { f=$(find "$1" -iname "$2" | sort | head -1); [ -n "$f" ] || { echo "font $2 not found in $1" >&2; exit 1; }; echo "$f"; }
-    mk() { grub-mkfont -s "$3" -r "$4" -o "$out/fonts/$1.pf2" "$2"; }
+    mk() { grub-mkfont -s "$3" -r "$4" -o "$out/fonts/$1.pf2" ''${5:+-n "$5"} "$2"; }
     shx=$(pick ${fontSrc} 'ShipporiMincho-ExtraBold.ttf')
     shr=$(pick ${fontSrc} 'ShipporiMincho-Regular.ttf')
     gro=$(pick ${fontSrc} 'SpaceGrotesk*.ttf')
@@ -30,7 +30,7 @@ let
     jbm=$(pick ${pkgs.nerd-fonts.jetbrains-mono} 'JetBrainsMonoNerdFont-Regular.ttf')
     mk kanji-120 "$shx" 120 "${kanji}"
     mk kanji-48 "$shx" 48 "${kanji}"
-    mk shippori-xb-60 "$shx" 60 "${latin}"
+    mk shippori-xb-60 "$shx" 60 "${latin}" "Shippori Mincho XB"   # own name, else it clashes with the regular cut
     mk shippori-60 "$shr" 60 "${latin}"
     mk grotesk-60 "$gro" 60 "${latin}"
     mk grotesk-30 "$gro" 30 "${latin}"

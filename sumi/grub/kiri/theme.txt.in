@@ -20,5 +20,4 @@ terminal-border: "0"
   scrollbar = false
 }
 + progress_bar { id = "__timeout__" left = 33% top = 83% width = 34% height = 3 fg_color = "#a6d4ad" bg_color = "#36463f" border_color = "#36463f" text = "" }
-+ label { id = "__timeout__" left = 33% top = 85% width = 34% height = 30 text = "@TIMEOUT_NOTIFICATION_SHORT@" font = "{{F:grotesk-20}}" color = "#a9b8b1" align = "center" }
 + label { left = 0 top = 93% width = 100% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#7d8a84" align = "center" }
