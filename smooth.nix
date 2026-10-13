@@ -22,8 +22,8 @@
       nss nspr atk at-spi2-atk at-spi2-core cups gtk3 pango cairo gdk-pixbuf
       libdrm mesa libgbm libGL libglvnd vulkan-loader libxkbcommon
       alsa-lib libpulseaudio pipewire udev libsecret libnotify fontconfig freetype
-      xorg.libX11 xorg.libXcomposite xorg.libXdamage xorg.libXext xorg.libXfixes
-      xorg.libXrandr xorg.libXrender xorg.libXtst xorg.libXi xorg.libXcursor xorg.libxcb xorg.libxshmfence
+      libx11 libxcomposite libxdamage libxext libxfixes
+      libxrandr libxrender libxtst libxi libxcursor libxcb libxshmfence
     ];
   };
   programs.appimage = {
