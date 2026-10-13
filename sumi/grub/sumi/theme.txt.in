@@ -1,0 +1,25 @@
+# Sumi: the red kanji, the name in Mincho, the menu in mono on the left over the ink mountains
+title-text: ""
+desktop-image: "{{DIR}}background.jpg"
+desktop-color: "#0f0f14"
+terminal-font: "{{F:jbmono-20}}"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
++ label { left = 9% top = 13% width = 20% height = 170 text = "墨" font = "{{F:kanji-120}}" color = "#c8323a" }
++ label { left = 9% top = 27% width = 40% height = 80 text = "Sumi" font = "{{F:shippori-xb-60}}" color = "#f2ecd2" }
++ label { left = 9% top = 33% width = 40% height = 30 text = "nixos  ·  wähle ein System" font = "{{F:jbmono-20}}" color = "#727169" }
++ boot_menu {
+  left = 9% top = 40% width = 36% height = 42%
+  item_font = "{{F:jbmono-30}}" item_color = "#dcd7ba"
+  selected_item_font = "{{F:jbmono-30}}" selected_item_color = "#f2ecd2"
+  item_height = 64 item_padding = 28 item_spacing = 10
+  icon_width = 0 icon_height = 0 item_icon_space = 0
+  selected_item_pixmap_style = "{{DIR}}select_*.png"
+  scrollbar = false
+}
++ progress_bar { id = "__timeout__" left = 9% top = 85% width = 36% height = 3 fg_color = "#c8323a" bg_color = "#363646" border_color = "#363646" text = "" }
++ label { id = "__timeout__" left = 9% top = 87% width = 36% height = 30 text = "@TIMEOUT_NOTIFICATION_SHORT@" font = "{{F:jbmono-20}}" color = "#727169" }
++ label { left = 9% top = 93% width = 60% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:jbmono-20}}" color = "#54546d" }

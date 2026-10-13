@@ -24,6 +24,34 @@ nix eval --raw ./ci#nixosConfigurations.test.config.environment.etc.\"bluetooth/
 for o in hardware.nvidia.prime.offload.enable programs.steam.enable programs.nix-ld.enable services.flatpak.enable services.power-profiles-daemon.enable zramSwap.enable time.hardwareClockInLocalTime nix.gc.automatic; do echo "$o = $(nix eval --json ./ci#nixosConfigurations.test.config.$o 2>&1 | tail -1)" | tee -a $OUT/summary.txt; done
 nix eval --json ./ci#nixosConfigurations.test.config.services.blueman.enable 2>/dev/null | xargs -I{} echo "blueman enabled: {}" | tee -a $OUT/summary.txt
 nix eval --json ./ci#nixosConfigurations.test.config.boot.blacklistedKernelModules 2>/dev/null | tee -a $OUT/summary.txt
+# boot menu: build the GRUB themes, boot each one in QEMU from a small ISO and take a screenshot
+if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.config.system.build.sumiGrub 2>$OUT/grub-build.log); then
+  log "grub themes OK: $(ls $SG | tr '\n' ' ')"; grep -- "->" $OUT/grub-build.log | head -20 >> $OUT/summary.txt
+  nix log ./ci#nixosConfigurations.test.config.system.build.sumiGrub 2>/dev/null | grep -- "->" | head -20 >> $OUT/summary.txt
+  GRUB=$(B grub2); XO=$(B xorriso); MT=$(B mtools); QEMU=$(B qemu); SOCAT=$(B socat); IM=$(B imagemagick)
+  for t in sumi iso kiri hagane summit; do
+    rm -rf /tmp/giso; mkdir -p /tmp/giso/boot/grub; cp -rL $SG /tmp/giso/boot/grub/theme; chmod -R u+w /tmp/giso
+    {
+      echo 'insmod all_video'; echo 'insmod gfxterm'; echo 'insmod png'; echo 'insmod jpeg'
+      echo 'set gfxmode=2560x1600,1920x1200,auto'; echo 'terminal_output gfxterm'
+      (cd /tmp/giso/boot/grub/theme && find . -name '*.pf2' | sed 's|^\./|loadfont /boot/grub/theme/|')
+      echo 'set theme=/boot/grub/theme/theme.txt'; echo 'export theme'; echo "set sumi_theme=$t"
+      cat sumi/grub/select.cfg
+      echo 'set timeout=60'
+      echo 'menuentry "NixOS" { true }'; echo 'menuentry "NixOS - All configurations" { true }'
+      echo 'menuentry "Windows Boot Manager (on /dev/nvme0n1p1)" { true }'; echo 'menuentry "UEFI Firmware Settings" { true }'
+    } > /tmp/giso/boot/grub/grub.cfg
+    PATH=$XO/bin:$MT/bin:$PATH $GRUB/bin/grub-mkrescue -o /tmp/g.iso /tmp/giso >> $OUT/grub-iso.log 2>&1
+    rm -f /tmp/qmon
+    $QEMU/bin/qemu-system-x86_64 -cdrom /tmp/g.iso -m 512 -display none -vga std -global VGA.vgamem_mb=64 -monitor unix:/tmp/qmon,server,nowait >> $OUT/grub-qemu.log 2>&1 &
+    QEP=$!
+    sleep 25
+    echo "screendump /tmp/g.ppm" | $SOCAT/bin/socat - UNIX-CONNECT:/tmp/qmon >> $OUT/grub-qemu.log 2>&1; sleep 2
+    kill $QEP 2>/dev/null; wait $QEP 2>/dev/null
+    $IM/bin/magick /tmp/g.ppm $OUT/shot-grub-$t.png 2>>$OUT/grub-qemu.log && log "grub $t: $($IM/bin/magick identify -format '%wx%h' $OUT/shot-grub-$t.png)"
+  done
+else log "grub themes FAILED"; tail -30 $OUT/grub-build.log | tee -a $OUT/summary.txt; fi
+
 log "build home-manager config"
 if ! HM=$(nix build --no-link --print-out-paths ./ci#homeConfigurations.test.activationPackage 2>>$OUT/build.log); then
   log "HM BUILD FAILED"; tail -60 $OUT/build.log | tee -a $OUT/summary.txt; exit 1

@@ -1,0 +1,25 @@
+# Hagane: name small in the upper left, the menu low on the right, hairlines
+title-text: ""
+desktop-image: "{{DIR}}background.jpg"
+desktop-color: "#0b0b0c"
+terminal-font: "{{F:inter-20}}"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
++ label { left = 5% top = 6% width = 40% height = 60 text = "鋼" font = "{{F:kanji-48}}" color = "#a9d1ff" }
++ label { left = 5% top = 11% width = 40% height = 40 text = "H A G A N E" font = "{{F:inter-26}}" color = "#ffffff" }
++ label { left = 5% top = 15% width = 40% height = 30 text = "boot  ·  nixos" font = "{{F:inter-20}}" color = "#9a9aa0" }
++ boot_menu {
+  left = 56% top = 52% width = 38% height = 32%
+  item_font = "{{F:inter-30}}" item_color = "#e8e8ea"
+  selected_item_font = "{{F:inter-30}}" selected_item_color = "#ffffff"
+  item_height = 60 item_padding = 20 item_spacing = 10
+  icon_width = 0 icon_height = 0 item_icon_space = 0
+  selected_item_pixmap_style = "{{DIR}}select_*.png"
+  scrollbar = false
+}
++ progress_bar { id = "__timeout__" left = 56% top = 87% width = 38% height = 3 fg_color = "#a9d1ff" bg_color = "#333338" border_color = "#333338" text = "" }
++ label { id = "__timeout__" left = 56% top = 89% width = 38% height = 30 text = "@TIMEOUT_NOTIFICATION_SHORT@" font = "{{F:inter-20}}" color = "#9a9aa0" }
++ label { left = 5% top = 93% width = 40% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-20}}" color = "#6a6a70" }

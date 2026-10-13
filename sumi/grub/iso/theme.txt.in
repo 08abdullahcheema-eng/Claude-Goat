@@ -1,0 +1,24 @@
+# Iso: the coast kanji on the left, the menu on the right like the lock screen
+title-text: ""
+desktop-image: "{{DIR}}background.jpg"
+desktop-color: "#0a1115"
+terminal-font: "{{F:inter-20}}"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
++ label { left = 9% top = 30% width = 20% height = 170 text = "磯" font = "{{F:kanji-120}}" color = "#8fe0d4" }
++ label { left = 9% top = 45% width = 35% height = 80 text = "Iso" font = "{{F:shippori-60}}" color = "#ffffff" }
++ boot_menu {
+  left = 55% top = 34% width = 36% height = 42%
+  item_font = "{{F:inter-30}}" item_color = "#dfe7ea"
+  selected_item_font = "{{F:inter-30}}" selected_item_color = "#ffffff"
+  item_height = 64 item_padding = 28 item_spacing = 10
+  icon_width = 0 icon_height = 0 item_icon_space = 0
+  selected_item_pixmap_style = "{{DIR}}select_*.png"
+  scrollbar = false
+}
++ progress_bar { id = "__timeout__" left = 55% top = 79% width = 36% height = 3 fg_color = "#8fe0d4" bg_color = "#2a3c44" border_color = "#2a3c44" text = "" }
++ label { id = "__timeout__" left = 55% top = 81% width = 36% height = 30 text = "@TIMEOUT_NOTIFICATION_SHORT@" font = "{{F:inter-20}}" color = "#93a4ab" }
++ label { left = 55% top = 93% width = 40% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-20}}" color = "#5f7078" }

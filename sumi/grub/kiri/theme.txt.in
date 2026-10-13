@@ -1,0 +1,24 @@
+# Kiri: everything centred and soft in the fog
+title-text: ""
+desktop-image: "{{DIR}}background.jpg"
+desktop-color: "#101614"
+terminal-font: "{{F:grotesk-20}}"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
++ label { left = 0 top = 16% width = 100% height = 170 text = "霧" font = "{{F:kanji-120}}" color = "#a6d4ad" align = "center" }
++ label { left = 0 top = 31% width = 100% height = 80 text = "Kiri" font = "{{F:grotesk-60}}" color = "#ffffff" align = "center" }
++ boot_menu {
+  left = 33% top = 42% width = 34% height = 38%
+  item_font = "{{F:grotesk-30}}" item_color = "#e4ebe6"
+  selected_item_font = "{{F:grotesk-30}}" selected_item_color = "#ffffff"
+  item_height = 64 item_padding = 28 item_spacing = 10
+  icon_width = 0 icon_height = 0 item_icon_space = 0
+  selected_item_pixmap_style = "{{DIR}}select_*.png"
+  scrollbar = false
+}
++ progress_bar { id = "__timeout__" left = 33% top = 83% width = 34% height = 3 fg_color = "#a6d4ad" bg_color = "#36463f" border_color = "#36463f" text = "" }
++ label { id = "__timeout__" left = 33% top = 85% width = 34% height = 30 text = "@TIMEOUT_NOTIFICATION_SHORT@" font = "{{F:grotesk-20}}" color = "#a9b8b1" align = "center" }
++ label { left = 0 top = 93% width = 100% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#7d8a84" align = "center" }
