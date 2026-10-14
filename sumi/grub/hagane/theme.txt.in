@@ -1,4 +1,5 @@
-# Hagane: name small in the upper left, the menu low on the right, hairlines
+# Hagane: crop marks, a scale down the left edge, the menu in a hairline box with a bright top edge,
+# the countdown runs along the bottom of the box
 title-text: ""
 desktop-image: "{{DIR}}background.jpg"
 desktop-color: "#0b0b0c"
@@ -8,17 +9,17 @@ terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
-+ label { left = 5% top = 6% width = 40% height = 60 text = "鋼" font = "{{F:kanji-48}}" color = "#a9d1ff" }
-+ label { left = 5% top = 11% width = 40% height = 40 text = "H A G A N E" font = "{{F:inter-26}}" color = "#ffffff" }
-+ label { left = 5% top = 15% width = 40% height = 30 text = "boot  ·  nixos" font = "{{F:inter-20}}" color = "#9a9aa0" }
++ label { left = 7% top = 7.5% width = 40% height = 60 text = "鋼" font = "{{F:kanji-48}}" color = "#a9d1ff" }
++ label { left = 7% top = 12.5% width = 40% height = 40 text = "H A G A N E" font = "{{F:inter-26}}" color = "#ffffff" }
++ label { left = 7% top = 16% width = 40% height = 30 text = "boot  ·  nixos" font = "{{F:inter-20}}" color = "#9a9aa0" }
 + boot_menu {
-  left = 56% top = 52% width = 38% height = 32%
-  item_font = "{{F:inter-30}}" item_color = "#e8e8ea"
+  left = 56.5% top = 54% width = 35% height = 28%
+  item_font = "{{F:inter-30}}" item_color = "#c8c8cc"
   selected_item_font = "{{F:inter-30}}" selected_item_color = "#ffffff"
-  item_height = 60 item_padding = 20 item_spacing = 10
-  icon_width = 0 icon_height = 0 item_icon_space = 0
+  item_height = 60 item_padding = 26 item_spacing = 8
+  icon_width = 40 icon_height = 40 item_icon_space = 22
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ progress_bar { id = "__timeout__" left = 56% top = 87% width = 38% height = 3 fg_color = "#a9d1ff" bg_color = "#333338" border_color = "#333338" text = "" }
-+ label { left = 5% top = 93% width = 40% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-20}}" color = "#6a6a70" }
++ progress_bar { id = "__timeout__" left = 55% top = 86%-2 width = 38%+2 height = 3 fg_color = "#a9d1ff" bg_color = "#333338" border_color = "#333338" text = "" }
++ label { left = 7% top = 92.5% width = 40% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-20}}" color = "#6a6a70" }

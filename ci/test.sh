@@ -7,8 +7,10 @@ OUT=$PWD/out; mkdir -p $OUT
 log() { echo "== $*" | tee -a $OUT/summary.txt; }
 B() { nix build --no-link --print-out-paths "./ci#$1^out" 2>>$OUT/build.log | head -1; }
 
+# a commit with [grub] in its title only tests the boot menu (fast)
+GRUB_ONLY=$(git log -1 --format=%s 2>/dev/null | grep -q '\[grub\]' && echo 1)
 log "kernel default: $(nix eval --raw ./ci#kernel-default.version 2>>$OUT/build.log)"
-for k in linuwu-default linuwu-latest; do
+for k in $([ -n "$GRUB_ONLY" ] || echo linuwu-default linuwu-latest); do
   if P=$(nix build --no-link --print-out-paths ./ci#$k 2>>$OUT/build-$k.log); then log "$k OK: $(find $P -name '*.ko*' | head -1)"; modinfo $(find $P -name '*.ko*' | head -1) 2>/dev/null | grep -E "^(vermagic|alias)" | head -3 | tee -a $OUT/summary.txt
   else log "$k FAILED"; tail -40 $OUT/build-$k.log | tee -a $OUT/summary.txt; fi
 done
@@ -53,6 +55,7 @@ if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.conf
     $IM/bin/magick /tmp/g.ppm $OUT/shot-grub-$t.png 2>>$OUT/grub-qemu.log && log "grub $t: $($IM/bin/magick identify -format '%wx%h' $OUT/shot-grub-$t.png)"
   done
 else log "grub themes FAILED"; tail -30 $OUT/grub-build.log | tee -a $OUT/summary.txt; fi
+[ -n "$GRUB_ONLY" ] && { log "done (grub only)"; exit 0; }
 
 log "build home-manager config"
 if ! HM=$(nix build --no-link --print-out-paths ./ci#homeConfigurations.test.activationPackage 2>>$OUT/build.log); then

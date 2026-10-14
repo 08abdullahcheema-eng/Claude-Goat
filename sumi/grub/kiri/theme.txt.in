@@ -1,4 +1,4 @@
-# Kiri: everything centred and soft in the fog
+# Kiri: one frosted card in the middle of the fog, everything centred, a soft pill marks the choice
 title-text: ""
 desktop-image: "{{DIR}}background.jpg"
 desktop-color: "#101614"
@@ -8,16 +8,16 @@ terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
-+ label { left = 0 top = 16% width = 100% height = 170 text = "霧" font = "{{F:kanji-120}}" color = "#a6d4ad" align = "center" }
-+ label { left = 0 top = 31% width = 100% height = 80 text = "Kiri" font = "{{F:grotesk-60}}" color = "#ffffff" align = "center" }
++ label { left = 32% top = 17% width = 36% height = 170 text = "霧" font = "{{F:kanji-120}}" color = "#a6d4ad" align = "center" }
++ label { left = 32% top = 30% width = 36% height = 80 text = "Kiri" font = "{{F:grotesk-60}}" color = "#ffffff" align = "center" }
 + boot_menu {
-  left = 33% top = 42% width = 34% height = 38%
-  item_font = "{{F:grotesk-30}}" item_color = "#e4ebe6"
+  left = 36% top = 41% width = 28% height = 34%
+  item_font = "{{F:grotesk-30}}" item_color = "#cfd8d3"
   selected_item_font = "{{F:grotesk-30}}" selected_item_color = "#ffffff"
-  item_height = 64 item_padding = 28 item_spacing = 10
-  icon_width = 0 icon_height = 0 item_icon_space = 0
+  item_height = 64 item_padding = 24 item_spacing = 12
+  icon_width = 40 icon_height = 40 item_icon_space = 22
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ progress_bar { id = "__timeout__" left = 33% top = 83% width = 34% height = 3 fg_color = "#a6d4ad" bg_color = "#36463f" border_color = "#36463f" text = "" }
-+ label { left = 0 top = 93% width = 100% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#7d8a84" align = "center" }
++ progress_bar { id = "__timeout__" left = 38% top = 79% width = 24% height = 4 fg_color = "#a6d4ad" bg_color = "#2c3833" border_color = "#2c3833" text = "" }
++ label { left = 32% top = 81.5% width = 36% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#7d8a84" align = "center" }

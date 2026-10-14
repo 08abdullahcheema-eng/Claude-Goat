@@ -1,4 +1,4 @@
-# Summit: a dark glass panel on the left with contour lines, the menu inside it
+# Summit: a dark glass panel on the left with stars and contour lines, the menu inside it
 title-text: ""
 desktop-image: "{{DIR}}background.jpg"
 desktop-color: "#0a1020"
@@ -10,15 +10,15 @@ terminal-height: "100%"
 terminal-border: "0"
 + label { left = 4% top = 7% width = 25% height = 60 text = "峰" font = "{{F:kanji-48}}" color = "#9fc4ff" }
 + label { left = 4% top = 12% width = 25% height = 40 text = "S U M M I T" font = "{{F:grotesk-26}}" color = "#9fc4ff" }
-+ label { left = 4% top = 30% width = 25% height = 80 text = "larp" font = "{{F:grotesk-60}}" color = "#f4f8ff" }
++ label { left = 4% top = 26% width = 25% height = 80 text = "larp" font = "{{F:grotesk-60}}" color = "#f4f8ff" }
 + boot_menu {
-  left = 3% top = 40% width = 27% height = 40%
-  item_font = "{{F:grotesk-26}}" item_color = "#d6e2f5"
+  left = 3% top = 36% width = 27% height = 36%
+  item_font = "{{F:grotesk-26}}" item_color = "#c4d0e6"
   selected_item_font = "{{F:grotesk-26}}" selected_item_color = "#f4f8ff"
-  item_height = 60 item_padding = 22 item_spacing = 10
-  icon_width = 0 icon_height = 0 item_icon_space = 0
+  item_height = 60 item_padding = 22 item_spacing = 8
+  icon_width = 40 icon_height = 40 item_icon_space = 22
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ progress_bar { id = "__timeout__" left = 4% top = 84% width = 24% height = 3 fg_color = "#9fc4ff" bg_color = "#2e3f60" border_color = "#2e3f60" text = "" }
-+ label { left = 4% top = 93% width = 27% height = 30 text = "Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#5d6e90" }
++ progress_bar { id = "__timeout__" left = 4% top = 77% width = 24% height = 4 fg_color = "#9fc4ff" bg_color = "#24334f" border_color = "#24334f" text = "" }
++ label { left = 4% top = 79.5% width = 27% height = 30 text = "Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#5d6e90" }

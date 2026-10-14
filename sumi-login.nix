@@ -19,7 +19,7 @@ let
   # grub-mkfont only takes FROM-TO pairs, so single characters are written as X-X
   latin = "0x20-0x7E,0xA0-0x17F,0x2013-0x2014,0x2022-0x2022,0x2190-0x2193";
   kanji = "0x58A8-0x58A8,0x78EF-0x78EF,0x9727-0x9727,0x92FC-0x92FC,0x5CF0-0x5CF0";      # 墨 磯 霧 鋼 峰
-  sumi-grub = pkgs.runCommand "sumi-grub-themes" { nativeBuildInputs = [ pkgs.grub2 pkgs.python3 pkgs.findutils ]; } ''
+  sumi-grub = pkgs.runCommand "sumi-grub-themes" { nativeBuildInputs = [ pkgs.grub2 pkgs.python3 pkgs.findutils pkgs.librsvg ]; } ''
     cp -r ${./sumi/grub} $out; chmod -R u+w $out; mkdir -p $out/fonts
     pick() { f=$(find "$1" -iname "$2" | sort | head -1); [ -n "$f" ] || { echo "font $2 not found in $1" >&2; exit 1; }; echo "$f"; }
     mk() { grub-mkfont -s "$3" -r "$4" -o "$out/fonts/$1.pf2" ''${5:+-n "$5"} "$2"; }
@@ -41,6 +41,11 @@ let
     mk inter-20 "$int" 20 "${latin}"
     mk jbmono-30 "$jbm" 30 "${latin}"
     mk jbmono-20 "$jbm" 20 "${latin}"
+    # the theme's own logo is the icon of the NixOS entries
+    for t in sumi iso kiri hagane summit; do
+      mkdir -p $out/$t/icons
+      rsvg-convert -w 64 -h 64 ${./sumi/shell/assets}/logo-$t.svg -o $out/$t/icons/nixos.png
+    done
     python3 $out/render.py $out
     rm $out/render.py $out/select.cfg
   '';
