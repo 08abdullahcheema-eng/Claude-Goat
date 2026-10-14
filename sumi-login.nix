@@ -51,6 +51,19 @@ in
     gfxmodeEfi = lib.mkDefault "2560x1600,auto";
     gfxmodeBios = lib.mkDefault "2560x1600,auto";
     extraConfig = builtins.readFile ./sumi/grub/select.cfg;
+    # menu order: NixOS (default), Windows, then "NixOS - All configurations".
+    # NixOS writes extraEntries between its default entry and the generations submenu,
+    # so Windows gets its own entry here instead of the os-prober one (which lands last).
+    useOSProber = lib.mkForce false;
+    extraEntries = ''
+      menuentry "Windows" --class windows --class os {
+        insmod part_gpt
+        insmod fat
+        insmod chain
+        search --no-floppy --file --set=root /EFI/Microsoft/Boot/bootmgfw.efi
+        chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+      }
+    '';
   };
   system.build.sumiGrub = sumi-grub;
 

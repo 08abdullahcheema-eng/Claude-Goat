@@ -14,6 +14,8 @@ for k in linuwu-default linuwu-latest; do
 done
 if D=$(nix eval --raw ./ci#nixosConfigurations.test.config.system.build.toplevel.drvPath 2>$OUT/nixos-eval.log); then log "nixos eval OK"; else log "nixos eval FAILED"; tail -30 $OUT/nixos-eval.log | tee -a $OUT/summary.txt; fi
 grep -i "warning" $OUT/nixos-eval.log | sort -u | head -20 | tee -a $OUT/summary.txt
+echo "grub useOSProber = $(nix eval --json ./ci#nixosConfigurations.test.config.boot.loader.grub.useOSProber 2>&1 | tail -1)" | tee -a $OUT/summary.txt
+nix eval --raw ./ci#nixosConfigurations.test.config.boot.loader.grub.extraEntries 2>&1 | tee -a $OUT/summary.txt
 # build the parts that are new and could fail to build (nvidia driver, steam, nix-ld env)
 for a in config.hardware.nvidia.package config.programs.nix-ld.package config.system.path; do
   if nix build --no-link ./ci#nixosConfigurations.test.$a 2>$OUT/build-sys.log; then log "build $a OK"; else log "build $a FAILED"; tail -25 $OUT/build-sys.log | tee -a $OUT/summary.txt; fi
@@ -38,8 +40,8 @@ if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.conf
       echo 'set theme=/boot/grub/theme/theme.txt'; echo 'export theme'; echo "set sumi_theme=$t"
       cat sumi/grub/select.cfg
       echo 'set timeout=60'
-      echo 'menuentry "NixOS" { true }'; echo 'menuentry "NixOS - All configurations" { true }'
-      echo 'menuentry "Windows Boot Manager (on /dev/nvme0n1p1)" { true }'; echo 'menuentry "UEFI Firmware Settings" { true }'
+      echo 'menuentry "NixOS" { true }'; echo 'menuentry "Windows" { true }'
+      echo 'submenu "NixOS - All configurations" { menuentry "NixOS - Configuration 42" { true } }'
     } > /tmp/giso/boot/grub/grub.cfg
     PATH=$XO/bin:$MT/bin:$PATH $GRUB/bin/grub-mkrescue -o /tmp/g.iso /tmp/giso >> $OUT/grub-iso.log 2>&1
     rm -f /tmp/qmon
