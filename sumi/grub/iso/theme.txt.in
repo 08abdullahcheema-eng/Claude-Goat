@@ -3,28 +3,28 @@
 title-text: ""
 desktop-image: "{{DIR}}background.jpg"
 desktop-color: "#0a1115"
-terminal-font: "{{F:inter-20}}"
+terminal-font: "{{F:inter-15}}"
 terminal-left: "0"
 terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
-+ label { left = 58%+13 top = 19%+16 width = 120 height = 70 text = "磯" font = "{{F:kanji-48}}" color = "#8fe0d4" }
-+ label { left = 58%+93 top = 19%+8 width = 30% height = 80 text = "Iso" font = "{{F:shippori-60}}" color = "#ffffff" }
-+ label { left = 58%+13 top = 27%+8 width = 30% height = 30 text = "nixos  ·  wähle ein System" font = "{{F:inter-20}}" color = "#93a4ab" }
++ label { left = 58%+10 top = 19%+12 width = 90 height = 52 text = "磯" font = "{{F:kanji-36}}" color = "#8fe0d4" }
++ label { left = 58%+70 top = 19%+6 width = 30% height = 60 text = "Iso" font = "{{F:shippori-45}}" color = "#ffffff" }
++ label { left = 58%+10 top = 27%+6 width = 30% height = 22 text = "nixos  ·  wähle ein System" font = "{{F:inter-15}}" color = "#93a4ab" }
 + boot_menu {
   left = 58% top = 38% width = 30% height = 36%
-  item_font = "{{F:inter-30}}" item_color = "#c9d6da"
-  selected_item_font = "{{F:inter-30}}" selected_item_color = "#ffffff"
-  item_height = 40 item_padding = 26 item_spacing = 32
-  icon_width = 40 icon_height = 40 item_icon_space = 22
+  item_font = "{{F:inter-22}}" item_color = "#c9d6da"
+  selected_item_font = "{{F:inter-22}}" selected_item_color = "#ffffff"
+  item_height = 30 item_padding = 20 item_spacing = 24
+  icon_width = 30 icon_height = 30 item_icon_space = 16
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
 + circular_progress {
   id = "__timeout__"
-  left = 58%+13 top = 76% width = 72 height = 72
+  left = 58%+10 top = 76% width = 54 height = 54
   num_ticks = 24 ticks_disappear = true start_angle = -64
   center_bitmap = "{{DIR}}ring.png" tick_bitmap = "{{DIR}}tick.png"
 }
-+ label { left = 58%+113 top = 78% width = 30% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-20}}" color = "#6f8188" }
++ label { left = 58%+85 top = 78% width = 30% height = 22 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-15}}" color = "#6f8188" }

@@ -28,19 +28,21 @@ let
     gro=$(pick ${fontSrc} 'SpaceGrotesk*.ttf')
     int=$(pick ${pkgs.inter} 'InterVariable.ttf' 2>/dev/null || pick ${pkgs.inter} 'Inter*.tt[fc]')
     jbm=$(pick ${pkgs.nerd-fonts.jetbrains-mono} 'JetBrainsMonoNerdFont-Regular.ttf')
-    mk kanji-120 "$shx" 120 "${kanji}"
-    mk kanji-48 "$shx" 48 "${kanji}"
-    mk shippori-xb-60 "$shx" 60 "${latin}" "Shippori Mincho XB"   # own name, else it clashes with the regular cut
-    mk shippori-60 "$shr" 60 "${latin}"
-    mk grotesk-60 "$gro" 60 "${latin}"
-    mk grotesk-30 "$gro" 30 "${latin}"
-    mk grotesk-26 "$gro" 26 "${latin}"
+    # sizes for the 1920x1200 the laptop's firmware offers in GRUB
+    mk kanji-90 "$shx" 90 "${kanji}"
+    mk kanji-36 "$shx" 36 "${kanji}"
+    mk shippori-xb-45 "$shx" 45 "${latin}" "Shippori Mincho XB"   # own name, else it clashes with the regular cut
+    mk shippori-45 "$shr" 45 "${latin}"
+    mk grotesk-45 "$gro" 45 "${latin}"
+    mk grotesk-22 "$gro" 22 "${latin}"
     mk grotesk-20 "$gro" 20 "${latin}"
-    mk inter-30 "$int" 30 "${latin}"
-    mk inter-26 "$int" 26 "${latin}"
+    mk grotesk-15 "$gro" 15 "${latin}"
+    mk inter-22 "$int" 22 "${latin}"
     mk inter-20 "$int" 20 "${latin}"
-    mk jbmono-30 "$jbm" 30 "${latin}"
-    mk jbmono-20 "$jbm" 20 "${latin}"
+    mk inter-15 "$int" 15 "${latin}"
+    mk jbmono-22 "$jbm" 22 "${latin}"
+    mk jbmono-15 "$jbm" 15 "${latin}"
+
     # the theme's own logo is the icon of the NixOS entries
     for t in sumi iso kiri hagane summit; do
       mkdir -p $out/$t/icons
@@ -53,8 +55,12 @@ in
 {
   boot.loader.grub = {
     theme = lib.mkDefault sumi-grub;
-    gfxmodeEfi = lib.mkDefault "2560x1600,auto";
-    gfxmodeBios = lib.mkDefault "2560x1600,auto";
+    # the firmware only offers 1920x1200 in GRUB, the themes are drawn for exactly that
+    gfxmodeEfi = lib.mkDefault "1920x1200,auto";
+    gfxmodeBios = lib.mkDefault "1920x1200,auto";
+    # GRUB paints its hidden text console with the splash image; the Sumi picture keeps it from showing as a black box
+    splashImage = lib.mkDefault "${sumi-grub}/sumi/background.jpg";
+    splashMode = lib.mkDefault "normal";
     extraConfig = builtins.readFile ./sumi/grub/select.cfg;
     # menu order: NixOS (default), Windows, then "NixOS - All configurations".
     # NixOS writes extraEntries between its default entry and the generations submenu,

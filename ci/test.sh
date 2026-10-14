@@ -37,7 +37,7 @@ if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.conf
     rm -rf /tmp/giso; mkdir -p /tmp/giso/boot/grub; cp -rL $SG /tmp/giso/boot/grub/theme; chmod -R u+w /tmp/giso
     {
       echo 'insmod all_video'; echo 'insmod gfxterm'; echo 'insmod png'; echo 'insmod jpeg'
-      echo 'set gfxmode=2560x1600,1920x1200,auto'; echo 'terminal_output gfxterm'
+      echo 'set gfxmode=1920x1200,auto'; echo 'terminal_output gfxterm'
       (cd /tmp/giso/boot/grub/theme && find . -name '*.pf2' | sed 's|^\./|loadfont /boot/grub/theme/|')
       echo 'set theme=/boot/grub/theme/theme.txt'; echo 'export theme'; echo "set sumi_theme=$t"
       cat sumi/grub/select.cfg
