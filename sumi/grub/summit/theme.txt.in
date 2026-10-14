@@ -20,5 +20,10 @@ terminal-border: "0"
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ progress_bar { id = "__timeout__" left = 4% top = 77% width = 24% height = 4 fg_color = "#9fc4ff" bg_color = "#24334f" border_color = "#24334f" bar_style = "{{DIR}}bar_*.png" highlight_style = "{{DIR}}hl_*.png" }
-+ label { left = 4% top = 79%+8 width = 27% height = 30 text = "Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#5d6e90" }
++ circular_progress {
+  id = "__timeout__"
+  left = 4% top = 76% width = 72 height = 72
+  num_ticks = 24 ticks_disappear = true start_angle = -64
+  center_bitmap = "{{DIR}}ring.png" tick_bitmap = "{{DIR}}tick.png"
+}
++ label { left = 4%+100 top = 78% width = 27% height = 30 text = "Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#5d6e90" }

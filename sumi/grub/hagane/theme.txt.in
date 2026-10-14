@@ -21,5 +21,10 @@ terminal-border: "0"
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ progress_bar { id = "__timeout__" left = 55% top = 86%-2 width = 38%+2 height = 3 fg_color = "#a9d1ff" bg_color = "#333338" border_color = "#333338" bar_style = "{{DIR}}bar_*.png" highlight_style = "{{DIR}}hl_*.png" }
++ circular_progress {
+  id = "__timeout__"
+  left = 93%-96 top = 86%-96 width = 72 height = 72
+  num_ticks = 24 ticks_disappear = true start_angle = -64
+  center_bitmap = "{{DIR}}ring.png" tick_bitmap = "{{DIR}}tick.png"
+}
 + label { left = 7% top = 92%+8 width = 40% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-20}}" color = "#6a6a70" }
