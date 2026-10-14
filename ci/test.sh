@@ -42,8 +42,8 @@ if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.conf
       echo 'set theme=/boot/grub/theme/theme.txt'; echo 'export theme'; echo "set sumi_theme=$t"
       cat sumi/grub/select.cfg
       echo 'set timeout=60'
-      echo 'menuentry "NixOS" { true }'; echo 'menuentry "Windows" { true }'
-      echo 'submenu "NixOS - All configurations" { menuentry "NixOS - Configuration 42" { true } }'
+      echo 'menuentry "NixOS" --class nixos { true }'; echo 'menuentry "Windows" --class windows { true }'
+      echo 'submenu "NixOS - All configurations" --class submenu { menuentry "NixOS - Configuration 42" { true } }'
     } > /tmp/giso/boot/grub/grub.cfg
     PATH=$XO/bin:$MT/bin:$PATH $GRUB/bin/grub-mkrescue -o /tmp/g.iso /tmp/giso >> $OUT/grub-iso.log 2>&1
     rm -f /tmp/qmon

@@ -21,4 +21,4 @@ terminal-border: "0"
   scrollbar = false
 }
 + progress_bar { id = "__timeout__" left = 4% top = 77% width = 24% height = 4 fg_color = "#9fc4ff" bg_color = "#24334f" border_color = "#24334f" text = "" }
-+ label { left = 4% top = 79.5% width = 27% height = 30 text = "Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#5d6e90" }
++ label { left = 4% top = 79%+8 width = 27% height = 30 text = "Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#5d6e90" }

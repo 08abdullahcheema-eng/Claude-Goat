@@ -9,11 +9,11 @@ terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
-+ label { left = 7% top = 7.5% width = 40% height = 60 text = "鋼" font = "{{F:kanji-48}}" color = "#a9d1ff" }
-+ label { left = 7% top = 12.5% width = 40% height = 40 text = "H A G A N E" font = "{{F:inter-26}}" color = "#ffffff" }
++ label { left = 7% top = 7%+8 width = 40% height = 60 text = "鋼" font = "{{F:kanji-48}}" color = "#a9d1ff" }
++ label { left = 7% top = 12%+8 width = 40% height = 40 text = "H A G A N E" font = "{{F:inter-26}}" color = "#ffffff" }
 + label { left = 7% top = 16% width = 40% height = 30 text = "boot  ·  nixos" font = "{{F:inter-20}}" color = "#9a9aa0" }
 + boot_menu {
-  left = 56.5% top = 54% width = 35% height = 28%
+  left = 56%+13 top = 54% width = 35% height = 28%
   item_font = "{{F:inter-30}}" item_color = "#c8c8cc"
   selected_item_font = "{{F:inter-30}}" selected_item_color = "#ffffff"
   item_height = 60 item_padding = 26 item_spacing = 8
@@ -22,4 +22,4 @@ terminal-border: "0"
   scrollbar = false
 }
 + progress_bar { id = "__timeout__" left = 55% top = 86%-2 width = 38%+2 height = 3 fg_color = "#a9d1ff" bg_color = "#333338" border_color = "#333338" text = "" }
-+ label { left = 7% top = 92.5% width = 40% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-20}}" color = "#6a6a70" }
++ label { left = 7% top = 92%+8 width = 40% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-20}}" color = "#6a6a70" }
