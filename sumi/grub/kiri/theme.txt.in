@@ -14,10 +14,10 @@ terminal-border: "0"
   left = 36% top = 41% width = 28% height = 34%
   item_font = "{{F:grotesk-30}}" item_color = "#cfd8d3"
   selected_item_font = "{{F:grotesk-30}}" selected_item_color = "#ffffff"
-  item_height = 64 item_padding = 24 item_spacing = 12
+  item_height = 40 item_padding = 26 item_spacing = 32
   icon_width = 40 icon_height = 40 item_icon_space = 22
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ progress_bar { id = "__timeout__" left = 38% top = 79% width = 24% height = 4 fg_color = "#a6d4ad" bg_color = "#2c3833" border_color = "#2c3833" text = "" }
++ progress_bar { id = "__timeout__" left = 38% top = 79% width = 24% height = 4 fg_color = "#a6d4ad" bg_color = "#2c3833" border_color = "#2c3833" text = "" bar_style = "{{DIR}}bar_*.png" highlight_style = "{{DIR}}hl_*.png" }
 + label { left = 32% top = 81%+8 width = 36% height = 30 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:grotesk-20}}" color = "#7d8a84" align = "center" }
