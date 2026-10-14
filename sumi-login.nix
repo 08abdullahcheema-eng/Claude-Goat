@@ -59,7 +59,7 @@ in
     gfxmodeEfi = lib.mkDefault "1920x1200,auto";
     gfxmodeBios = lib.mkDefault "1920x1200,auto";
     # GRUB paints its hidden text console with the splash image; the Sumi picture keeps it from showing as a black box
-    splashImage = lib.mkDefault "${sumi-grub}/sumi/background.jpg";
+    splashImage = "${sumi-grub}/sumi/background.jpg";
     splashMode = lib.mkDefault "normal";
     extraConfig = builtins.readFile ./sumi/grub/select.cfg;
     # menu order: NixOS (default), Windows, then "NixOS - All configurations".
