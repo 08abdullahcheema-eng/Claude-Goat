@@ -63,6 +63,12 @@ in
     run ${sumi-theme}/bin/sumi-theme --init || true
   '';
 
+  # something on the desktop keeps rewriting ~/.gtkrc-2.0, so home-manager moves it aside on every
+  # rebuild; a backup left over from the last time would block that, so it goes first
+  home.activation.dropOldGtkBackup = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+    run rm -f "$HOME/.gtkrc-2.0.hm-bak"
+  '';
+
   # old pieces that the shell replaces
   programs.waybar.enable = lib.mkForce false;
   services.mako.enable = lib.mkForce false;
