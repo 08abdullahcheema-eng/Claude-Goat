@@ -33,6 +33,7 @@ let
     mk kanji-36 "$shx" 36 "${kanji}"
     mk shippori-xb-45 "$shx" 45 "${latin}" "Shippori Mincho XB"   # own name, else it clashes with the regular cut
     mk shippori-45 "$shr" 45 "${latin}"
+    mk shippori-32 "$shr" 32 "${latin}"
     mk grotesk-45 "$gro" 45 "${latin}"
     mk grotesk-22 "$gro" 22 "${latin}"
     mk grotesk-20 "$gro" 20 "${latin}"
@@ -44,7 +45,7 @@ let
     mk jbmono-15 "$jbm" 15 "${latin}"
 
     # the theme's own logo is the icon of the NixOS entries
-    for t in sumi iso kiri hagane summit; do
+    for t in iso kiri hagane summit; do
       mkdir -p $out/$t/icons
       rsvg-convert -w 64 -h 64 ${./sumi/shell/assets}/logo-$t.svg -o $out/$t/icons/nixos.png
     done

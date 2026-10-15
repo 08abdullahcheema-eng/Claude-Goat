@@ -1,5 +1,5 @@
-# Sumi: a red seal with the kanji, the name in Mincho over a dry brush line, an ink stroke marks the choice,
-# a ring of red dots counts down
+# Sumi: the red seal and the title live in the background picture (drawn for exactly 1920x1200),
+# GRUB only draws the three entries in Mincho, the chosen one on soft red glass. No countdown.
 title-text: ""
 desktop-image: "{{DIR}}background.jpg"
 desktop-color: "#0f0f14"
@@ -9,22 +9,12 @@ terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
-+ label { left = 9% top = 10%+22 width = 158 height = 120 text = "墨" font = "{{F:kanji-90}}" color = "#0f0f14" align = "center" }
-+ label { left = 9% top = 25% width = 40% height = 60 text = "Sumi" font = "{{F:shippori-xb-45}}" color = "#f2ecd2" }
-+ label { left = 9% top = 31% width = 40% height = 22 text = "nixos  ·  wähle ein System" font = "{{F:jbmono-15}}" color = "#727169" }
 + boot_menu {
-  left = 9% top = 39% width = 33% height = 40%
-  item_font = "{{F:jbmono-22}}" item_color = "#b8b29a"
-  selected_item_font = "{{F:jbmono-22}}" selected_item_color = "#f2ecd2"
-  item_height = 48 item_padding = 18 item_spacing = 9
-  icon_width = 30 icon_height = 30 item_icon_space = 16
+  left = 212 top = 476 width = 536 height = 560
+  item_font = "{{F:shippori-32}}" item_color = "#b0aa96"
+  selected_item_font = "{{F:shippori-32}}" selected_item_color = "#f2ecd2"
+  item_height = 40 item_padding = 20 item_spacing = 52
+  icon_width = 0 icon_height = 0 item_icon_space = 0
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ circular_progress {
-  id = "__timeout__"
-  left = 9% top = 82% width = 112 height = 112
-  num_ticks = 36 ticks_disappear = true start_angle = -64
-  center_bitmap = "{{DIR}}ring.png" tick_bitmap = "{{DIR}}tick.png"
-}
-+ label { left = 9%+142 top = 86% width = 40% height = 22 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:jbmono-15}}" color = "#54546d" }
