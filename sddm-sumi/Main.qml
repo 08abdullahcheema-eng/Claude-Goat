@@ -309,8 +309,8 @@ Rectangle {
         id: wallFx
         anchors.fill: parent
         source: wallSrc
-        blurEnabled: !root.ownScene; blur: 0.25; blurMax: 32
-        brightness: root.ownScene ? -0.16 : -0.32
+        blurEnabled: !root.ownScene; blur: 0.12; blurMax: 32
+        brightness: root.ownScene ? -0.16 : -0.1
         saturation: root.ownScene ? 0.0 : 0.05
         // the picture comes up out of the theme's background, then breathes: a very slow zoom
         opacity: 0

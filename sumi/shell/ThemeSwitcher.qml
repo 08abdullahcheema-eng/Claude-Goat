@@ -180,6 +180,8 @@ Item {
         id: stage
         anchors.fill: parent
         property real intro: 0
+        // a bar on the bottom edge (Shinkai) pushes dock and hints up
+        readonly property real inset: Theme.pickLayout !== "" && Theme.edgeOf(Theme.pickLayout) === "bottom" ? Theme.reserveOf(Theme.pickLayout) : 0
         NumberAnimation on intro { from: 0; to: 1; duration: 620; easing.type: Easing.OutQuint }
 
         // name of the selected theme in its own display font, re-entering on every change
@@ -240,7 +242,7 @@ Item {
             readonly property real tile: Theme.px(76)
             readonly property real gap: Theme.px(16)
             anchors.horizontalCenter: parent.horizontalCenter
-            y: parent.height - height - Theme.px(84) + (1 - stage.intro) * Theme.px(40)
+            y: parent.height - height - Theme.px(84) - stage.inset + (1 - stage.intro) * Theme.px(40)
             width: tiles.implicitWidth + Theme.px(36)
             height: tile + Theme.px(44)
             opacity: stage.intro
@@ -335,7 +337,7 @@ Item {
 
         // quiet key hints
         Row {
-            anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(22) }
+            anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(22) + stage.inset }
             spacing: Theme.px(24)
             opacity: 0.55 * stage.intro
             Repeater {
