@@ -1,0 +1,10 @@
+target shell
+  function launcher(mode: string): void
+  function close(): void
+  function open(name: string): void
+  function dnd(): void
+  function toggle(name: string): void
+  function toggleAt(name: string, x: real): void
+  function saver(on: bool): void
+target osd
+  function brightness(): void

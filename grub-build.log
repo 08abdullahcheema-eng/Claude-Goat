@@ -1,0 +1,7 @@
+warning: Git tree '/home/runner/work/Claude-Goat/Claude-Goat' is dirty
+this derivation will be built:
+  /nix/store/yhi9jjmjbik0l0yan7v0kj9ndzdsax36-sumi-grub-themes.drv
+this path will be fetched (6.7 MiB download, 29.6 MiB unpacked):
+  /nix/store/zy2x266parrb8qgdh02iz3lkh9ngkswp-grub-2.12
+copying path '/nix/store/zy2x266parrb8qgdh02iz3lkh9ngkswp-grub-2.12' from 'https://cache.nixos.org'...
+building '/nix/store/yhi9jjmjbik0l0yan7v0kj9ndzdsax36-sumi-grub-themes.drv'...

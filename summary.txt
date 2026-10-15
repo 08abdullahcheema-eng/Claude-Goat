@@ -1,0 +1,756 @@
+== kernel default: 6.18.56
+== linuwu-default OK: /nix/store/i9yl9v32j1hqq1qgwwmmj45r1z82sq3x-linuwu-sense-0-unstable-2026-03-13-6.18.56/lib/modules/6.18.56/kernel/drivers/platform/x86/linuwu_sense.ko
+alias:          wmi:676AA15E-6A47-4D9F-A2CC-1E6D18D14026
+alias:          wmi:6AF4F258-B401-42FD-BE91-3D4AC2D7C0D3
+alias:          wmi:67C3371D-95A3-4C37-BB61-DD47B491DAAB
+== linuwu-latest FAILED
+these 3 paths will be fetched (257.5 MiB download, 704.8 MiB unpacked):
+  /nix/store/43mavslhcz39avhvjzfs76zw00h1qx8s-linux-7.2.10
+  /nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev
+  /nix/store/h5iz6475yn6va8abgwzl5a0vv68p9rip-uname
+copying path '/nix/store/h5iz6475yn6va8abgwzl5a0vv68p9rip-uname' from 'https://cache.nixos.org'...
+copying path '/nix/store/43mavslhcz39avhvjzfs76zw00h1qx8s-linux-7.2.10' from 'https://cache.nixos.org'...
+copying path '/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev' from 'https://cache.nixos.org'...
+building '/nix/store/xn0d2g3k26g267qnyixgr6z7nps3fiiq-linuwu-sense-0-unstable-2026-03-13-7.2.10.drv'...
+error: Cannot build '/nix/store/xn0d2g3k26g267qnyixgr6z7nps3fiiq-linuwu-sense-0-unstable-2026-03-13-7.2.10.drv'.
+       Reason: builder failed with exit code 2.
+       Output paths:
+         /nix/store/1m60aqfl1n19gs7w4x8237mi4xfmj16x-linuwu-sense-0-unstable-2026-03-13-7.2.10
+       Last 25 log lines:
+       >       |      ^~~~~~~
+       > src/linuwu_sense.c:38:1: note: include '<string.h>' or provide a declaration of 'strncpy'
+       >    37 |  #include <linux/bitfield.h>
+       >   +++ |+#include <string.h>
+       >    38 |  #include <linux/bitmap.h>
+       > src/linuwu_sense.c:3302:6: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+       >  3302 |      strncpy(input, buf, len);
+       >       |      ^~~~~~~
+       > src/linuwu_sense.c:3302:6: note: include '<string.h>' or provide a declaration of 'strncpy'
+       > src/linuwu_sense.c: In function 'four_zoned_rgb_kb_store':
+       > src/linuwu_sense.c:3753:6: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+       >  3753 |      strncpy(input_buf, buf, len);
+       >       |      ^~~~~~~
+       > src/linuwu_sense.c:3753:6: note: include '<string.h>' or provide a declaration of 'strncpy'
+       > src/linuwu_sense.c: In function 'per_zoned_rgb_kb_store':
+       > src/linuwu_sense.c:3926:6: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+       >  3926 |      strncpy(str_buf, buf, len);
+       >       |      ^~~~~~~
+       > src/linuwu_sense.c:3926:6: note: include '<string.h>' or provide a declaration of 'strncpy'
+       > make[3]: *** [/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/source/scripts/Makefile.build:289: src/linuwu_sense.o] Error 1
+       > make[2]: *** [/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/source/Makefile:2198: .] Error 2
+       > make[1]: *** [/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/source/Makefile:248: __sub-make] Error 2
+       > make[1]: Leaving directory '/build/source'
+       > make: *** [/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/source/Makefile:248: __sub-make] Error 2
+       > make: Leaving directory '/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/build'
+       For full logs, run:
+         nix log /nix/store/xn0d2g3k26g267qnyixgr6z7nps3fiiq-linuwu-sense-0-unstable-2026-03-13-7.2.10.drv
+== nixos eval OK
+warning: Git tree '/home/runner/work/Claude-Goat/Claude-Goat' is dirty
+grub useOSProber = false
+warning: Git tree '/home/runner/work/Claude-Goat/Claude-Goat' is dirty
+menuentry "Windows" --class windows --class os {
+  insmod part_gpt
+  insmod fat
+  insmod chain
+  search --no-floppy --file --set=root /EFI/Microsoft/Boot/bootmgfw.efi
+  chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+}
+== build config.hardware.nvidia.package OK
+== build config.programs.nix-ld.package OK
+== build config.system.path OK
+bluetooth enabled: true
+options btusb enable_autosuspend=0
+
+
+
+softdep nvidia post: nvidia-uvm
+
+options nvidia NVreg_DynamicPowerManagement=0x02 NVreg_PreserveVideoMemoryAllocations=1 NVreg_UseKernelSuspendNotifiers=1
+options nvidia-drm fbdev=1 modeset=1hardware.nvidia.prime.offload.enable = true
+programs.steam.enable = true
+programs.nix-ld.enable = true
+services.flatpak.enable = true
+services.power-profiles-daemon.enable = true
+zramSwap.enable = true
+time.hardwareClockInLocalTime = true
+nix.gc.automatic = true
+blueman enabled: true
+["acer_wmi","nouveau","nova_core","nvidiafb"]
+== grub themes OK: fonts hotaru koyo shinkai theme.txt tsuki yoru 
+shippori-30      -> Shippori Mincho Regular 30
+inter-24         -> Inter Variable Regular 24
+jbmono-15        -> JetBrainsMono NF Regular 15
+inter-28         -> Inter Variable Regular 28
+== efi boot hotaru-stalezero shot
+== efi boot yoru-stale shot
+== efi boot shinkai shot
+== efi boot tsuki shot
+== grub yoru: 1920x1200
+== grub koyo: 1920x1200
+== grub hotaru: 1920x1200
+== grub shinkai: 1920x1200
+== grub tsuki: 1920x1200
+== build home-manager config
+== hm: /nix/store/06r6hlc7ns7asa8jnkcili9mwxqy1cf0-home-manager-generation
+helium bin: helium
+Exec=helium %U
+Icon=helium
+Exec=helium
+Exec=helium --incognito
+Hyprland 0.55.4 built from branch v0.55.4-b at commit a0136d8c04687bb36eb8a28eb9d1ff92aea99704 clean ([gha] Nix: update inputs).
+Date: 2026-06-11
+old bind count (want 0): 0
+waybar mentions (want 0): 0
+== waybar config gone (good)
+== mako config gone (good)
+Inter
+Inter Display
+Inter Display,Inter Display Black
+Inter Display,Inter Display ExtraBold
+Inter Display,Inter Display ExtraLight
+Inter Display,Inter Display Light
+Inter Display,Inter Display Medium
+Inter Display,Inter Display SemiBold
+Inter Display,Inter Display Thin
+Inter Variable
+Inter,Inter Black
+Inter,Inter ExtraBold
+Inter,Inter ExtraLight
+Inter,Inter Light
+Inter,Inter Medium
+Inter,Inter SemiBold
+Inter,Inter Thin
+Shippori Mincho,しっぽり明朝,Shippori Mincho ExtraBold,しっぽり明朝 ExtraBold,芵苁苛苨难銩,芵苁苛苨难銩⁅硴牡䉯汤
+Shippori Mincho,しっぽり明朝,Shippori Mincho Medium,しっぽり明朝 Medium,芵苁苛苨难銩
+Shippori Mincho,しっぽり明朝,Shippori Mincho SemiBold,しっぽり明朝 SemiBold,芵苁苛苨难銩
+Shippori Mincho,しっぽり明朝,芵苁苛苨难銩
+Space Grotesk,Space Grotesk Light
+jetbrains fonts: 48
+== wayland display: wayland-1
+[Settings]
+gtk-application-prefer-dark-theme=1
+gtk-icon-theme-name=Papirus-Dark
+gtk-theme-name=adw-gtk3-dark
+== sumi-theme --init rc=0
+== old theme falls back to: yoru
+total 32
+drwxr-xr-x 2 runner runner 4096 Oct 15 21:28 .
+drwxr-xr-x 8 runner runner 4096 Oct 15 21:28 ..
+-rw-r--r-- 1 runner runner 1165 Oct 15 21:28 gtk.css
+-rw-r--r-- 1 runner runner  776 Oct 15 21:28 hypr-theme.conf
+-rw-r--r-- 1 runner runner  725 Oct 15 21:28 hyprlock-colors.conf
+-rw-r--r-- 1 runner runner 2974 Oct 15 21:28 hyprlock-theme.conf
+-rw-r--r-- 1 runner runner  588 Oct 15 21:28 kitty.conf
+-rw-r--r-- 1 runner runner 1819 Oct 15 21:28 theme.json
+== renderer: GL
+== verify koyo
+config ok
+== verify hotaru
+config ok
+== verify shinkai
+config ok
+== verify tsuki
+config ok
+== verify yoru
+config ok
+== qs warnings/errors:
+--- qs-agents.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35376
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-anchor.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40605
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+--- qs-anim.log
+--- qs-audio.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40481
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-bar-hotaru.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 37172
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-bar-koyo.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 36287
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-bar-shinkai.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 38050
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-bar-tsuki.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 38931
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-bar-yoru.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 39808
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-bar.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35160
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-battery.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40419
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-bluetooth.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40450
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-bottom-calendar.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40243
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-calendar.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40361
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-launcher-clip.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35253
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-launcher-emoji-q.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35313
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-launcher-emoji.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35284
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-launcher-q.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35221
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-launcher.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35189
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-bottom.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40153
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-capsule.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 39982
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-corners.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40184
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-islands.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 39954
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-notch.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.mpris.watcher[0m: Could not connect to DBus. Mpris service will not work.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40095
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-pill.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40124
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-rail.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40010
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-ridge.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40067
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-layout-side.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40038
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-network.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35343
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-osd.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40544
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-pill-audio.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40214
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-polkit.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40510
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-power.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35408
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-predator.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40576
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-probe.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35100
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-probe2.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35131
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-rail-system.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40272
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-real.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[0m: Process failed to start, likely because the binary could not be found. Command: QList("nmcli", "-t", "-f", "NAME,TYPE", "connection", "show")
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40653
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+[33m  WARN[0m: Process failed to start, likely because the binary could not be found. Command: QList("nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,FREQ,CHAN,SECURITY", "device", "wifi", "list", "--rescan", "no")
+[33m  WARN[0m: Process failed to start, likely because the binary could not be found. Command: QList("nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,FREQ,CHAN,SECURITY", "device", "wifi", "list", "--rescan", "no")
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[0m: Process failed to start, likely because the binary could not be found. Command: QList("nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,FREQ,CHAN,SECURITY", "device", "wifi", "list", "--rescan", "no")
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[0m: Process failed to start, likely because the binary could not be found. Command: QList("nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,FREQ,CHAN,SECURITY", "device", "wifi", "list", "--rescan", "no")
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[0m: Process failed to start, likely because the binary could not be found. Command: QList("nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,FREQ,CHAN,SECURITY", "device", "wifi", "list", "--rescan", "no")
+--- qs-ridge-calendar.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40331
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-saver-hotaru.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 37201
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+--- qs-saver-koyo.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 36316
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+--- qs-saver-shinkai.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 38079
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+--- qs-saver-tsuki.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 38960
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+--- qs-saver-yoru.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 39836
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+--- qs-side-audio.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40302
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-system.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 40390
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-themes-hotaru.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 37133
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-themes-koyo.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 36247
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-themes-pick-koyo.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35478
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-themes-pick-tsuki.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35516
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-themes-shinkai.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 38010
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-themes-tsuki.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 38891
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-themes-yoru.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 39768
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+--- qs-themes.log
+[31m ERROR[97m quickshell.service.pipewire.loop[0m: Failed to connect pipewire context. Errno: 112
+[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")
+[33m  WARN[0m: $HYPRLAND_INSTANCE_SIGNATURE is unset. Cannot connect to hyprland.
+[33m  WARN[0m: The active compositor does not support the hyprland_focus_grab_v1 protocol. HyprlandFocusGrab will not work.
+[33m  WARN[0m: ** Learn why $XDG_CURRENT_DESKTOP sucks and download a better compositor today at https://hyprland.org
+[33m  WARN[97m quickshell.service.notifications[0m: Could not connect to DBus. Notification service will not work.
+[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower: QDBusError(org.freedesktop.DBus.Error.ServiceUnknown, The name org.freedesktop.UPower was not provided by any .service files)
+[33m  WARN[97m quickshell.service.upower[0m: Could not start UPower. The UPower service will not work.
+[33m  WARN[97m quickshell.service.polkit.listener[0m: failed to create subject for listener: No session for pid 35439
+[33m  WARN[97m quickshell.service.polkit[0m: failed to register listener on path "/org/quickshell/PolkitAgent"
+== sumi-theme koyo rc=0 layout=pill wall=wall-koyo-2.jpg
+== layout after auto: none
+# written by sumi-theme (koyo)
+foreground #eadccb
+background #120d0a
+import QtQuick
+// written by sumi-theme (yoru), read by the Sumi login screen
+Item {
+    property string name: "yoru"
+    property string label: "Yoru"
+    property string kanji: "夜"
+    property color bg: "#0d0b14"
+    property color bg1: "#15121f"
+    property color line: "#2b2640"
+    property color mute: "#5a5372"
+    property color dim: "#8c84a3"
+    property color fg: "#e4dff0"
+    property color hi: "#fbf7ff"
+    property color accent: "#ff3d81"
+    property color accent2: "#3de1ff"
+    property color error: "#ff5c7a"
+    property string head: "Inter"
+    property string body: "Inter"
+    property real radius: 16
+}
+      5 Socket error:  "QLocalSocket::connectToServer: Invalid name"
+greeter rc=124 after 1184s
+greeter rc=124 after 1163s
+greeter rc=124 after 1204s
+greeter rc=124 after 1225s
+greeter rc=124 after 1142s
+== hyprlock config problems:
+      5 [1;32mDEBUG [0m]: output 56 make Unknown model Unknown
+== lockinfo samples:
+clock #c8323a -> 21<span foreground='#c8323a' alpha='50%'>:</span>40
+tick -> <span foreground="#ffffff">────────────────────────────────</span><span foreground="#ffffff" alpha="18%">────────────────────────────</span>
+wave 32 -> ⣀⣀⠤⠔⠒⠊⠉⠉⠉⠉⠑⠒⠢⠤⠤⠤⠤⠔⠒⠒⠉⠉⠉⠉⠑⠒⠤⠤⣀⣀⣀⣀
+stars -> <span alpha="19%">✦</span>      <span alpha="43%">·</span>      <span alpha="26%">✧</span>      <span alpha="46%">·</span>      <span alpha="66%">✦</span>      <span alpha="21%">·</span>      <span alpha="99%">·</span>      <span alpha="16%">✧</span>      <span alpha="99%">·</span>      <span alpha="60%">✦</span>      
+breath x 6000 -> <span letter_spacing="14000" alpha="37%">x</span>
+nextwall -> /nix/store/06r6hlc7ns7asa8jnkcili9mwxqy1cf0-home-manager-generation/home-files/.config/quickshell/sumi/assets/walls/wall-yoru-2.jpg
+== done

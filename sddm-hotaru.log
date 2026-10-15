@@ -1,0 +1,7 @@
+High-DPI autoscaling Enabled
+Loading theme configuration from "/tmp/sddm-test/theme.conf"
+Socket error:  "QLocalSocket::connectToServer: Invalid name"
+Loading file:///tmp/sddm-test/Main.qml...
+Adding view for "HEADLESS-1" QRect(0,0 1600x1000)
+Signal received: SIGTERM
+greeter rc=124 after 1184s

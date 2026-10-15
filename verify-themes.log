@@ -1,0 +1,25 @@
+== verify koyo
+[1;32mDEBUG [0m]: Disabling stdout logs! Check the log for further logs.
+[1;32mDEBUG [0m]: Using config: /home/runner/work/Claude-Goat/Claude-Goat/out/hyprland.conf
+======== Config parsing result:
+config ok
+== verify hotaru
+[1;32mDEBUG [0m]: Disabling stdout logs! Check the log for further logs.
+[1;32mDEBUG [0m]: Using config: /home/runner/work/Claude-Goat/Claude-Goat/out/hyprland.conf
+======== Config parsing result:
+config ok
+== verify shinkai
+[1;32mDEBUG [0m]: Disabling stdout logs! Check the log for further logs.
+[1;32mDEBUG [0m]: Using config: /home/runner/work/Claude-Goat/Claude-Goat/out/hyprland.conf
+======== Config parsing result:
+config ok
+== verify tsuki
+[1;32mDEBUG [0m]: Disabling stdout logs! Check the log for further logs.
+[1;32mDEBUG [0m]: Using config: /home/runner/work/Claude-Goat/Claude-Goat/out/hyprland.conf
+======== Config parsing result:
+config ok
+== verify yoru
+[1;32mDEBUG [0m]: Disabling stdout logs! Check the log for further logs.
+[1;32mDEBUG [0m]: Using config: /home/runner/work/Claude-Goat/Claude-Goat/out/hyprland.conf
+======== Config parsing result:
+config ok

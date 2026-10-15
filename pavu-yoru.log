@@ -1,0 +1,2 @@
+
+(pavucontrol:39871): Gtk-WARNING **: 21:33:57.935: Unable to acquire session bus: Cannot autolaunch D-Bus without X11 $DISPLAY

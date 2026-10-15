@@ -1,0 +1,12 @@
+total 44
+dr-xr-xr-x 11 root root 4096 Jan  1  1970 .
+dr-xr-xr-x  5 root root 4096 Jan  1  1970 ..
+dr-xr-xr-x  2 root root 4096 Jan  1  1970 dconf
+dr-xr-xr-x  2 root root 4096 Jan  1  1970 environment.d
+dr-xr-xr-x  3 root root 4096 Jan  1  1970 fontconfig
+dr-xr-xr-x  2 root root 4096 Jan  1  1970 gtk-3.0
+dr-xr-xr-x  2 root root 4096 Jan  1  1970 gtk-4.0
+dr-xr-xr-x  2 root root 4096 Jan  1  1970 hypr
+dr-xr-xr-x  2 root root 4096 Jan  1  1970 kitty
+dr-xr-xr-x  2 root root 4096 Jan  1  1970 quickshell
+dr-xr-xr-x  3 root root 4096 Jan  1  1970 systemd

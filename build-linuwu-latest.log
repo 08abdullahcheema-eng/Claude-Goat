@@ -1,0 +1,43 @@
+warning: Git tree '/home/runner/work/Claude-Goat/Claude-Goat' is dirty
+this derivation will be built:
+  /nix/store/xn0d2g3k26g267qnyixgr6z7nps3fiiq-linuwu-sense-0-unstable-2026-03-13-7.2.10.drv
+these 3 paths will be fetched (257.5 MiB download, 704.8 MiB unpacked):
+  /nix/store/43mavslhcz39avhvjzfs76zw00h1qx8s-linux-7.2.10
+  /nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev
+  /nix/store/h5iz6475yn6va8abgwzl5a0vv68p9rip-uname
+copying path '/nix/store/h5iz6475yn6va8abgwzl5a0vv68p9rip-uname' from 'https://cache.nixos.org'...
+copying path '/nix/store/43mavslhcz39avhvjzfs76zw00h1qx8s-linux-7.2.10' from 'https://cache.nixos.org'...
+copying path '/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev' from 'https://cache.nixos.org'...
+building '/nix/store/xn0d2g3k26g267qnyixgr6z7nps3fiiq-linuwu-sense-0-unstable-2026-03-13-7.2.10.drv'...
+error: Cannot build '/nix/store/xn0d2g3k26g267qnyixgr6z7nps3fiiq-linuwu-sense-0-unstable-2026-03-13-7.2.10.drv'.
+       Reason: builder failed with exit code 2.
+       Output paths:
+         /nix/store/1m60aqfl1n19gs7w4x8237mi4xfmj16x-linuwu-sense-0-unstable-2026-03-13-7.2.10
+       Last 25 log lines:
+       >       |      ^~~~~~~
+       > src/linuwu_sense.c:38:1: note: include '<string.h>' or provide a declaration of 'strncpy'
+       >    37 |  #include <linux/bitfield.h>
+       >   +++ |+#include <string.h>
+       >    38 |  #include <linux/bitmap.h>
+       > src/linuwu_sense.c:3302:6: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+       >  3302 |      strncpy(input, buf, len);
+       >       |      ^~~~~~~
+       > src/linuwu_sense.c:3302:6: note: include '<string.h>' or provide a declaration of 'strncpy'
+       > src/linuwu_sense.c: In function 'four_zoned_rgb_kb_store':
+       > src/linuwu_sense.c:3753:6: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+       >  3753 |      strncpy(input_buf, buf, len);
+       >       |      ^~~~~~~
+       > src/linuwu_sense.c:3753:6: note: include '<string.h>' or provide a declaration of 'strncpy'
+       > src/linuwu_sense.c: In function 'per_zoned_rgb_kb_store':
+       > src/linuwu_sense.c:3926:6: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+       >  3926 |      strncpy(str_buf, buf, len);
+       >       |      ^~~~~~~
+       > src/linuwu_sense.c:3926:6: note: include '<string.h>' or provide a declaration of 'strncpy'
+       > make[3]: *** [/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/source/scripts/Makefile.build:289: src/linuwu_sense.o] Error 1
+       > make[2]: *** [/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/source/Makefile:2198: .] Error 2
+       > make[1]: *** [/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/source/Makefile:248: __sub-make] Error 2
+       > make[1]: Leaving directory '/build/source'
+       > make: *** [/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/source/Makefile:248: __sub-make] Error 2
+       > make: Leaving directory '/nix/store/294g2688syzh1m82nizdrvgkmaiczr2k-linux-7.2.10-dev/lib/modules/7.2.10/build'
+       For full logs, run:
+         nix log /nix/store/xn0d2g3k26g267qnyixgr6z7nps3fiiq-linuwu-sense-0-unstable-2026-03-13-7.2.10.drv
