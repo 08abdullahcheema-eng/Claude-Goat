@@ -33,6 +33,38 @@ if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.conf
   log "grub themes OK: $(ls $SG | tr '\n' ' ')"; grep -- "->" $OUT/grub-build.log | head -20 >> $OUT/summary.txt
   nix log ./ci#nixosConfigurations.test.config.system.build.sumiGrub 2>/dev/null | grep -- "->" | head -20 >> $OUT/summary.txt
   GRUB=$(B grub2); XO=$(B xorriso); MT=$(B mtools); QEMU=$(B qemu); SOCAT=$(B socat); IM=$(B imagemagick)
+  # boot check: variants of the sumi theme, each booting an entry that prints text (like "Loading Linux")
+  for v in sumi kiri sumi-noterm sumi-nosel sumi-tbox; do
+    rm -rf /tmp/giso; mkdir -p /tmp/giso/boot/grub; cp -rL $SG /tmp/giso/boot/grub/theme; chmod -R u+w /tmp/giso
+    TD=/tmp/giso/boot/grub/theme
+    base=${v%%-*}
+    if [ "$v" != "$base" ]; then
+      cp -r $TD/$base $TD/$v
+      case $v in
+        *-noterm) sed -i '/^terminal-/d' $TD/$v/theme.txt ;;
+        *-nosel) sed -i '/selected_item_pixmap_style/d' $TD/$v/theme.txt ;;
+        *-tbox) sed -i 's/^terminal-border: "0"/terminal-border: "2"/; s/^terminal-left: "0"/terminal-left: "10%"/; s/^terminal-top: "0"/terminal-top: "10%"/; s/^terminal-width: "100%"/terminal-width: "80%"/; s/^terminal-height: "100%"/terminal-height: "80%"/' $TD/$v/theme.txt ;;
+      esac
+    fi
+    {
+      echo 'insmod all_video'; echo 'insmod gfxterm'; echo 'insmod png'; echo 'insmod jpeg'
+      echo 'set gfxmode=1920x1200,auto'; echo 'terminal_output gfxterm'
+      (cd $TD && find . -name '*.pf2' | sed 's|^\./|loadfont /boot/grub/theme/|')
+      echo 'set theme=/boot/grub/theme/theme.txt'; echo 'export theme'; echo "set sumi_theme=$v"
+      cat sumi/grub/select.cfg
+      echo 'set timeout=3'
+      echo 'menuentry "NixOS" --class nixos { echo "Loading Linux 6.18 ..."; echo "Loading initial ramdisk ..."; sleep 30 }'
+      echo 'menuentry "Windows" --class windows { true }'
+    } > /tmp/giso/boot/grub/grub.cfg
+    PATH=$XO/bin:$MT/bin:$PATH $GRUB/bin/grub-mkrescue -o /tmp/g.iso /tmp/giso >> $OUT/grub-iso.log 2>&1
+    rm -f /tmp/qmon
+    $QEMU/bin/qemu-system-x86_64 -cdrom /tmp/g.iso -m 512 -display none -vga std -global VGA.vgamem_mb=64 -monitor unix:/tmp/qmon,server,nowait >> $OUT/grub-qemu.log 2>&1 &
+    QEP=$!
+    sleep 32
+    echo "screendump /tmp/g.ppm" | $SOCAT/bin/socat - UNIX-CONNECT:/tmp/qmon >> $OUT/grub-qemu.log 2>&1; sleep 2
+    kill $QEP 2>/dev/null; wait $QEP 2>/dev/null
+    $IM/bin/magick /tmp/g.ppm $OUT/shot-grubboot-$v.png 2>>$OUT/grub-qemu.log && log "grub boot $v ok"
+  done
   for t in sumi iso kiri hagane summit; do
     rm -rf /tmp/giso; mkdir -p /tmp/giso/boot/grub; cp -rL $SG /tmp/giso/boot/grub/theme; chmod -R u+w /tmp/giso
     {
