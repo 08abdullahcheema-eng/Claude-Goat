@@ -4,15 +4,17 @@ import Quickshell
 import Quickshell.Hyprland
 
 // Ridge (Summit): the bar is a strip of night sky whose lower edge is a mountain ridge.
-// Every workspace is a peak, the active one wears a snow cap. Clock in the middle,
-// music, CPU, RAM, the moon, controls and battery on the right.
+// Every workspace is a peak, the active one rises highest and wears a snow cap.
+// Time, date, a few icons and the battery ring sit on the right.
 Scope {
     id: lay
     required property var screenRef
+    property bool preview: false        // a copy drawn above the theme picker
 
     BarWindow {
         id: bw
         screen: lay.screenRef
+        preview: lay.preview
         edge: "top"
 
         readonly property int focusedId: Theme.demo ? 1 : (Hyprland.focusedWorkspace?.id ?? 1)
@@ -32,9 +34,13 @@ Scope {
         readonly property real step: Theme.px(52)      // distance between peaks
         readonly property real base: Theme.px(58)      // ridge height at the valleys
         // peak heights (distance from the top), a fixed irregular pattern
-        readonly property var tops: [Theme.px(40), Theme.px(32), Theme.px(44), Theme.px(30), Theme.px(42), Theme.px(36), Theme.px(43), Theme.px(34), Theme.px(41)]
+        readonly property var tops: [Theme.px(44), Theme.px(40), Theme.px(46), Theme.px(41), Theme.px(45), Theme.px(42), Theme.px(46), Theme.px(40), Theme.px(44)]
         function peakX(i) { return x0 + i * step; }
-        function peakY(i) { return tops[i % tops.length]; }
+        // the active workspace rises above the others, the lift glides from peak to peak
+        readonly property int focusedIdx: Math.max(0, ids.indexOf(focusedId))
+        property real liftPos: focusedIdx
+        Behavior on liftPos { NumberAnimation { duration: Theme.mIn; easing.type: Theme.mEase } }
+        function peakY(i) { return tops[i % tops.length] - Theme.px(16) * Math.max(0, 1 - Math.abs(i - liftPos)); }
 
         // ridge points: peaks for the workspaces, then a calm far range across the rest
         readonly property var pts: {
@@ -131,18 +137,10 @@ Scope {
         }
         WheelHandler { onWheel: (e) => Hyprland.dispatch(e.angleDelta.y > 0 ? "workspace e-1" : "workspace e+1") }
 
-        // music, after the last peak
-        ModMedia {
-            x: bw.peakX(bw.ids.length - 1) + Theme.px(34); y: Theme.px(4)
-            height: Theme.px(28)
-            fontSize: Theme.px(11.5); maxTitle: Theme.px(150); coverSize: Theme.px(18); coverRadius: Theme.px(4)
-            barW: Theme.px(46); barColor: Theme.accent
-        }
-
         // clock
         Item {
             id: clock
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors { right: icons.left; rightMargin: Theme.px(18) }
             y: Theme.px(3)
             width: crow.implicitWidth + Theme.px(16); height: Theme.px(30)
             readonly property var d: Dev.clockDate
@@ -153,7 +151,7 @@ Scope {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Qt.formatTime(clock.d, "HH:mm")
-                    color: Theme.hi; font.family: Theme.head; font.pixelSize: Theme.px(23); font.weight: Font.Light; font.letterSpacing: Theme.px(2.5)
+                    color: Theme.hi; font.family: Theme.head; font.pixelSize: Theme.px(20); font.weight: Font.Light; font.letterSpacing: Theme.px(2.5)
                 }
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
@@ -165,29 +163,16 @@ Scope {
         }
 
         Row {
+            id: icons
             anchors { right: parent.right; rightMargin: Theme.px(14) }
             y: Theme.px(3)
             height: Theme.px(30)
             spacing: Theme.px(1)
-            ModCpu { anchors.verticalCenter: parent.verticalCenter }
-            ModMem { anchors.verticalCenter: parent.verticalCenter }
-            Pill {   // moon phase
-                anchors.verticalCenter: parent.verticalCenter
-                icon: "moon"; label: "mond"; iconColor: Theme.dim; iconSize: Theme.px(13)
-                text: Sky.moon + "%"; textColor: Theme.dim
-                onClicked: Ui.toggleAt("calendar", centerX())
-            }
-            ModFan { anchors.verticalCenter: parent.verticalCenter }
-            ModAgent { anchors.verticalCenter: parent.verticalCenter }
-            Sep { anchors.verticalCenter: parent.verticalCenter }
-            ModNet { anchors.verticalCenter: parent.verticalCenter }
-            ModBt { anchors.verticalCenter: parent.verticalCenter }
-            ModVol { anchors.verticalCenter: parent.verticalCenter }
-            ModMic { anchors.verticalCenter: parent.verticalCenter }
-            ModDnd { anchors.verticalCenter: parent.verticalCenter }
-            KbdLayout { anchors.verticalCenter: parent.verticalCenter }
-            ModBat { anchors.verticalCenter: parent.verticalCenter }
-            ModPower { anchors.verticalCenter: parent.verticalCenter }
+            ModDnd { anchors.verticalCenter: parent.verticalCenter; visible: Ui.dnd }
+            ModNet { anchors.verticalCenter: parent.verticalCenter; text: "" }
+            ModBt { anchors.verticalCenter: parent.verticalCenter; text: "" }
+            ModVol { anchors.verticalCenter: parent.verticalCenter; text: "" }
+            ModBatRing { anchors.verticalCenter: parent.verticalCenter; ringSize: Theme.px(20); color: "transparent" }
         }
     }
 }

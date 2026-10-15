@@ -21,6 +21,7 @@ Rectangle {
     property string activeStyle: BarStyle.activeStyle   // "box" | "line" | "fill" | "none"
     property real pad: BarStyle.pad
     property Component lead: null              // optional item drawn before the icon (curve, ring)
+    property alias rowDirection: row.layoutDirection   // RightToLeft puts the lead after the text
     signal clicked(var mouse)
     signal wheel(var wheel)
 

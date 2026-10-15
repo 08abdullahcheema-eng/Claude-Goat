@@ -11,6 +11,7 @@ Singleton {
     property string panel: ""
     property string launcherMode: "all"
     property bool dnd: false
+    property bool saver: false    // the screensaver is showing (hypridle starts it, any input ends it)
     property var barWindows: []   // bar windows, clicks there must not count as "outside"
     property real anchorX: -1   // screen x of the bar icon that opened the panel, so it drops down under it
     property real anchorY: -1   // its centre y, for a bar on the left edge (the panel opens beside the icon)
@@ -61,7 +62,13 @@ Singleton {
         function open(name: string): void { root.open(name); }
         function close(): void { root.close(); }
         function toggleAt(name: string, x: real): void { root.toggleAt(name, x); }
-        function launcher(mode: string): void { root.launcherMode = mode || "all"; root.toggle("launcher"); }
+        // a launcher already open in another tab switches tab instead of closing
+        function launcher(mode: string): void {
+            const m = mode || "all";
+            if (root.panel === "launcher" && root.launcherMode !== m) { root.launcherMode = m; return; }
+            root.launcherMode = m; root.toggle("launcher");
+        }
+        function saver(on: bool): void { root.saver = on; }
         function dnd(): void { root.dnd = !root.dnd; }
     }
 

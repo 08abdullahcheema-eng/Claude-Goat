@@ -3,8 +3,10 @@ import Quickshell
 import Quickshell.Io
 import QtQuick.Effects
 
-// Theme picker in the spirit of Omarchy: big pictures first. A carousel of desktop previews
-// over a blurred backdrop of the selected theme, the name in the theme's own font, nothing else.
+// Theme picker: the whole screen is the preview. The selected theme's wallpaper fills it and
+// its real bar is drawn on top (a live copy, see shell.qml), so you see the desktop as it will be.
+// A glass dock at the bottom holds one kanji tile per theme, the selected tile lifts and fills
+// with the theme's accent. Name and a short description sit above the dock.
 //   left / right or wheel  theme      up / down  wallpaper      tab  bar layout
 //   enter or click         apply      esc        cancel
 Item {
@@ -16,7 +18,8 @@ Item {
     property int sel: 0
     property var wv: ({})              // theme name -> wallpaper index
     property var lv: ({})              // theme name -> chosen bar layout
-    readonly property var layoutNames: ({ islands: "Inseln", capsule: "Glas-Kapsel", rail: "Haarlinie", side: "Seitenleiste", ridge: "Grat", notch: "Notch", pill: "Pille", bottom: "Leiste unten", corners: "Ecken" })
+    readonly property var layoutNames: ({ islands: "Glasleiste", capsule: "Glas-Kapsel", rail: "Haarlinie", side: "Seitenleiste", ridge: "Grat", notch: "Notch", pill: "Pille", bottom: "Leiste unten", corners: "Ecken" })
+    readonly property var blurbs: ({ sumi: "Tusche, rote Sonne", iso: "Küste, Gischt", kiri: "Nebel, Milchglas", hagane: "Stahl, Haarlinien", summit: "Grat, Nachthimmel" })
     function layoutOf(t) {
         if (!t) return "islands";
         const c = lv[t.name];
@@ -29,15 +32,11 @@ Item {
         const L = Theme.layouts;
         const i = (L.indexOf(layoutOf(t)) + d + L.length) % L.length;
         const m = Object.assign({}, lv); m[t.name] = L[i]; lv = m;
+        Theme.pickLayout = L[i];
     }
     property bool applied: false
     readonly property int n: themes.length
     readonly property var cur: themes[sel] || Theme.p
-    // the picker draws on a dark scrim whatever theme is being previewed, so its own text is fixed
-    readonly property color tInk: "#f2ecd2"
-    readonly property color tDim: "#b8b29a"
-    readonly property color tMute: "#85816f"
-    readonly property color tLine: "#454552"
 
     function wallsOf(t) { return (t && t.walls && t.walls.length) ? t.walls : ["wall-" + (t ? t.name : "sumi") + ".jpg"]; }
     function wallIndex(t) { return ((wv[t.name] ?? 0) % wallsOf(t).length + wallsOf(t).length) % wallsOf(t).length; }
@@ -49,15 +48,15 @@ Item {
         sel = ((i % n) + n) % n;
         previewTimer.restart();
     }
-    // the whole shell recolours on preview; wait until browsing pauses so the carousel stays fluid
+    // the whole shell recolours on preview; wait a moment so fast browsing stays fluid
     Timer {
         id: previewTimer
-        interval: 140
+        interval: 90
         onTriggered: {
             const t = root.themes[root.sel];
             if (!t) return;
             Theme.preview(t);
-            if (!Theme.demo) Quickshell.execDetached(["hyprctl", "keyword", "general:col.active_border", "rgb(" + String(t.accent).replace("#", "") + ")"]);
+            Theme.pickLayout = root.layoutOf(t);
         }
     }
     function browse(d) { select(sel + d); }
@@ -77,6 +76,7 @@ Item {
         Ui.close();
     }
     Component.onDestruction: {
+        Theme.pickLayout = "";
         if (!applied) {
             Theme.revert();
             if (!Theme.demo) Quickshell.execDetached(["sumi-theme", "--restore"]);
@@ -90,6 +90,7 @@ Item {
         else if (e.key === Qt.Key_Up || e.key === Qt.Key_K) { cycleWall(-1); e.accepted = true; }
         else if (e.key === Qt.Key_Tab) { cycleLayout(1); e.accepted = true; }
         else if (e.key === Qt.Key_Backtab) { cycleLayout(-1); e.accepted = true; }
+        else if (e.key >= Qt.Key_1 && e.key <= Qt.Key_9) { select(e.key - Qt.Key_1); e.accepted = true; }
         else if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter || e.key === Qt.Key_Space) { apply(); e.accepted = true; }
         else if (e.key === Qt.Key_Escape) { Ui.close(); e.accepted = true; }
     }
@@ -107,250 +108,245 @@ Item {
                 }
                 root.themes = list;
                 const i = list.findIndex(t => t.name === Theme.name);
-                root.sel = i >= 0 ? i : 0;
-                // start on the wallpaper that is applied right now
+                // start on the wallpaper and the layout that are active right now
                 const cw = (parts[1] || "").trim();
                 if (cw !== "" && i >= 0) {
                     const k = root.wallsOf(list[i]).indexOf(cw);
                     if (k > 0) { const w = {}; w[list[i].name] = k; root.wv = w; }
                 }
-                // and on the layout that is active right now
                 if (i >= 0 && Theme.userLayout && Theme.layouts.indexOf(Theme.userLayout) >= 0) {
                     const m = {}; m[list[i].name] = Theme.userLayout; root.lv = m;
                 }
+                const pre = Quickshell.env("SUMI_PICK");          // test hook: start on another theme
+                const j = pre ? list.findIndex(t => t.name === pre) : -1;
+                root.sel = j >= 0 ? j : (i >= 0 ? i : 0);
+                const t = list[root.sel];
+                if (t) { Theme.preview(t); Theme.pickLayout = root.layoutOf(t); }
             }
         }
     }
 
-    function pictureOf(t, wi) {
-        // the desktop preview for the theme's first wallpaper, the wallpaper itself for the others
-        if (wi === 0) return Quickshell.shellPath("assets/previews/preview-" + t.name + ".jpg");
-        return Theme.wall(wallsOf(t)[wi]);
-    }
-
-    // ------------------------------------------------------------------ backdrop
-    // blurred picture of the selected theme filling the screen, crossfading as you browse
+    // ------------------------------------------------------------------ the preview
+    // the selected wallpaper, sharp and full screen, crossfading and settling as you browse
     Item {
         id: backdrop
         anchors.fill: parent
         Repeater {
             model: root.themes
             delegate: Item {
+                id: bd
                 required property var modelData
                 required property int index
+                readonly property bool on: index === root.sel
                 anchors.fill: parent
-                opacity: index === root.sel ? 1 : 0
+                opacity: on ? 1 : 0
                 visible: opacity > 0.01
-                Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.InOutQuad } }
-                Image {
-                    id: bimg
-                    anchors.fill: parent
-                    source: "file://" + root.pictureOf(modelData, 0)
-                    sourceSize: Qt.size(480, 300)
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    visible: false
-                }
-                MultiEffect {
-                    anchors.fill: parent; source: bimg; blurEnabled: true; blur: 1.0; blurMax: 64; brightness: -0.25; saturation: 0.1
-                    // a very slow drift keeps the backdrop alive
-                    SequentialAnimation on scale {
-                        loops: Animation.Infinite
-                        NumberAnimation { from: 1.04; to: 1.12; duration: 14000; easing.type: Easing.InOutSine }
-                        NumberAnimation { from: 1.12; to: 1.04; duration: 14000; easing.type: Easing.InOutSine }
+                Behavior on opacity { NumberAnimation { duration: 420; easing.type: Easing.InOutQuad } }
+                scale: on ? 1 : 1.035
+                Behavior on scale { NumberAnimation { duration: 900; easing.type: Easing.OutQuint } }
+                Repeater {
+                    model: root.wallsOf(bd.modelData).length
+                    delegate: Image {
+                        required property int index
+                        anchors.fill: parent
+                        // every theme keeps its chosen wallpaper loaded, the others load once it is selected
+                        source: (bd.on || index === root.wallIndex(bd.modelData)) ? "file://" + Theme.wall(root.wallsOf(bd.modelData)[index]) : ""
+                        sourceSize: Qt.size(root.width, root.height)
+                        fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
+                        opacity: index === root.wallIndex(bd.modelData) && status === Image.Ready ? 1 : 0
+                        Behavior on opacity { NumberAnimation { duration: 360; easing.type: Easing.OutCubic } }
                     }
                 }
             }
         }
-        Rectangle { anchors.fill: parent; color: Qt.rgba(0, 0, 0, 0.45) }
+        // a soft darkening towards the bottom so the dock and the name read well
+        Rectangle {
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: parent.height * 0.5
+            gradient: Gradient {
+                GradientStop { position: 0; color: "transparent" }
+                GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0.62) }
+            }
+        }
     }
 
-    // ------------------------------------------------------------------ carousel
+    WheelHandler { onWheel: (e) => root.browse(e.angleDelta.y > 0 || e.angleDelta.x > 0 ? -1 : 1) }
+    // clicks on the picture do nothing, a right click cancels
+    MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; onClicked: (m) => { if (m.button === Qt.RightButton) Ui.close(); } }
+
+    // ------------------------------------------------------------------ name and dock
     Item {
         id: stage
         anchors.fill: parent
-        opacity: 0
-        scale: 1.04
-        Component.onCompleted: { opacity = 1; scale = 1; }
-        Behavior on opacity { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: 420; easing.type: Easing.OutQuint } }
+        property real intro: 0
+        NumberAnimation on intro { from: 0; to: 1; duration: 620; easing.type: Easing.OutQuint }
 
-        readonly property real cw: Math.min(width * 0.6, Theme.px(1000))   // selected picture width
-        readonly property real ch: cw * 0.625
-        readonly property real midY: height * 0.44
-
-        WheelHandler { onWheel: (e) => root.browse(e.angleDelta.y > 0 || e.angleDelta.x > 0 ? -1 : 1) }
-
-        Repeater {
-            model: root.themes
-            delegate: Item {
-                id: card
-                required property var modelData
-                required property int index
-                readonly property var t: modelData
-                readonly property int d: { const v = (index - root.sel + root.n) % root.n; return v > root.n / 2 ? v - root.n : v; }
-                readonly property bool on: d === 0
-                readonly property real k: on ? 1 : (Math.abs(d) === 1 ? 0.66 : 0.46)     // size relative to the selected card
-                readonly property int wi: root.wallIndex(t)
-                readonly property bool near: Math.abs(d) <= 2
-
-                // fixed size, moved and scaled on the GPU: no image re-layout while animating
-                width: stage.cw
-                height: stage.ch
-                x: stage.width / 2 - width / 2 + (d === 0 ? 0 : Math.sign(d) * (stage.cw * 0.5 + stage.cw * 0.66 * 0.5 * 0.5 + (Math.abs(d) - 1) * stage.cw * 0.46 * 0.75))
-                y: stage.midY - height / 2 + (1 - intro) * Theme.px(60)
-                z: 10 - Math.abs(d)
-                scale: k * (0.92 + 0.08 * intro)
-                opacity: (on ? 1 : (Math.abs(d) === 1 ? 0.55 : (Math.abs(d) === 2 ? 0.18 : 0))) * intro
-                visible: opacity > 0.01
-                // neighbours turn slightly towards the middle, like a cover flow
-                transform: Rotation {
-                    origin.x: card.width / 2; origin.y: card.height / 2
-                    axis { x: 0; y: 1; z: 0 }
-                    angle: card.d === 0 ? 0 : (card.d > 0 ? -16 : 16)
-                    Behavior on angle { NumberAnimation { duration: 520; easing.type: Easing.OutQuint } }
-                }
-
-                Behavior on x { enabled: card.near; NumberAnimation { duration: 520; easing.type: Easing.OutQuint } }
-                Behavior on scale { enabled: card.near; NumberAnimation { duration: 520; easing.type: Easing.OutQuint } }
-                Behavior on opacity { NumberAnimation { duration: 340; easing.type: Easing.OutCubic } }
-
-                // entry: cards rise in one after another, the selected one first
-                property real intro: 0
-                SequentialAnimation on intro {
-                    running: true
-                    PauseAnimation { duration: 40 + Math.abs(card.d) * 70 }
-                    NumberAnimation { to: 1; duration: 560; easing.type: Easing.OutQuint }
-                }
-
-                // soft shadow under the picture
-                Rectangle {
-                    id: shadowSrc
-                    anchors.fill: pic
-                    radius: pic.radius
-                    color: "black"
-                    visible: false
-                }
-                MultiEffect {
-                    anchors.fill: pic
-                    source: shadowSrc
-                    shadowEnabled: true; shadowBlur: 1.0; shadowOpacity: card.on ? 0.7 : 0.35
-                    shadowVerticalOffset: Theme.px(14); shadowColor: "black"
-                    opacity: 0.9
-                }
-                Rectangle {
-                    id: pic
-                    anchors.fill: parent
-                    radius: Theme.px(card.on ? 18 : 14)
-                    color: card.t.bg
-                    clip: true
-                    // the pictures: desktop preview, then the theme's other wallpapers
-                    Repeater {
-                        model: root.wallsOf(card.t).length
-                        delegate: Image {
-                            required property int index
-                            anchors.fill: parent
-                            source: "file://" + root.pictureOf(card.t, index)
-                            sourceSize: Qt.size(1280, 800)
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
-                            smooth: true
-                            mipmap: true
-                            opacity: index === card.wi && status === Image.Ready ? 1 : 0
-                            Behavior on opacity { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
-                        }
-                    }
-                    // a hairline frame, in the theme's accent on the selected picture
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: parent.radius
-                        color: "transparent"
-                        border.width: card.on ? Theme.px(2) : 1
-                        border.color: card.on ? card.t.accent : Qt.rgba(1, 1, 1, 0.12)
-                        Behavior on border.color { ColorAnimation { duration: 250 } }
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: { if (card.on) root.apply(); else root.browse(card.d); }
-                }
-            }
-        }
-
-        // name of the selected theme, set in its own display font; it slides in on every change
+        // name of the selected theme in its own display font, re-entering on every change
         Connections { target: root; function onSelChanged() { nameAnim.restart(); } }
         ParallelAnimation {
             id: nameAnim
-            NumberAnimation { target: nameCol; property: "opacity"; from: 0; to: 1; duration: 380; easing.type: Easing.OutCubic }
-            NumberAnimation { target: nameCol; property: "shift"; from: Theme.px(14); to: 0; duration: 480; easing.type: Easing.OutQuint }
+            NumberAnimation { target: nameCol; property: "opacity"; from: 0; to: 1; duration: 360; easing.type: Easing.OutCubic }
+            NumberAnimation { target: nameCol; property: "shift"; from: Theme.px(12); to: 0; duration: 520; easing.type: Easing.OutQuint }
         }
         Column {
             id: nameCol
             property real shift: 0
             anchors.horizontalCenter: parent.horizontalCenter
-            y: stage.midY + stage.ch / 2 + Theme.px(30) + shift
-            spacing: Theme.px(12)
+            anchors.bottom: dock.top
+            anchors.bottomMargin: Theme.px(22) - shift
+            spacing: Theme.px(10)
+            opacity: stage.intro
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: root.cur.label || ""
+                color: "#ffffff"
+                font.family: root.cur.fontHead || Theme.serif
+                font.pixelSize: Theme.px(52)
+                font.weight: Font.Medium
+                style: Text.Raised; styleColor: Qt.rgba(0, 0, 0, 0.25)
+            }
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: [root.blurbs[root.cur.name] || "", root.layoutNames[root.layoutOf(root.cur)] || "",
+                       root.wallsOf(root.cur).length + " Wallpaper"].filter(x => x).join("  ·  ")
+                color: Qt.rgba(1, 1, 1, 0.62)
+                font.family: "Inter"; font.pixelSize: Theme.px(13)
+            }
+            // wallpaper dots
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: Theme.px(14)
-                Text {
-                    text: root.cur.label || ""
-                    color: "#ffffff"
-                    font.family: root.cur.fontHead || Theme.serif
-                    font.pixelSize: Theme.px(34)
-                    font.weight: Font.DemiBold
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                Text {
-                    text: root.cur.kanji || ""
-                    color: root.cur.accent || root.tInk
-                    font.family: Theme.serif
-                    font.pixelSize: Theme.px(26)
-                    anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.px(7)
+                height: Theme.px(10)
+                Repeater {
+                    model: root.wallsOf(root.cur).length > 1 ? root.wallsOf(root.cur).length : 0
+                    delegate: Rectangle {
+                        required property int index
+                        readonly property bool on: index === root.wallIndex(root.cur)
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: on ? Theme.px(18) : Theme.px(6); height: Theme.px(6); radius: height / 2
+                        color: on ? (root.cur.accent || "#ffffff") : Qt.rgba(1, 1, 1, 0.55)
+                        Behavior on width { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+                        MouseArea { anchors.fill: parent; anchors.margins: -Theme.px(5); cursorShape: Qt.PointingHandCursor
+                            onClicked: { const w = Object.assign({}, root.wv); w[root.cur.name] = index; root.wv = w; } }
+                    }
                 }
             }
+        }
+
+        // the dock: frosted glass, one tile per theme
+        Item {
+            id: dock
+            readonly property real tile: Theme.px(76)
+            readonly property real gap: Theme.px(16)
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: parent.height - height - Theme.px(84) + (1 - stage.intro) * Theme.px(40)
+            width: tiles.implicitWidth + Theme.px(36)
+            height: tile + Theme.px(44)
+            opacity: stage.intro
+
+            Rectangle {
+                id: glassShape
+                anchors.fill: parent
+                radius: Theme.px(26)
+                color: Qt.rgba(0.04, 0.05, 0.07, 0.52)
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.10)
+                Rectangle {
+                    anchors { left: parent.left; right: parent.right; top: parent.top; leftMargin: parent.radius; rightMargin: parent.radius; topMargin: 1 }
+                    height: 1
+                    gradient: Gradient { orientation: Gradient.Horizontal
+                        GradientStop { position: 0; color: "transparent" }
+                        GradientStop { position: 0.5; color: Qt.rgba(1, 1, 1, 0.16) }
+                        GradientStop { position: 1; color: "transparent" } }
+                }
+            }
+
             Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: Theme.px(16)
-                // wallpaper dots
-                Row {
-                    visible: root.wallsOf(root.cur).length > 1
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.px(7)
-                    Repeater {
-                        model: root.wallsOf(root.cur).length
-                        delegate: Rectangle {
-                            required property int index
-                            width: index === root.wallIndex(root.cur) ? Theme.px(20) : Theme.px(7); height: Theme.px(7); radius: height / 2
-                            color: index === root.wallIndex(root.cur) ? "#ffffff" : Qt.rgba(1, 1, 1, 0.3)
-                            Behavior on width { NumberAnimation { duration: 180 } }
+                id: tiles
+                anchors.centerIn: parent
+                spacing: dock.gap
+                Repeater {
+                    model: root.themes
+                    delegate: Item {
+                        id: tl
+                        required property var modelData
+                        required property int index
+                        readonly property bool on: index === root.sel
+                        width: dock.tile; height: dock.tile
+                        // tiles pop in one after another when the picker opens
+                        property real pop: 0
+                        SequentialAnimation on pop {
+                            running: true
+                            PauseAnimation { duration: 60 + tl.index * 45 }
+                            NumberAnimation { to: 1; duration: 480; easing.type: Easing.OutBack; easing.overshoot: 1.4 }
+                        }
+                        Rectangle {
+                            id: face
+                            width: parent.width; height: parent.height
+                            y: tl.on ? -Theme.px(10) : 0
+                            Behavior on y { NumberAnimation { duration: 340; easing.type: Easing.OutBack; easing.overshoot: 1.6 } }
+                            scale: tl.pop * (tl.on ? 1.08 : (tma.containsMouse ? 1.03 : 1))
+                            Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+                            radius: Theme.px(18)
+                            color: tl.on ? tl.modelData.accent : Qt.rgba(1, 1, 1, tma.containsMouse ? 0.10 : 0.06)
+                            Behavior on color { ColorAnimation { duration: 260 } }
+                            border.width: 1
+                            border.color: tl.on ? Qt.lighter(tl.modelData.accent, 1.25) : Qt.rgba(1, 1, 1, 0.08)
+                            Text {
+                                anchors.centerIn: parent
+                                text: tl.modelData.kanji
+                                color: tl.on ? tl.modelData.bg : tl.modelData.accent
+                                Behavior on color { ColorAnimation { duration: 260 } }
+                                font.family: Theme.serif; font.weight: Font.Bold
+                                font.pixelSize: dock.tile * 0.5
+                            }
+                        }
+                        // soft glow of the accent under the lifted tile
+                        Rectangle {
+                            z: -1
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            y: face.y + Theme.px(8)
+                            width: parent.width * 0.9; height: parent.height * 0.9; radius: Theme.px(22)
+                            color: tl.modelData.accent
+                            opacity: tl.on ? 0.22 : 0
+                            Behavior on opacity { NumberAnimation { duration: 300 } }
+                            layer.enabled: true
+                            layer.effect: MultiEffect { blurEnabled: true; blur: 1; blurMax: 32 }
+                        }
+                        Rectangle {
+                            anchors { horizontalCenter: parent.horizontalCenter; top: parent.bottom; topMargin: Theme.px(8) }
+                            width: Theme.px(5); height: width; radius: width / 2
+                            color: "#ffffff"
+                            opacity: tl.on ? 0.9 : 0
+                            Behavior on opacity { NumberAnimation { duration: 200 } }
+                        }
+                        MouseArea {
+                            id: tma
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: { if (tl.on) root.apply(); else root.select(tl.index); }
                         }
                     }
-                }
-                // bar layout, click or tab to change
-                Rectangle {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: lchip.implicitWidth + Theme.px(22); height: Theme.px(26); radius: height / 2
-                    color: lma.containsMouse ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(1, 1, 1, 0.06)
-                    border.width: 1; border.color: Qt.rgba(1, 1, 1, 0.14)
-                    Text {
-                        id: lchip; anchors.centerIn: parent
-                        text: "Bar · " + (root.layoutNames[root.layoutOf(root.cur)] || "")
-                        color: root.layoutOf(root.cur) === root.cur.layout ? Qt.rgba(1, 1, 1, 0.7) : (root.cur.accent || "#ffffff")
-                        font.family: Theme.mono; font.pixelSize: Theme.px(11)
-                    }
-                    MouseArea { id: lma; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.cycleLayout(1) }
                 }
             }
         }
 
         // quiet key hints
-        Text {
-            anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(36) }
-            text: "←→ Theme    ↑↓ Wallpaper    ⇥ Bar    ↵ Übernehmen    esc Abbrechen"
-            color: Qt.rgba(1, 1, 1, 0.35)
-            font.family: Theme.mono; font.pixelSize: Theme.px(11); font.letterSpacing: Theme.px(1)
+        Row {
+            anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(22) }
+            spacing: Theme.px(24)
+            opacity: 0.55 * stage.intro
+            Repeater {
+                model: [["←  →", "Theme"], ["↑  ↓", "Wallpaper"], ["Tab", "Leiste"], ["↵", "Übernehmen"], ["Esc", "Abbrechen"]]
+                delegate: Row {
+                    required property var modelData
+                    spacing: Theme.px(7)
+                    Text { text: modelData[0]; color: "#ffffff"; font.family: "Inter"; font.pixelSize: Theme.px(12); font.weight: Font.DemiBold }
+                    Text { text: modelData[1]; color: "#ffffff"; font.family: "Inter"; font.pixelSize: Theme.px(12) }
+                }
+            }
         }
     }
 }

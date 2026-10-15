@@ -66,6 +66,10 @@ if [ "$dark" = "true" ]; then ink=$(hex bg); else ink=$(hex hi); fi
 # lock screen colours (sourced by hyprlock.conf)
 cat > "$CONF/hyprlock-colors.conf.tmp" <<EOC
 \$sumi_wall = $wall
+\$sumi_assets = $SHELL_DIR/assets
+\$sumi_avatar = $SHELL_DIR/assets/lock/avatar-$name.png
+\$sumi_accent_soft = rgba($(hex accent)8c)
+\$sumi_error = rgb($(hex error))
 \$sumi_ink = rgb($ink)
 \$sumi_bg = rgba($(hex bg)d9)
 \$sumi_fg = rgb($(hex fg))
@@ -97,6 +101,181 @@ mv "$CONF/hyprlock-colors.conf.tmp" "$CONF/hyprlock-colors.conf"
   for i in $(seq 0 15); do echo "color$i $(jq -r ".ansi[$i]" "$t")"; done
 } > "$CONF/kitty.conf.tmp"
 mv "$CONF/kitty.conf.tmp" "$CONF/kitty.conf"
+
+# ---- terminal apps: btop and neovim follow the theme ----
+# btop: a theme file plus color_theme in btop.conf (left alone when home-manager owns it),
+# running btops reload on SIGUSR2
+bt="$HOME/.config/btop"
+if mkdir -p "$bt/themes" 2>/dev/null && [ -w "$bt/themes" ]; then
+  a() { jq -r ".ansi[$1]" "$t"; }
+  cat > "$bt/themes/sumi.theme.tmp" <<EOB
+# written by sumi-theme ($name)
+theme[main_bg]="$(get bg)"
+theme[main_fg]="$(get fg)"
+theme[title]="$(get hi)"
+theme[hi_fg]="$(get accent)"
+theme[selected_bg]="$(get bg2)"
+theme[selected_fg]="$(get hi)"
+theme[inactive_fg]="$(get mute)"
+theme[graph_text]="$(get dim)"
+theme[meter_bg]="$(get line)"
+theme[proc_misc]="$(get accent2)"
+theme[cpu_box]="$(get line2)"
+theme[mem_box]="$(get line2)"
+theme[net_box]="$(get line2)"
+theme[proc_box]="$(get line2)"
+theme[div_line]="$(get line)"
+theme[temp_start]="$(get green)"
+theme[temp_mid]="$(get gold)"
+theme[temp_end]="$(get accent)"
+theme[cpu_start]="$(get mute)"
+theme[cpu_mid]="$(get accent2)"
+theme[cpu_end]="$(get accent)"
+theme[free_start]="$(get green)"
+theme[free_mid]="$(get green)"
+theme[free_end]="$(get green)"
+theme[cached_start]="$(get gold)"
+theme[cached_mid]="$(get gold)"
+theme[cached_end]="$(get gold)"
+theme[available_start]="$(get cyan)"
+theme[available_mid]="$(get cyan)"
+theme[available_end]="$(get cyan)"
+theme[used_start]="$(get accent2)"
+theme[used_mid]="$(get accent)"
+theme[used_end]="$(get accent)"
+theme[download_start]="$(get mute)"
+theme[download_mid]="$(get cyan)"
+theme[download_end]="$(get cyan)"
+theme[upload_start]="$(get mute)"
+theme[upload_mid]="$(get accent2)"
+theme[upload_end]="$(get accent)"
+theme[process_start]="$(get dim)"
+theme[process_mid]="$(get accent2)"
+theme[process_end]="$(get accent)"
+EOB
+  mv "$bt/themes/sumi.theme.tmp" "$bt/themes/sumi.theme"
+  bc="$bt/btop.conf"
+  if [ ! -e "$bc" ]; then
+    printf 'color_theme = "sumi"\ntheme_background = False\n' > "$bc"
+  elif [ -f "$bc" ] && [ ! -L "$bc" ] && [ -w "$bc" ]; then
+    if grep -q '^color_theme' "$bc"; then sed -i 's|^color_theme.*|color_theme = "sumi"|' "$bc"; else echo 'color_theme = "sumi"' >> "$bc"; fi
+  fi
+  pkill -USR2 -x btop 2>/dev/null || true
+fi
+
+# neovim: a colour scheme named "sumi" (use it with  vim.cmd.colorscheme("sumi")  in your init);
+# running neovims that use it switch at once
+nv="$HOME/.config/nvim/colors"
+if mkdir -p "$nv" 2>/dev/null && [ -w "$nv" ]; then
+  bgmode=dark; [ "$dark" = "true" ] || bgmode=light
+  cat > "$nv/sumi.lua.tmp" <<EON
+-- written by sumi-theme ($name)
+vim.cmd("highlight clear")
+if vim.fn.exists("syntax_on") == 1 then vim.cmd("syntax reset") end
+vim.o.background = "$bgmode"
+vim.o.termguicolors = true
+vim.g.colors_name = "sumi"
+local c = {
+  bg = "$(get bg)", bg1 = "$(get bg1)", bg2 = "$(get bg2)", line = "$(get line)", line2 = "$(get line2)",
+  mute = "$(get mute)", dim = "$(get dim)", fg = "$(get fg)", hi = "$(get hi)",
+  accent = "$(get accent)", accent2 = "$(get accent2)", gold = "$(get gold)", orange = "$(get orange)",
+  green = "$(get green)", cyan = "$(get cyan)", blue = "$(get blue)", violet = "$(get violet)",
+  sel = "$(get sel)", add = "$(get diffAdd)", del = "$(get diffDel)",
+  error = "$(get error)", warn = "$(get warn)", info = "$(get info)", ok = "$(get ok)",
+}
+local h = function(g, o) vim.api.nvim_set_hl(0, g, o) end
+h("Normal", { fg = c.fg, bg = c.bg })
+h("NormalFloat", { fg = c.fg, bg = c.bg1 })
+h("FloatBorder", { fg = c.line2, bg = c.bg1 })
+h("FloatTitle", { fg = c.accent, bg = c.bg1, bold = true })
+h("Cursor", { fg = c.bg, bg = c.hi })
+h("CursorLine", { bg = c.bg1 })
+h("CursorLineNr", { fg = c.accent, bold = true })
+h("LineNr", { fg = c.mute })
+h("SignColumn", { bg = c.bg })
+h("ColorColumn", { bg = c.bg1 })
+h("VertSplit", { fg = c.line })
+h("WinSeparator", { fg = c.line })
+h("StatusLine", { fg = c.fg, bg = c.bg1 })
+h("StatusLineNC", { fg = c.mute, bg = c.bg1 })
+h("TabLine", { fg = c.dim, bg = c.bg1 })
+h("TabLineSel", { fg = c.hi, bg = c.bg2, bold = true })
+h("TabLineFill", { bg = c.bg })
+h("Pmenu", { fg = c.fg, bg = c.bg1 })
+h("PmenuSel", { fg = c.hi, bg = c.bg2, bold = true })
+h("PmenuSbar", { bg = c.bg1 })
+h("PmenuThumb", { bg = c.line2 })
+h("Visual", { bg = c.sel })
+h("Search", { fg = c.bg, bg = c.gold })
+h("IncSearch", { fg = c.bg, bg = c.accent })
+h("CurSearch", { fg = c.bg, bg = c.accent })
+h("MatchParen", { fg = c.accent, bold = true, underline = true })
+h("NonText", { fg = c.line2 })
+h("Whitespace", { fg = c.line })
+h("Folded", { fg = c.dim, bg = c.bg1 })
+h("Title", { fg = c.accent, bold = true })
+h("Directory", { fg = c.blue })
+h("ErrorMsg", { fg = c.error })
+h("WarningMsg", { fg = c.warn })
+h("MoreMsg", { fg = c.green })
+h("Question", { fg = c.cyan })
+h("Comment", { fg = c.mute, italic = true })
+h("Constant", { fg = c.orange })
+h("String", { fg = c.green })
+h("Character", { fg = c.green })
+h("Number", { fg = c.orange })
+h("Boolean", { fg = c.orange })
+h("Identifier", { fg = c.fg })
+h("Function", { fg = c.blue })
+h("Statement", { fg = c.accent2 })
+h("Keyword", { fg = c.accent2, italic = true })
+h("Conditional", { fg = c.accent2 })
+h("Repeat", { fg = c.accent2 })
+h("Operator", { fg = c.dim })
+h("PreProc", { fg = c.violet })
+h("Include", { fg = c.violet })
+h("Type", { fg = c.cyan })
+h("Special", { fg = c.gold })
+h("Delimiter", { fg = c.dim })
+h("Todo", { fg = c.bg, bg = c.gold, bold = true })
+h("Error", { fg = c.error })
+h("DiffAdd", { bg = c.add })
+h("DiffDelete", { bg = c.del })
+h("DiffChange", { bg = c.bg2 })
+h("DiffText", { bg = c.sel })
+h("DiagnosticError", { fg = c.error })
+h("DiagnosticWarn", { fg = c.warn })
+h("DiagnosticInfo", { fg = c.info })
+h("DiagnosticHint", { fg = c.cyan })
+h("DiagnosticOk", { fg = c.ok })
+h("DiagnosticUnderlineError", { undercurl = true, sp = c.error })
+h("DiagnosticUnderlineWarn", { undercurl = true, sp = c.warn })
+h("GitSignsAdd", { fg = c.green })
+h("GitSignsChange", { fg = c.gold })
+h("GitSignsDelete", { fg = c.accent })
+h("@variable", { fg = c.fg })
+h("@variable.builtin", { fg = c.accent2 })
+h("@property", { fg = c.fg })
+h("@field", { fg = c.fg })
+h("@parameter", { fg = c.hi })
+h("@function.builtin", { fg = c.cyan })
+h("@keyword.return", { fg = c.accent })
+h("@punctuation", { fg = c.dim })
+h("@tag", { fg = c.accent2 })
+h("@tag.attribute", { fg = c.gold })
+h("@markup.heading", { fg = c.accent, bold = true })
+h("@markup.link", { fg = c.blue, underline = true })
+local ansi = { $(jq -r '[.ansi[] | "\"" + . + "\""] | join(", ")' "$t") }
+for i, v in ipairs(ansi) do vim.g["terminal_color_" .. (i - 1)] = v end
+EON
+  mv "$nv/sumi.lua.tmp" "$nv/sumi.lua"
+  if command -v nvim >/dev/null 2>&1; then
+    for s in "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"/nvim.*.0 "${XDG_RUNTIME_DIR:-/tmp}"/nvim*/0; do
+      [ -S "$s" ] || continue
+      timeout 2 nvim --server "$s" --remote-expr 'execute("if get(g:, \"colors_name\", \"\") ==# \"sumi\" | colorscheme sumi | endif")' >/dev/null 2>&1 || true
+    done
+  fi
+fi
 
 # ---- apps: GTK colours (read by gtk.css of GTK 3 and 4, see sumi-shell.nix) ----
 {

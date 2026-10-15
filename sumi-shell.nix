@@ -42,6 +42,9 @@ in
     grim
     slurp
     wl-clipboard
+    cliphist               # clipboard history for the launcher's Clipboard tab
+    wtype                  # "paste" from the clipboard and emoji tabs (Shift+Enter)
+    noto-fonts-color-emoji
     yazi
     btop
     claude-code
@@ -99,7 +102,7 @@ in
   programs.hyprlock.settings = lib.mkForce { };
   programs.hyprlock.extraConfig = lib.mkForce (builtins.readFile ./sumi/hyprlock.conf);
 
-  # idle: dim after 4 min, lock after 5, screen off after 5.5, sleep after 20.
+  # idle: screensaver after 3 min, dim after 4.5, lock after 5, screen off after 5.5, sleep after 20.
   # Closing the lid suspends (systemd default) and the screen is locked before it sleeps.
   services.hypridle = {
     enable = true;
@@ -111,7 +114,8 @@ in
         ignore_dbus_inhibit = false;      # videos and games keep the screen awake
       };
       listener = [
-        { timeout = 240; on-timeout = "brightnessctl -s set 15%"; on-resume = "brightnessctl -r"; }
+        { timeout = 180; on-timeout = "${ipc} shell saver true"; on-resume = "${ipc} shell saver false"; }
+        { timeout = 270; on-timeout = "brightnessctl -s set 15%"; on-resume = "brightnessctl -r"; }
         { timeout = 300; on-timeout = "loginctl lock-session"; }
         { timeout = 330; on-timeout = "hyprctl dispatch dpms off"; on-resume = "hyprctl dispatch dpms on"; }
         { timeout = 1200; on-timeout = "systemctl suspend"; }
@@ -123,6 +127,9 @@ in
     exec-once = lib.mkForce [
       "sumi-theme --restore"
       "${qs} -n -c sumi"
+      # clipboard history: every copied text and picture goes into cliphist
+      "wl-paste --type text --watch cliphist store"
+      "wl-paste --type image --watch cliphist store"
     ];
 
     # window feel: small even gaps that line up with the floating bar, smooth motion, tidy tiling
@@ -174,7 +181,9 @@ in
       "SUPER, E, exec, kitty -e yazi"
       "SUPER, C, killactive,"
       "SUPER, M, exec, ${ipc} shell open power"
-      "SUPER, V, togglefloating,"
+      "SUPER, V, exec, ${ipc} shell launcher clip"
+      "SUPER SHIFT, V, togglefloating,"
+      "SUPER CTRL, E, exec, ${ipc} shell launcher emoji"
       "SUPER, F, fullscreen,"
       "SUPER SHIFT, F, fullscreen, 1"
       "SUPER, L, exec, pidof hyprlock || hyprlock"

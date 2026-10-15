@@ -113,6 +113,45 @@ case "${1:-status}" in
     d=(SO MO DI MI DO FR SA); m=(JAN FEB MÄR APR MAI JUN JUL AUG SEP OKT NOV DEZ)
     echo "${d[$(date +%w)]} $(date +%d) ${m[$(( $(date +%-m) - 1 ))]} · MOND $(moon_pct) %"
     ;;
+  clockc)
+    # HH:MM with a steady colon in the given colour
+    echo "$(date +%H)<span foreground='${2:-#c8323a}'>:</span>$(date +%M)"
+    ;;
+  ldate)
+    # DONNERSTAG  ·  15. OKTOBER
+    days=(SONNTAG MONTAG DIENSTAG MITTWOCH DONNERSTAG FREITAG SAMSTAG)
+    months=(JANUAR FEBRUAR MÄRZ APRIL MAI JUNI JULI AUGUST SEPTEMBER OKTOBER NOVEMBER DEZEMBER)
+    echo "${days[$(date +%w)]}  ·  $(date +%-d). ${months[$(( $(date +%-m) - 1 ))]}"
+    ;;
+  kday)
+    # date and weekday in kanji: 十月十五日  木曜日
+    k=(日 月 火 水 木 金 土)
+    echo "$("$0" kdate)  ${k[$(date +%w)]}曜日"
+    ;;
+  now)
+    # now playing, with a short accent bar in front (empty when nothing plays)
+    t=$(playerctl metadata --format '{{title}} · {{artist}}' 2>/dev/null | cut -c1-60 || true)
+    if [ -n "$t" ]; then echo "<span foreground='${2:-#c8323a}'>▍</span> $t"; else echo ""; fi
+    ;;
+  stat2)
+    # battery, keyboard layout, network, spaced out
+    out=""
+    for b in /sys/class/power_supply/BAT*; do
+      [ -r "$b/capacity" ] || continue
+      cap=$(cat "$b/capacity" || true); st=$(cat "$b/status" 2>/dev/null || true)
+      if [ "$st" = "Charging" ]; then out="⚡ $cap %"; else out="$cap %"; fi
+      break
+    done
+    kb=$(hyprctl -j devices 2>/dev/null | jq -r '[.keyboards[] | select(.main)][0].active_keymap // empty' 2>/dev/null || true)
+    case "$kb" in German*) kb=DE;; "English (US)"*) kb=US;; "") ;; *) kb=$(echo "$kb" | cut -c1-2 | tr a-z A-Z);; esac
+    [ -n "$kb" ] && out="$out     $kb"
+    ssid=$(nmcli -t -f ACTIVE,SSID dev wifi 2>/dev/null | awk -F: '$1=="yes"{print $2; exit}' || true)
+    [ -n "$ssid" ] && out="$out     $ssid"
+    echo "$out"
+    ;;
+  since)
+    echo "Passwort eingeben  ·  gesperrt seit $(date +%H:%M)"
+    ;;
   music)
     t=$(playerctl metadata --format '{{title}} · {{artist}}' 2>/dev/null | cut -c1-60 || true)
     if [ -n "$t" ]; then echo "♪  $t"; else echo ""; fi

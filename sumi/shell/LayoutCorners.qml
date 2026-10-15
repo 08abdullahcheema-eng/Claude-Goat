@@ -5,9 +5,11 @@ import Quickshell
 Scope {
     id: lay
     required property var screenRef
+    property bool preview: false        // a copy drawn above the theme picker
 
     BarWindow {
         screen: lay.screenRef
+        preview: lay.preview
         edge: "top"
         Rectangle { anchors.fill: parent; gradient: Gradient { GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0.35) } GradientStop { position: 1; color: "transparent" } } }
         Row {
@@ -31,6 +33,7 @@ Scope {
     }
     BarWindow {
         screen: lay.screenRef
+        preview: lay.preview
         edge: "bottom"
         reserve: Theme.px(30)
         Rectangle { anchors.fill: parent; gradient: Gradient { GradientStop { position: 0; color: "transparent" } GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0.35) } } }

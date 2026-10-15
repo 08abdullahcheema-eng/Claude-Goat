@@ -5,9 +5,11 @@ import Quickshell
 Scope {
     id: lay
     required property var screenRef
+    property bool preview: false        // a copy drawn above the theme picker
 
     BarWindow {
         screen: lay.screenRef
+        preview: lay.preview
         edge: "bottom"
         Rectangle {
             anchors.fill: parent

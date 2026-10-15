@@ -1,30 +1,20 @@
-# Hagane: crop marks, a scale down the left edge, the menu in a hairline box with a bright top edge,
-# the countdown runs along the bottom of the box
+# Hagane: mark and title live in the background picture (drawn for exactly 1920x1200),
+# GRUB only draws the entries, the chosen one on soft Hagane glass. No countdown.
 title-text: ""
 desktop-image: "{{DIR}}background.jpg"
 desktop-color: "#0b0b0c"
-terminal-font: "{{F:inter-15}}"
+terminal-font: "{{F:jbmono-15}}"
 terminal-left: "0"
 terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
-+ label { left = 7% top = 7%+6 width = 40% height = 45 text = "鋼" font = "{{F:kanji-36}}" color = "#a9d1ff" }
-+ label { left = 7% top = 12%+6 width = 40% height = 30 text = "H A G A N E" font = "{{F:inter-20}}" color = "#ffffff" }
-+ label { left = 7% top = 16% width = 40% height = 22 text = "boot  ·  nixos" font = "{{F:inter-15}}" color = "#9a9aa0" }
 + boot_menu {
-  left = 56%+10 top = 54% width = 35% height = 28%
-  item_font = "{{F:inter-22}}" item_color = "#c8c8cc"
-  selected_item_font = "{{F:inter-22}}" selected_item_color = "#ffffff"
-  item_height = 45 item_padding = 20 item_spacing = 6
-  icon_width = 30 icon_height = 30 item_icon_space = 16
+  left = 180 top = 444 width = 600 height = 560
+  item_font = "{{F:inter-32}}" item_color = "#c4c4c8"
+  selected_item_font = "{{F:inter-32}}" selected_item_color = "#ffffff"
+  item_height = 40 item_padding = 20 item_spacing = 52
+  icon_width = 0 icon_height = 0 item_icon_space = 0
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ circular_progress {
-  id = "__timeout__"
-  left = 93%-72 top = 86%-72 width = 54 height = 54
-  num_ticks = 24 ticks_disappear = true start_angle = -64
-  center_bitmap = "{{DIR}}ring.png" tick_bitmap = "{{DIR}}tick.png"
-}
-+ label { left = 7% top = 92%+6 width = 40% height = 22 text = "Pfeiltasten wählen  ·  Enter startet  ·  e bearbeitet" font = "{{F:inter-15}}" color = "#6a6a70" }

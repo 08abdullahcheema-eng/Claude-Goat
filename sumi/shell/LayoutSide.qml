@@ -1,16 +1,17 @@
 import QtQuick
-import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 
 // Side: a floating column on the left edge, like a tide gauge.
-// Top: mark, workspaces, music disc. Middle: the clock. Bottom: CPU curve, controls, battery ring.
+// Top: mark and workspaces. Middle: the clock. Bottom: status icons and the battery ring.
 Scope {
     id: lay
     required property var screenRef
+    property bool preview: false        // a copy drawn above the theme picker
 
     BarWindow {
         screen: lay.screenRef
+        preview: lay.preview
         edge: "left"
 
         Rectangle {
@@ -66,44 +67,6 @@ Scope {
                     }
                     WheelHandler { onWheel: (e) => Hyprland.dispatch(e.angleDelta.y > 0 ? "workspace e-1" : "workspace e+1") }
                 }
-                Line { visible: Media.active }
-                // music: the cover as a disc inside a progress ring, the title running down
-                Item {
-                    visible: Media.active
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: Theme.px(36); height: width
-                    Shape {
-                        anchors.fill: parent
-                        preferredRendererType: Shape.CurveRenderer
-                        ShapePath { strokeColor: Theme.line2; strokeWidth: Theme.px(2); fillColor: "transparent"
-                            PathAngleArc { centerX: Theme.px(18); centerY: Theme.px(18); radiusX: Theme.px(17); radiusY: Theme.px(17); startAngle: 0; sweepAngle: 360 } }
-                        ShapePath { strokeColor: Theme.accent2; strokeWidth: Theme.px(2); fillColor: "transparent"; capStyle: ShapePath.RoundCap
-                            PathAngleArc { centerX: Theme.px(18); centerY: Theme.px(18); radiusX: Theme.px(17); radiusY: Theme.px(17); startAngle: -90; sweepAngle: 360 * Media.progress } }
-                    }
-                    Cover { anchors.centerIn: parent; width: Theme.px(26); height: width; radius: width / 2 }
-                    Icon { anchors.centerIn: parent; name: Media.playing ? "pause" : "play"; size: Theme.px(11); color: "white" }
-                    MouseArea {
-                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                        onClicked: (e) => { if (e.button === Qt.RightButton) Media.next(); else if (e.button === Qt.MiddleButton) Media.previous(); else Media.toggle(); }
-                    }
-                }
-                Item {
-                    visible: Media.active
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: Theme.px(14); height: Math.min(Theme.px(130), title.implicitWidth)
-                    clip: true
-                    Text {
-                        id: title
-                        rotation: 90
-                        transformOrigin: Item.TopLeft
-                        x: Theme.px(13); y: 0
-                        width: parent.height
-                        elide: Text.ElideRight
-                        text: Media.title + (Media.artist ? " · " + Media.artist : "")
-                        color: Theme.dim; font.family: Theme.body; font.pixelSize: Theme.px(10); font.letterSpacing: Theme.px(1.2)
-                    }
-                }
             }
 
             // ---- middle: the clock
@@ -132,28 +95,12 @@ Scope {
             Column {
                 anchors { bottom: parent.bottom; bottomMargin: Theme.px(12); horizontalCenter: parent.horizontalCenter }
                 spacing: Theme.px(4)
-                Item {
-                    id: cpu
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: Theme.px(40); height: Theme.px(34)
-                    CpuCurve { anchors.horizontalCenter: parent.horizontalCenter; width: Theme.px(36); height: Theme.px(16); color: Theme.accent }
-                    Text { anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom } text: Sys.cpu + "%"; color: Theme.dim; font.family: Theme.body; font.pixelSize: Theme.px(9.5) }
-                    MouseArea {
-                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                        onClicked: { Ui.anchorY = cpu.mapToItem(null, 0, cpu.height / 2).y; Ui.toggleAt("system", 1); }
-                    }
-                }
-                Line {}
-                ModFan { anchors.horizontalCenter: parent.horizontalCenter; text: "" }
-                ModAgent { anchors.horizontalCenter: parent.horizontalCenter; text: "" }
-                ModNet { anchors.horizontalCenter: parent.horizontalCenter }
-                ModBt { anchors.horizontalCenter: parent.horizontalCenter; text: "" }
+                ModDnd { anchors.horizontalCenter: parent.horizontalCenter; visible: Ui.dnd }
                 ModVol { anchors.horizontalCenter: parent.horizontalCenter; text: "" }
-                ModMic { anchors.horizontalCenter: parent.horizontalCenter }
-                ModDnd { anchors.horizontalCenter: parent.horizontalCenter }
-                Item { width: 1; height: Theme.px(2) }
-                ModBatRing { anchors.horizontalCenter: parent.horizontalCenter; ringSize: Theme.px(28); pad: 0 }
-                ModPower { anchors.horizontalCenter: parent.horizontalCenter }
+                ModBt { anchors.horizontalCenter: parent.horizontalCenter; text: "" }
+                ModNet { anchors.horizontalCenter: parent.horizontalCenter }
+                Item { width: 1; height: Theme.px(8) }
+                ModBatRing { anchors.horizontalCenter: parent.horizontalCenter; ringSize: Theme.px(26); pad: 0; color: "transparent" }
             }
         }
     }

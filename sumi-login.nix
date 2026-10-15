@@ -18,37 +18,20 @@ let
   fontSrc = pkgs.google-fonts.override { fonts = [ "ShipporiMincho" "SpaceGrotesk" ]; };
   # grub-mkfont only takes FROM-TO pairs, so single characters are written as X-X
   latin = "0x20-0x7E,0xA0-0x17F,0x2013-0x2014,0x2022-0x2022,0x2190-0x2193";
-  kanji = "0x58A8-0x58A8,0x78EF-0x78EF,0x9727-0x9727,0x92FC-0x92FC,0x5CF0-0x5CF0";      # 墨 磯 霧 鋼 峰
-  sumi-grub = pkgs.runCommand "sumi-grub-themes" { nativeBuildInputs = [ pkgs.grub2 pkgs.python3 pkgs.findutils pkgs.librsvg ]; } ''
+  sumi-grub = pkgs.runCommand "sumi-grub-themes" { nativeBuildInputs = [ pkgs.grub2 pkgs.python3 pkgs.findutils ]; } ''
     cp -r ${./sumi/grub} $out; chmod -R u+w $out; mkdir -p $out/fonts
     pick() { f=$(find "$1" -iname "$2" | sort | head -1); [ -n "$f" ] || { echo "font $2 not found in $1" >&2; exit 1; }; echo "$f"; }
     mk() { grub-mkfont -s "$3" -r "$4" -o "$out/fonts/$1.pf2" ''${5:+-n "$5"} "$2"; }
-    shx=$(pick ${fontSrc} 'ShipporiMincho-ExtraBold.ttf')
     shr=$(pick ${fontSrc} 'ShipporiMincho-Regular.ttf')
     gro=$(pick ${fontSrc} 'SpaceGrotesk*.ttf')
     int=$(pick ${pkgs.inter} 'InterVariable.ttf' 2>/dev/null || pick ${pkgs.inter} 'Inter*.tt[fc]')
     jbm=$(pick ${pkgs.nerd-fonts.jetbrains-mono} 'JetBrainsMonoNerdFont-Regular.ttf')
     # sizes for the 1920x1200 the laptop's firmware offers in GRUB
-    mk kanji-90 "$shx" 90 "${kanji}"
-    mk kanji-36 "$shx" 36 "${kanji}"
-    mk shippori-xb-45 "$shx" 45 "${latin}" "Shippori Mincho XB"   # own name, else it clashes with the regular cut
-    mk shippori-45 "$shr" 45 "${latin}"
     mk shippori-32 "$shr" 32 "${latin}"
-    mk grotesk-45 "$gro" 45 "${latin}"
-    mk grotesk-22 "$gro" 22 "${latin}"
-    mk grotesk-20 "$gro" 20 "${latin}"
-    mk grotesk-15 "$gro" 15 "${latin}"
-    mk inter-22 "$int" 22 "${latin}"
-    mk inter-20 "$int" 20 "${latin}"
-    mk inter-15 "$int" 15 "${latin}"
-    mk jbmono-22 "$jbm" 22 "${latin}"
+    mk grotesk-32 "$gro" 32 "${latin}"
+    mk inter-32 "$int" 32 "${latin}"
     mk jbmono-15 "$jbm" 15 "${latin}"
 
-    # the theme's own logo is the icon of the NixOS entries
-    for t in iso kiri hagane summit; do
-      mkdir -p $out/$t/icons
-      rsvg-convert -w 64 -h 64 ${./sumi/shell/assets}/logo-$t.svg -o $out/$t/icons/nixos.png
-    done
     python3 $out/render.py $out
     rm $out/render.py $out/select.cfg
   '';

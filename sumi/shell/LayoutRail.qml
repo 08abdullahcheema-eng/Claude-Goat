@@ -1,48 +1,44 @@
 import QtQuick
 import Quickshell
 
-// Rail: a hairline-thin strip across the top, text only.
+// Hagane: a bare rail across the top with one hairline under it. Text only:
+// the kanji and name, numbered workspaces with an accent underline, time and date in the middle,
+// uppercase labels with values on the right.
 Scope {
     id: lay
     required property var screenRef
+    property bool preview: false        // a copy drawn above the theme picker
 
     BarWindow {
         screen: lay.screenRef
+        preview: lay.preview
         edge: "top"
         Rectangle {
             anchors.fill: parent
-            gradient: Gradient {
-                GradientStop { position: 0; color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.92) }
-                GradientStop { position: 1; color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.55) }
-            }
-            Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: Qt.rgba(Theme.accent2.r, Theme.accent2.g, Theme.accent2.b, 0.22) }
+            color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.82)
+            Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: Qt.rgba(Theme.hi.r, Theme.hi.g, Theme.hi.b, 0.55) }
         }
         Row {
-            anchors { left: parent.left; leftMargin: Theme.px(14); verticalCenter: parent.verticalCenter }
-            spacing: Theme.px(12)
-            Logo { visible: (Theme.p.badge ?? "") !== ""; anchors.verticalCenter: parent.verticalCenter; size: Theme.px(17) }
+            anchors { left: parent.left; leftMargin: Theme.px(16); verticalCenter: parent.verticalCenter }
+            spacing: Theme.px(10)
             Text {
-                visible: (Theme.p.badge ?? "") === ""
-                text: Theme.kanji; color: Theme.accent; font.family: Theme.head; font.pixelSize: Theme.px(14); anchors.verticalCenter: parent.verticalCenter
-                MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: Ui.toggle("launcher") }
+                text: Theme.kanji; color: Theme.accent; font.family: Theme.serif; font.pixelSize: Theme.px(14); anchors.verticalCenter: parent.verticalCenter
+                MouseArea { anchors.fill: parent; anchors.margins: -Theme.px(4); cursorShape: Qt.PointingHandCursor; onClicked: Ui.toggle("launcher") }
             }
-            Text { text: Theme.label.toUpperCase(); color: Theme.fg; font.family: Theme.body; font.pixelSize: Theme.px(10.5); font.letterSpacing: Theme.px(2.2); anchors.verticalCenter: parent.verticalCenter }
+            Text { text: Theme.label.toUpperCase(); color: Theme.hi; font.family: Theme.body; font.pixelSize: Theme.px(10.5); font.weight: Font.DemiBold; font.letterSpacing: Theme.px(1.2); anchors.verticalCenter: parent.verticalCenter }
+            Item { width: Theme.px(30); height: 1 }
             Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
-            Item { width: Theme.px(10); height: 1 }
-            ModMedia {
-                anchors.verticalCenter: parent.verticalCenter
-                implicitHeight: BarStyle.itemH; coverSize: Theme.px(14); coverRadius: Theme.px(2)
-                barW: Theme.px(50); barColor: Theme.hi; maxTitle: Theme.px(150)
-                fontFamily: Theme.body; fontSize: Theme.px(10.5)
-            }
         }
-        ModClock { anchors.centerIn: parent; timeSize: Theme.px(11.5); timeFont: Theme.body }
+        ModClock { anchors.centerIn: parent; timeSize: Theme.px(12); timeFont: Theme.body; activeStyle: "line" }
         Row {
-            anchors { right: parent.right; rightMargin: Theme.px(10); verticalCenter: parent.verticalCenter }
-            spacing: Theme.px(2)
-            ModFan {} ModCpuCurve { curveColor: Theme.hi; curveFill: false; curveWidth: Theme.px(46) } ModAgent {} ModVol {} ModMic {} ModNet {} ModBt {} ModDnd {}
-            KbdLayout { anchors.verticalCenter: parent.verticalCenter }
-            ModBatRing { ringSize: Theme.px(15); showPct: true; labels: false; textColor: Theme.accent } ModPower {}
+            anchors { right: parent.right; rightMargin: Theme.px(12); verticalCenter: parent.verticalCenter }
+            spacing: Theme.px(6)
+            ModDnd { visible: Ui.dnd }
+            ModCpu { text: Sys.cpu + "%"; textColor: Theme.hi }
+            ModMem { label: "mem"; text: Sys.memPct + "%"; textColor: Theme.hi }
+            ModNet { text: Net.kind === "ethernet" ? "eth" : Net.kind === "wifi" ? "wifi" : "off"; textColor: Theme.hi; label: "net" }
+            ModVol { textColor: Theme.hi }
+            ModBat { text: Dev.batPct + "%"; textColor: Theme.hi }
         }
     }
 }

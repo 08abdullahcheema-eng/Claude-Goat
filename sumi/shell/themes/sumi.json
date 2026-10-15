@@ -54,7 +54,9 @@
   "#f2ecd2"
  ],
  "walls": [
-  "wall-sumi-ink.jpg"
+  "wall-sumi-ink.jpg",
+  "wall-sumi-abendrot.jpg",
+  "wall-sumi-mondnacht.jpg"
  ],
  "bezier": [
   "brush, 0.16, 1, 0.3, 1",

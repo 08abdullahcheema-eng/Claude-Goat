@@ -1,62 +1,70 @@
 import QtQuick
 import Quickshell
 
-// Islands: three floating bubbles along the top (workspaces and stats, clock, controls).
+// Sumi: one floating strip of dark glass along the top. Seal and kanji workspaces on the left,
+// time and date in the middle, the few status icons and a battery ring on the right.
+// It shows no window titles or music, the desktop stays quiet.
 Scope {
     id: lay
     required property var screenRef
-
-    component Island: Rectangle {
-        default property alias content: row.data
-        property real padX: Theme.px(7)
-        height: Theme.barH
-        width: row.implicitWidth + padX * 2
-        radius: Theme.px(11)
-        color: Theme.barBg
-        border.width: 1
-        border.color: Theme.line
-        Row { id: row; anchors.centerIn: parent; spacing: Theme.px(3) }
-    }
+    property bool preview: false        // a copy drawn above the theme picker
 
     BarWindow {
         screen: lay.screenRef
+        preview: lay.preview
         edge: "top"
-        Island {
-            x: Theme.px(10); y: Theme.barM
-            Logo { anchors.verticalCenter: parent.verticalCenter; size: Theme.px(24) }
-            Sep { anchors.verticalCenter: parent.verticalCenter }
-            Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
-            Sep { anchors.verticalCenter: parent.verticalCenter }
-            ModFan { anchors.verticalCenter: parent.verticalCenter }
-            ModCpuCurve { anchors.verticalCenter: parent.verticalCenter; curveColor: Theme.gold }
-            ModAgent { anchors.verticalCenter: parent.verticalCenter }
-        }
-        Island {
-            id: mid
-            x: (parent.width - width) / 2; y: Theme.barM; padX: Theme.px(4)
-            ModClock { anchors.verticalCenter: parent.verticalCenter; showKanji: Theme.wsKanji; timeFont: Theme.head; timeSize: Theme.px(15) }
-        }
-        // ink: a short brush stroke of the accent under the clock
         Rectangle {
-            visible: (Theme.p.barFx ?? "") === "ink"
-            x: mid.x + mid.width / 2 - width / 2; y: mid.y + mid.height - height - Theme.px(3)
-            width: mid.width * 0.5; height: Theme.px(2.5); radius: height / 2
-            gradient: Gradient { orientation: Gradient.Horizontal
-                GradientStop { position: 0; color: "transparent" } GradientStop { position: 0.5; color: Theme.accent } GradientStop { position: 1; color: "transparent" } }
-        }
-        Island {
-            x: parent.width - width - Theme.px(10); y: Theme.barM
-            ModMedia { anchors.verticalCenter: parent.verticalCenter; maxTitle: Theme.px(130); barW: Theme.px(46) }
-            Sep { anchors.verticalCenter: parent.verticalCenter; visible: Media.active }
-            ModNet { anchors.verticalCenter: parent.verticalCenter }
-            ModBt { anchors.verticalCenter: parent.verticalCenter }
-            ModVol { anchors.verticalCenter: parent.verticalCenter }
-            ModMic { anchors.verticalCenter: parent.verticalCenter }
-            ModDnd { anchors.verticalCenter: parent.verticalCenter }
-            Sep { anchors.verticalCenter: parent.verticalCenter }
-            KbdLayout { anchors.verticalCenter: parent.verticalCenter }
-            ModBatRing { anchors.verticalCenter: parent.verticalCenter; showPct: true; ringSize: Theme.px(17) }
-            ModPower { anchors.verticalCenter: parent.verticalCenter }
+            id: strip
+            x: Theme.px(10); y: Theme.barM
+            width: parent.width - Theme.px(20); height: Theme.barH
+            radius: Theme.px(10)
+            color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.72)
+            border.width: 1
+            border.color: Qt.rgba(Theme.hi.r, Theme.hi.g, Theme.hi.b, 0.07)
+            // light along the upper edge of the glass
+            Rectangle {
+                anchors { left: parent.left; right: parent.right; top: parent.top; leftMargin: parent.radius; rightMargin: parent.radius; topMargin: 1 }
+                height: 1
+                gradient: Gradient { orientation: Gradient.Horizontal
+                    GradientStop { position: 0; color: "transparent" }
+                    GradientStop { position: 0.5; color: Qt.rgba(Theme.hi.r, Theme.hi.g, Theme.hi.b, 0.12) }
+                    GradientStop { position: 1; color: "transparent" } }
+            }
+
+            Row {
+                anchors { left: parent.left; leftMargin: Theme.px(6); verticalCenter: parent.verticalCenter }
+                spacing: Theme.px(8)
+                Logo { anchors.verticalCenter: parent.verticalCenter; size: Theme.px(24) }
+                Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
+            }
+
+            ModClock {
+                id: clock
+                anchors.centerIn: parent
+                showKanji: false
+                timeFont: Theme.head; timeSize: Theme.px(15)
+                activeStyle: "none"
+            }
+            // ink: a short brush stroke of the accent under the clock
+            Rectangle {
+                visible: (Theme.p.barFx ?? "") === "ink"
+                anchors { horizontalCenter: clock.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(3) }
+                width: clock.width * 0.45; height: Theme.px(2); radius: height / 2
+                opacity: Ui.panel === "calendar" ? 1 : 0.55
+                Behavior on opacity { NumberAnimation { duration: Theme.mMed } }
+                gradient: Gradient { orientation: Gradient.Horizontal
+                    GradientStop { position: 0; color: "transparent" } GradientStop { position: 0.5; color: Theme.accent } GradientStop { position: 1; color: "transparent" } }
+            }
+
+            Row {
+                anchors { right: parent.right; rightMargin: Theme.px(4); verticalCenter: parent.verticalCenter }
+                spacing: 0
+                ModDnd { anchors.verticalCenter: parent.verticalCenter; visible: Ui.dnd }
+                ModNet { anchors.verticalCenter: parent.verticalCenter; text: "" }
+                ModBt { anchors.verticalCenter: parent.verticalCenter; text: "" }
+                ModVol { anchors.verticalCenter: parent.verticalCenter; text: "" }
+                ModBatRing { anchors.verticalCenter: parent.verticalCenter; showPct: true; ringSize: Theme.px(17); rowDirection: Qt.RightToLeft }
+            }
         }
     }
 }

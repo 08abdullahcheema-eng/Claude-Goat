@@ -60,6 +60,7 @@ Singleton {
     readonly property var layouts: ["islands", "capsule", "rail", "side", "ridge", "notch", "pill", "bottom", "corners"]
     property string userLayout: ""
     property string previewLayout: ""          // set by the theme picker while browsing
+    property string pickLayout: ""             // bar layout drawn above the theme picker ("" = none)
     readonly property string envLayout: Quickshell.env("SUMI_LAYOUT") ?? ""
     readonly property string layout: {
         for (const c of [previewLayout, envLayout, userLayout, saved.layout ?? ""])

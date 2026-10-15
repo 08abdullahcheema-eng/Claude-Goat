@@ -1,29 +1,20 @@
-# Summit: a dark glass panel on the left with stars and contour lines, the menu inside it
+# Summit: mark and title live in the background picture (drawn for exactly 1920x1200),
+# GRUB only draws the entries, the chosen one on soft Summit glass. No countdown.
 title-text: ""
 desktop-image: "{{DIR}}background.jpg"
 desktop-color: "#0a1020"
-terminal-font: "{{F:grotesk-15}}"
+terminal-font: "{{F:jbmono-15}}"
 terminal-left: "0"
 terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
-+ label { left = 4% top = 7% width = 25% height = 45 text = "峰" font = "{{F:kanji-36}}" color = "#9fc4ff" }
-+ label { left = 4% top = 12% width = 25% height = 30 text = "S U M M I T" font = "{{F:grotesk-20}}" color = "#9fc4ff" }
-+ label { left = 4% top = 26% width = 25% height = 60 text = "larp" font = "{{F:grotesk-45}}" color = "#f4f8ff" }
 + boot_menu {
-  left = 3% top = 36% width = 27% height = 36%
-  item_font = "{{F:grotesk-20}}" item_color = "#c4d0e6"
-  selected_item_font = "{{F:grotesk-20}}" selected_item_color = "#f4f8ff"
-  item_height = 45 item_padding = 16 item_spacing = 6
-  icon_width = 30 icon_height = 30 item_icon_space = 16
+  left = 180 top = 444 width = 600 height = 560
+  item_font = "{{F:grotesk-32}}" item_color = "#b1bfd9"
+  selected_item_font = "{{F:grotesk-32}}" selected_item_color = "#f4f8ff"
+  item_height = 40 item_padding = 20 item_spacing = 52
+  icon_width = 0 icon_height = 0 item_icon_space = 0
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
-+ circular_progress {
-  id = "__timeout__"
-  left = 4% top = 76% width = 54 height = 54
-  num_ticks = 24 ticks_disappear = true start_angle = -64
-  center_bitmap = "{{DIR}}ring.png" tick_bitmap = "{{DIR}}tick.png"
-}
-+ label { left = 4%+75 top = 78% width = 27% height = 22 text = "Enter startet  ·  e bearbeitet" font = "{{F:grotesk-15}}" color = "#5d6e90" }

@@ -8,15 +8,19 @@ PanelWindow {
     id: win
     property string edge: "top"
     property int reserve: Theme.barReserve
+    property bool preview: false        // copy above the theme picker: no space, no input
     anchors { left: true; right: edge !== "left"; top: edge !== "bottom"; bottom: edge !== "top" }
     implicitHeight: edge === "left" ? 0 : reserve
     implicitWidth: edge === "left" ? reserve : 0
-    exclusiveZone: reserve
+    // Auto reserves the window's own height (or width on the left edge), which is the reserve
+    exclusionMode: preview ? ExclusionMode.Ignore : ExclusionMode.Auto
+    mask: preview ? emptyRegion : null
+    Region { id: emptyRegion }
     color: "transparent"
     WlrLayershell.namespace: "sumi-bar"
-    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.layer: preview ? WlrLayer.Overlay : WlrLayer.Top
 
-    Component.onCompleted: Ui.barWindows = Ui.barWindows.concat([win])
+    Component.onCompleted: if (!preview) Ui.barWindows = Ui.barWindows.concat([win])
     Component.onDestruction: Ui.barWindows = Ui.barWindows.filter(w => w !== win)
 
     MouseArea { anchors.fill: parent; z: -1; onClicked: Ui.close() }

@@ -7,9 +7,11 @@ import QtQuick.Effects
 Scope {
     id: lay
     required property var screenRef
+    property bool preview: false        // a copy drawn above the theme picker
 
     BarWindow {
         screen: lay.screenRef
+        preview: lay.preview
         edge: "bottom"
         // electric: a violet glow around the capsule
         MultiEffect {

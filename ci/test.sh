@@ -135,14 +135,21 @@ run_qs probe2 SUMI_DEMO=1
 run_qs bar SUMI_DEMO=1
 run_qs launcher SUMI_DEMO=1 SUMI_OPEN=launcher SUMI_DEMO_QUERY=
 run_qs launcher-q SUMI_DEMO=1 SUMI_OPEN=launcher SUMI_DEMO_QUERY=s
+run_qs launcher-clip SUMI_DEMO=1 SUMI_OPEN=launcher SUMI_LAUNCHER=clip
+run_qs launcher-emoji SUMI_DEMO=1 SUMI_OPEN=launcher SUMI_LAUNCHER=emoji
+run_qs launcher-emoji-q SUMI_DEMO=1 SUMI_OPEN=launcher SUMI_LAUNCHER=emoji SUMI_DEMO_QUERY=heart
 run_qs network SUMI_DEMO=1 SUMI_OPEN=network
 run_qs agents SUMI_DEMO=1 SUMI_OPEN=agents
 run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
+WAIT=4 run_qs themes-pick-iso SUMI_DEMO=1 SUMI_OPEN=themes SUMI_PICK=iso
+WAIT=4 run_qs themes-pick-hagane SUMI_DEMO=1 SUMI_OPEN=themes SUMI_PICK=hagane
 for t in iso kiri hagane summit sumi; do
   sumi-theme $t >/dev/null 2>&1
   WAIT=4 run_qs themes-$t SUMI_DEMO=1 SUMI_OPEN=themes
   WAIT=4 run_qs bar-$t SUMI_DEMO=1
+  WAIT=7 run_qs saver-$t SUMI_DEMO=1 SUMI_DEMO_SAVER=1
+  $GRIM -s 0.5 $OUT/saver-$t-b.png
   # apps follow the theme: Dolphin (Qt/KDE) and pavucontrol (GTK) side by side
   (timeout 14 env QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME=kde QT_STYLE_OVERRIDE=breeze QT_PLUGIN_PATH=$HM/home-path/lib/qt-6/plugins $DOLPHIN/bin/dolphin --new-window $HOME > $OUT/dolphin-$t.log 2>&1 &)
   (timeout 14 env GDK_BACKEND=wayland pavucontrol > $OUT/pavu-$t.log 2>&1 &)
