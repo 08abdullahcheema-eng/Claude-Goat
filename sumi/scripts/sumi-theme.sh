@@ -116,7 +116,14 @@ mv "$CONF/gtk.css.tmp" "$CONF/gtk.css"
 
 # ---- apps: KDE colour scheme in kdeglobals (Dolphin, Kate, Okular and every other Qt/KDE app) ----
 # only the colour sections are replaced, everything else in kdeglobals stays as it is
-rgb() { h=$(get "$1" | tr -d '#'); printf '%d,%d,%d' "0x${h:0:2}" "0x${h:2:2}" "0x${h:4:2}"; }
+rgb() {
+  case "$1" in selbg) echo "$selbg"; return ;; esac
+  h=$(get "$1" | tr -d '#'); printf '%d,%d,%d' "0x${h:0:2}" "0x${h:2:2}" "0x${h:4:2}"
+}
+# selection: the accent sunk into the background, so light text stays readable on every accent,
+# whether the window is focused or not
+selbg=$(awk -v a="$(rgb accent)" -v b="$(rgb bg1)" 'BEGIN { split(a, x, ","); split(b, y, ","); t = 0.42
+  printf "%d,%d,%d", y[1] + (x[1] - y[1]) * t, y[2] + (x[2] - y[2]) * t, y[3] + (x[3] - y[3]) * t }')
 kgroup() {   # section, normal background, alternate background, normal text [, all text]
   local all="${5:-}"
   cat <<EOK
@@ -147,7 +154,7 @@ kg="$HOME/.config/kdeglobals"
   kgroup View bg bg1 fg
   kgroup Window bg1 bg2 fg
   kgroup Button bg2 line fg
-  kgroup Selection accent accent onAccent onAccent   # text on the accent stays readable in every state
+  kgroup Selection selbg selbg hi hi
   kgroup Tooltip bg2 bg1 fg
   kgroup Complementary bg bg1 fg
   kgroup Header bg1 bg fg
