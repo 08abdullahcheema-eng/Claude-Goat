@@ -37,11 +37,17 @@ if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.conf
   # then start an entry. Variants show which part raises "scale to a size w/ a zero dimension".
   GE=$(B grub2_efi); OVMF=$(nix build --no-link --print-out-paths ./ci#ovmf 2>>$OUT/build.log | head -1); DJ=$(B dejavu_fonts)
   ls $OVMF $OVMF/FV >> $OUT/grub-qemu.log 2>&1
-  for v in sumi kiri sumi-nosplash sumi-text kiri-nosplash; do
+  for v in kiri-stalezero kiri-stale sumi-stale kiri; do
     rm -rf /tmp/giso; mkdir -p /tmp/giso/boot/grub; cp -rL $SG /tmp/giso/boot/grub/theme; chmod -R u+w /tmp/giso
     $GE/bin/grub-mkfont -o /tmp/giso/boot/grub/converted-font.pf2 $(find $DJ -name DejaVuSansMono.ttf | head -1) >> $OUT/grub-iso.log 2>&1
     cp $SG/sumi/background.jpg /tmp/giso/boot/grub/background.jpeg
     t=${v%%-*}
+    # icons an older theme left in /boot/theme (GRUB's theme copy keeps old files)
+    case $v in *stale*)
+      for th in sumi iso kiri hagane summit; do mkdir -p /tmp/giso/boot/grub/theme/$th/icons
+        cp ci/grub-old-icons/*.png /tmp/giso/boot/grub/theme/$th/icons/; done ;; esac
+    # the theme as it was before the fix: icons 0 px
+    case $v in *stalezero) sed -i 's/icon_width = 1 icon_height = 1/icon_width = 0 icon_height = 0/' /tmp/giso/boot/grub/theme/*/theme.txt ;; esac
     {
       echo 'insmod efi_gop'; echo 'insmod efi_uga'; echo 'insmod font'
       echo 'if loadfont /boot/grub/converted-font.pf2; then'

@@ -9,12 +9,14 @@ terminal-top: "0"
 terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
+# icons: 1 px and see-through. GRUB keeps old files in /boot/theme, and an icon left over from an
+# earlier theme scaled to 0 px stops every boot with "requested to scale to a size w/ a zero dimension".
 + boot_menu {
   left = 180 top = 444 width = 600 height = 560
   item_font = "{{F:shippori-32}}" item_color = "#b0aa96"
   selected_item_font = "{{F:shippori-32}}" selected_item_color = "#f2ecd2"
   item_height = 40 item_padding = 20 item_spacing = 52
-  icon_width = 0 icon_height = 0 item_icon_space = 0
+  icon_width = 1 icon_height = 1 item_icon_space = 0
   selected_item_pixmap_style = "{{DIR}}select_*.png"
   scrollbar = false
 }
