@@ -117,14 +117,15 @@ mv "$CONF/gtk.css.tmp" "$CONF/gtk.css"
 # ---- apps: KDE colour scheme in kdeglobals (Dolphin, Kate, Okular and every other Qt/KDE app) ----
 # only the colour sections are replaced, everything else in kdeglobals stays as it is
 rgb() { h=$(get "$1" | tr -d '#'); printf '%d,%d,%d' "0x${h:0:2}" "0x${h:2:2}" "0x${h:4:2}"; }
-kgroup() {   # section, normal background, alternate background, normal text
+kgroup() {   # section, normal background, alternate background, normal text [, all text]
+  local all="${5:-}"
   cat <<EOK
 [Colors:$1]
 BackgroundNormal=$(rgb "$2")
 BackgroundAlternate=$(rgb "$3")
 ForegroundNormal=$(rgb "$4")
-ForegroundInactive=$(rgb dim)
-ForegroundActive=$(rgb hi)
+ForegroundInactive=$(rgb "${all:-dim}")
+ForegroundActive=$(rgb "${all:-hi}")
 ForegroundLink=$(rgb blue)
 ForegroundVisited=$(rgb violet)
 ForegroundNegative=$(rgb error)
@@ -146,7 +147,7 @@ kg="$HOME/.config/kdeglobals"
   kgroup View bg bg1 fg
   kgroup Window bg1 bg2 fg
   kgroup Button bg2 line fg
-  kgroup Selection accent accent onAccent
+  kgroup Selection accent accent onAccent onAccent   # text on the accent stays readable in every state
   kgroup Tooltip bg2 bg1 fg
   kgroup Complementary bg bg1 fg
   kgroup Header bg1 bg fg

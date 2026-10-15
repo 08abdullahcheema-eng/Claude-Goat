@@ -82,6 +82,8 @@ in
     theme = { name = "adw-gtk3-dark"; package = pkgs.adw-gtk3; };
     iconTheme = { name = "Papirus-Dark"; package = pkgs.papirus-icon-theme; };
     gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
+    # home-manager leaves the theme out of GTK 4's settings.ini, plain GTK 4 apps (pavucontrol...) need it
+    gtk4.extraConfig = { gtk-application-prefer-dark-theme = 1; gtk-theme-name = "adw-gtk3-dark"; };
     gtk3.extraCss = ''@import url("file://${config.xdg.configHome}/sumi/gtk.css");'';
     gtk4.extraCss = ''@import url("file://${config.xdg.configHome}/sumi/gtk.css");'';
   };
