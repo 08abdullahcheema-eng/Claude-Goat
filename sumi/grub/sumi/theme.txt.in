@@ -10,7 +10,7 @@ terminal-width: "100%"
 terminal-height: "100%"
 terminal-border: "0"
 + boot_menu {
-  left = 212 top = 476 width = 536 height = 560
+  left = 180 top = 444 width = 600 height = 560
   item_font = "{{F:shippori-32}}" item_color = "#b0aa96"
   selected_item_font = "{{F:shippori-32}}" selected_item_color = "#f2ecd2"
   item_height = 40 item_padding = 20 item_spacing = 52
