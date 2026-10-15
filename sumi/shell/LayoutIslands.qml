@@ -34,7 +34,15 @@ Scope {
             Row {
                 anchors { left: parent.left; leftMargin: Theme.px(6); verticalCenter: parent.verticalCenter }
                 spacing: Theme.px(8)
-                Logo { anchors.verticalCenter: parent.verticalCenter; size: Theme.px(24) }
+                // the theme's seal (Sumi: the red hanko), opens the launcher
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Theme.px(24); height: width
+                    source: Quickshell.shellPath("assets/lock/avatar-" + Theme.name + ".png")
+                    sourceSize: Qt.size(width * 2, height * 2)
+                    smooth: true; mipmap: true
+                    MouseArea { anchors.fill: parent; anchors.margins: -Theme.px(4); cursorShape: Qt.PointingHandCursor; onClicked: Ui.toggle("launcher") }
+                }
                 Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
             }
 
@@ -43,6 +51,7 @@ Scope {
                 anchors.centerIn: parent
                 showKanji: false
                 timeFont: Theme.head; timeSize: Theme.px(15)
+                fontFamily: "Inter"; fontSize: Theme.px(12.5)
                 activeStyle: "none"
             }
             // ink: a short brush stroke of the accent under the clock

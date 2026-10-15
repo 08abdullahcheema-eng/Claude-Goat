@@ -7,7 +7,7 @@ import Quickshell.Wayland
 PanelWindow {
     id: win
     property string edge: "top"
-    property int reserve: Theme.barReserve
+    property int reserve: preview ? Theme.reserveOf(Theme.pickLayout) : Theme.barReserve
     property bool preview: false        // copy above the theme picker: no space, no input
     anchors { left: true; right: edge !== "left"; top: edge !== "bottom"; bottom: edge !== "top" }
     implicitHeight: edge === "left" ? 0 : reserve

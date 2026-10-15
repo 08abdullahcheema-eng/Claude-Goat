@@ -4,7 +4,7 @@ import Quickshell
 
 // How bar items look in the active layout. Every Pill reads its defaults from here.
 Singleton {
-    readonly property string l: Theme.layout
+    readonly property string l: Theme.pickLayout !== "" ? Theme.pickLayout : Theme.layout   // the picker previews a layout
     readonly property bool labels: l === "rail" || l === "corners" || l === "bottom"
     readonly property bool caps: labels || l === "ridge"
     readonly property string fontFamily: l === "bottom" ? Theme.head : Theme.body
