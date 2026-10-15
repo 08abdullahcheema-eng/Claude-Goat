@@ -55,7 +55,8 @@
         linuwu-default = pkgs.linuxPackages.callPackage ../predator/linuwu-sense.nix { };
         linuwu-latest = pkgs.linuxPackages_latest.callPackage ../predator/linuwu-sense.nix { };
         kernel-default = pkgs.linuxPackages.kernel;
-        inherit (pkgs) quickshell sway grim hyprlock mesa libglvnd jq papirus-icon-theme kitty pavucontrol btop libnotify dbus hyprland grub2 xorriso mtools qemu socat imagemagick;
+        inherit (pkgs) quickshell sway grim hyprlock mesa libglvnd jq papirus-icon-theme kitty pavucontrol btop libnotify dbus hyprland grub2 grub2_efi xorriso mtools qemu socat imagemagick dejavu_fonts;
+        ovmf = pkgs.OVMF.fd;
         fonts = pkgs.symlinkJoin { name = "fonts"; paths = [ pkgs.nerd-fonts.jetbrains-mono pkgs.noto-fonts-cjk-serif pkgs.inter ]; };
         sddm = pkgs.kdePackages.sddm;
         dolphin = pkgs.kdePackages.dolphin;
