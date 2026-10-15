@@ -1,0 +1,22 @@
+# Tsuki: mark, title and help line live in the background picture (drawn for exactly 1920x1200),
+# GRUB draws the entries and the picture behind the chosen one. No countdown.
+title-text: ""
+desktop-image: "{{DIR}}background.jpg"
+desktop-color: "#0c0c0d"
+terminal-font: "{{F:jbmono-15}}"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
+# icons: 1 px and see-through. GRUB keeps old files in /boot/theme, and an icon left over from an
+# earlier theme scaled to 0 px stops every boot with "requested to scale to a size w/ a zero dimension".
++ boot_menu {
+  left = 200 top = 436 width = 600 height = 520
+  item_font = "{{F:shippori-30}}" item_color = "#bfb9ae"
+  selected_item_font = "{{F:shippori-30}}" selected_item_color = "#fffaf0"
+  item_height = 40 item_padding = 20 item_spacing = 44
+  icon_width = 1 icon_height = 1 item_icon_space = 0
+  selected_item_pixmap_style = "{{DIR}}select_*.png"
+  scrollbar = false
+}

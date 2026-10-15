@@ -1,0 +1,22 @@
+# Kōyō: mark, title and help line live in the background picture (drawn for exactly 1920x1200),
+# GRUB draws the entries and the picture behind the chosen one. No countdown.
+title-text: ""
+desktop-image: "{{DIR}}background.jpg"
+desktop-color: "#120d0a"
+terminal-font: "{{F:jbmono-15}}"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
+# icons: 1 px and see-through. GRUB keeps old files in /boot/theme, and an icon left over from an
+# earlier theme scaled to 0 px stops every boot with "requested to scale to a size w/ a zero dimension".
++ boot_menu {
+  left = 216 top = 396 width = 600 height = 520
+  item_font = "{{F:shippori-30}}" item_color = "#c7b7a6"
+  selected_item_font = "{{F:shippori-30}}" selected_item_color = "#fff3e4"
+  item_height = 40 item_padding = 20 item_spacing = 44
+  icon_width = 1 icon_height = 1 item_icon_space = 0
+  selected_item_pixmap_style = "{{DIR}}select_*.png"
+  scrollbar = false
+}

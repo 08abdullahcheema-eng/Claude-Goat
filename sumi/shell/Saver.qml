@@ -86,8 +86,11 @@ Variants {
                 }
 
                 // particles in the theme's character
+                // yoru: rain streaks falling through neon light   koyo: maple leaves drifting down
+                // hotaru: fireflies wandering and pulsing           shinkai: marine snow rising slowly
+                // tsuki: stars twinkling out of step
                 Repeater {
-                    model: win.style === "summit" ? 90 : win.style === "kiri" ? 9 : 42
+                    model: win.style === "tsuki" ? 90 : win.style === "yoru" ? 70 : win.style === "hotaru" ? 36 : 42
                     delegate: Item {
                         id: pt
                         required property int index
@@ -95,59 +98,75 @@ Variants {
                         function rnd(k) { const v = Math.sin((pt.index + 1) * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); }
                         readonly property real x0: rnd(1) * fade.width
                         readonly property real y0: rnd(2) * fade.height
-                        readonly property real sz: win.style === "kiri" ? Theme.px(220 + 260 * rnd(3))
-                                                  : win.style === "summit" ? Theme.px(1 + 2 * rnd(3))
-                                                  : win.style === "hagane" ? Theme.px(1.4)
+                        readonly property real sz: win.style === "tsuki" ? Theme.px(1 + 2 * rnd(3))
+                                                  : win.style === "koyo" ? Theme.px(7 + 7 * rnd(3))
+                                                  : win.style === "hotaru" ? Theme.px(3 + 3 * rnd(3))
                                                   : Theme.px(1.5 + 3 * rnd(3))
-                        readonly property int life: win.style === "kiri" ? 40000 + 30000 * rnd(4)
-                                                  : win.style === "hagane" ? 1800 + 1800 * rnd(4)
-                                                  : win.style === "summit" ? 2400 + 4000 * rnd(4)
-                                                  : 9000 + 9000 * rnd(4)
+                        readonly property int life: win.style === "yoru" ? 900 + 900 * rnd(4)
+                                                  : win.style === "koyo" ? 12000 + 9000 * rnd(4)
+                                                  : win.style === "hotaru" ? 14000 + 12000 * rnd(4)
+                                                  : win.style === "tsuki" ? 2400 + 4000 * rnd(4)
+                                                  : 16000 + 12000 * rnd(4)
                         property real t: rnd(5)
                         NumberAnimation on t { running: Ui.saver; loops: Animation.Infinite; from: 0; to: 1; duration: pt.life }
 
                         x: {
                             switch (win.style) {
-                            case "kiri": return (x0 + t * fade.width * 0.6) % (fade.width + sz) - sz;
-                            case "hagane": return x0 + t * Theme.px(140);
-                            case "iso": return x0 + Math.sin(t * Math.PI * 4 + rnd(6) * 6) * Theme.px(26);
-                            case "summit": return x0;
+                            case "yoru": return x0 - t * Theme.px(60);
+                            case "koyo": return x0 + Math.sin(t * Math.PI * 3 + rnd(6) * 6) * Theme.px(60) + t * Theme.px(80);
+                            case "hotaru": return x0 + Math.sin(t * Math.PI * 2 * (1 + rnd(8)) + rnd(6) * 6) * Theme.px(120);
+                            case "tsuki": return x0;
                             }
                             return x0 + Math.sin(t * Math.PI * 2 + rnd(6) * 6) * Theme.px(18);
                         }
                         y: {
                             switch (win.style) {
-                            case "kiri": return y0 * 0.8;
-                            case "hagane": return (y0 + t * fade.height * 0.55) % fade.height;
-                            case "summit": return y0 * 0.85;
+                            case "yoru": return (y0 + t * fade.height) % fade.height;
+                            case "koyo": return (y0 + t * fade.height * 0.9) % (fade.height + Theme.px(40)) - Theme.px(20);
+                            case "hotaru": return fade.height * 0.35 + y0 * 0.6 + Math.cos(t * Math.PI * 2 * (1 + rnd(9)) + rnd(7) * 6) * Theme.px(60);
+                            case "tsuki": return y0 * 0.85;
                             }
                             return fade.height - ((fade.height - y0) + t * fade.height * 0.7) % fade.height;     // rising
                         }
                         opacity: {
                             switch (win.style) {
-                            case "kiri": return 0.05 + 0.04 * Math.sin(t * Math.PI);
-                            case "summit": return 0.25 + 0.6 * Math.abs(Math.sin(t * Math.PI));
-                            case "hagane": return 0.9 * (1 - t);
+                            case "yoru": return 0.25 + 0.35 * rnd(7);
+                            case "koyo": return 0.55 + 0.35 * rnd(7);
+                            case "hotaru": return Math.max(0, Math.sin(t * Math.PI * 6 + rnd(7) * 6)) * (0.6 + 0.4 * rnd(8));
+                            case "tsuki": return 0.25 + 0.6 * Math.abs(Math.sin(t * Math.PI));
                             }
                             return Math.sin(t * Math.PI) * (0.4 + 0.5 * rnd(7));
                         }
 
+                        // dots: marine snow, stars, fireflies (with a soft glow)
                         Rectangle {
-                            visible: win.style !== "hagane"
+                            visible: win.style === "shinkai" || win.style === "tsuki" || win.style === "hotaru"
                             width: pt.sz; height: pt.sz; radius: width / 2
-                            color: win.style === "summit" ? Theme.hi : win.style === "kiri" ? Theme.fg : (pt.index % 3 === 0 ? Theme.accent2 : Theme.accent)
-                            layer.enabled: win.style === "kiri"
-                            layer.effect: MultiEffect { blurEnabled: true; blur: 1; blurMax: 64 }
+                            color: win.style === "tsuki" ? Theme.hi : win.style === "hotaru" ? Qt.lighter(Theme.accent, 1.25) : (pt.index % 3 === 0 ? Theme.accent2 : Theme.accent)
                         }
-                        // hagane: short slanted spark streaks
                         Rectangle {
-                            visible: win.style === "hagane"
-                            width: Theme.px(1.2); height: Theme.px(10 + 14 * pt.rnd(8))
-                            rotation: -14
+                            visible: win.style === "hotaru"
+                            x: -pt.sz * 2.5; y: -pt.sz * 2.5
+                            width: pt.sz * 6; height: width; radius: width / 2
+                            color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22)
+                        }
+                        // yoru: rain streaks, some catching the neon
+                        Rectangle {
+                            visible: win.style === "yoru"
+                            width: Theme.px(1.2); height: Theme.px(18 + 22 * pt.rnd(8))
+                            rotation: 8
                             gradient: Gradient {
                                 GradientStop { position: 0; color: "transparent" }
-                                GradientStop { position: 1; color: pt.index % 4 === 0 ? Theme.hi : Theme.accent }
+                                GradientStop { position: 1; color: pt.index % 5 === 0 ? Theme.accent : pt.index % 7 === 0 ? Theme.accent2 : Qt.rgba(0.85, 0.88, 1, 0.8) }
                             }
+                        }
+                        // koyo: a small five-pointed maple leaf, turning as it falls
+                        Text {
+                            visible: win.style === "koyo"
+                            text: "✦"
+                            rotation: pt.t * 720 * (pt.rnd(9) > 0.5 ? 1 : -1)
+                            color: pt.index % 3 === 0 ? Theme.accent2 : Theme.accent
+                            font.pixelSize: pt.sz * 2
                         }
                     }
                 }

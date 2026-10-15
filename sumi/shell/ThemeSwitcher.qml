@@ -19,7 +19,7 @@ Item {
     property var wv: ({})              // theme name -> wallpaper index
     property var lv: ({})              // theme name -> chosen bar layout
     readonly property var layoutNames: ({ islands: "Glasleiste", capsule: "Glas-Kapsel", rail: "Haarlinie", side: "Seitenleiste", ridge: "Grat", notch: "Notch", pill: "Pille", bottom: "Leiste unten", corners: "Ecken" })
-    readonly property var blurbs: ({ sumi: "Tusche, rote Sonne", iso: "Küste, Gischt", kiri: "Nebel, Milchglas", hagane: "Stahl, Haarlinien", summit: "Grat, Nachthimmel" })
+    readonly property var blurbs: ({ yoru: "Neon-Tokio im Regen", koyo: "Ahorn im Herbst", hotaru: "Glühwürmchen im Wald", shinkai: "Leuchten der Tiefsee", tsuki: "Mondlicht über dem Meer" })
     function layoutOf(t) {
         if (!t) return "islands";
         const c = lv[t.name];
@@ -38,7 +38,7 @@ Item {
     readonly property int n: themes.length
     readonly property var cur: themes[sel] || Theme.p
 
-    function wallsOf(t) { return (t && t.walls && t.walls.length) ? t.walls : ["wall-" + (t ? t.name : "sumi") + ".jpg"]; }
+    function wallsOf(t) { return (t && t.walls && t.walls.length) ? t.walls : ["wall-" + (t ? t.name : "yoru") + ".jpg"]; }
     function wallIndex(t) { return ((wv[t.name] ?? 0) % wallsOf(t).length + wallsOf(t).length) % wallsOf(t).length; }
     function wallFile(t) { return wallsOf(t)[wallIndex(t)]; }
     function focusFirst() { root.forceActiveFocus(); }
@@ -97,7 +97,7 @@ Item {
 
     Process {
         running: true
-        command: ["sh", "-c", "for f in sumi iso kiri hagane summit; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
+        command: ["sh", "-c", "for f in yoru koyo hotaru shinkai tsuki; do [ -f \"$1/$f.json\" ] || continue; cat \"$1/$f.json\"; printf '\\036'; done; printf 'WALL:'; cat \"$HOME/.config/sumi/wall\" 2>/dev/null", "sh", Theme.themeDir]
         stdout: StdioCollector {
             onStreamFinished: {
                 const parts = this.text.split("WALL:");

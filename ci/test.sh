@@ -37,14 +37,14 @@ if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.conf
   # then start an entry. Variants show which part raises "scale to a size w/ a zero dimension".
   GE=$(B grub2_efi); OVMF=$(nix build --no-link --print-out-paths ./ci#ovmf 2>>$OUT/build.log | head -1); DJ=$(B dejavu_fonts)
   ls $OVMF $OVMF/FV >> $OUT/grub-qemu.log 2>&1
-  for v in kiri-stalezero kiri-stale sumi-stale kiri; do
+  for v in hotaru-stalezero yoru-stale shinkai tsuki; do
     rm -rf /tmp/giso; mkdir -p /tmp/giso/boot/grub; cp -rL $SG /tmp/giso/boot/grub/theme; chmod -R u+w /tmp/giso
     $GE/bin/grub-mkfont -o /tmp/giso/boot/grub/converted-font.pf2 $(find $DJ -name DejaVuSansMono.ttf | head -1) >> $OUT/grub-iso.log 2>&1
     cp $SG/sumi/background.jpg /tmp/giso/boot/grub/background.jpeg
     t=${v%%-*}
     # icons an older theme left in /boot/theme (GRUB's theme copy keeps old files)
     case $v in *stale*)
-      for th in sumi iso kiri hagane summit; do mkdir -p /tmp/giso/boot/grub/theme/$th/icons
+      for th in yoru koyo hotaru shinkai tsuki; do mkdir -p /tmp/giso/boot/grub/theme/$th/icons
         cp ci/grub-old-icons/*.png /tmp/giso/boot/grub/theme/$th/icons/; done ;; esac
     # the theme as it was before the fix: icons 0 px
     case $v in *stalezero) sed -i 's/icon_width = 1 icon_height = 1/icon_width = 0 icon_height = 0/' /tmp/giso/boot/grub/theme/*/theme.txt ;; esac
@@ -82,7 +82,7 @@ if SG=$(nix build --no-link --print-out-paths ./ci#nixosConfigurations.test.conf
     kill $QEP 2>/dev/null; wait $QEP 2>/dev/null
     $IM/bin/magick /tmp/g.ppm $OUT/shot-efiboot-$v.png 2>>$OUT/grub-qemu.log && log "efi boot $v shot"
   done
-  for t in sumi iso kiri hagane summit; do
+  for t in yoru koyo hotaru shinkai tsuki; do
     rm -rf /tmp/giso; mkdir -p /tmp/giso/boot/grub; cp -rL $SG /tmp/giso/boot/grub/theme; chmod -R u+w /tmp/giso
     {
       echo 'insmod all_video'; echo 'insmod gfxterm'; echo 'insmod png'; echo 'insmod jpeg'
@@ -158,11 +158,14 @@ DOLPHIN=$(B dolphin)
 # theme files like the activation script does
 export SUMI_SHELL_DIR=$HF/.config/quickshell/sumi
 sumi-theme --init; log "sumi-theme --init rc=$?"
+# a theme from before the update falls back to yoru
+cp ~/.config/sumi/theme.json /tmp/theme.keep; echo '{"name":"sumi"}' > ~/.config/sumi/theme.json
+sumi-theme --restore >/dev/null 2>&1; log "old theme falls back to: $(jq -r .name ~/.config/sumi/theme.json)"
 ls -la ~/.config/sumi >> $OUT/summary.txt
 SHELLDIR=$(readlink -f $HF/.config/quickshell/sumi)
 
 # wallpaper behind everything
-swaybg -i $SHELLDIR/assets/walls/wall-sumi.jpg -m fill >/dev/null 2>&1 &
+swaybg -i $SHELLDIR/assets/walls/wall-yoru-1.jpg -m fill >/dev/null 2>&1 &
 sleep 1
 
 run_qs() {   # name, extra env...
@@ -191,9 +194,9 @@ run_qs network SUMI_DEMO=1 SUMI_OPEN=network
 run_qs agents SUMI_DEMO=1 SUMI_OPEN=agents
 run_qs power SUMI_DEMO=1 SUMI_OPEN=power
 run_qs themes SUMI_DEMO=1 SUMI_OPEN=themes
-WAIT=4 run_qs themes-pick-iso SUMI_DEMO=1 SUMI_OPEN=themes SUMI_PICK=iso
-WAIT=4 run_qs themes-pick-hagane SUMI_DEMO=1 SUMI_OPEN=themes SUMI_PICK=hagane
-for t in iso kiri hagane summit sumi; do
+WAIT=4 run_qs themes-pick-koyo SUMI_DEMO=1 SUMI_OPEN=themes SUMI_PICK=koyo
+WAIT=4 run_qs themes-pick-tsuki SUMI_DEMO=1 SUMI_OPEN=themes SUMI_PICK=tsuki
+for t in koyo hotaru shinkai tsuki yoru; do
   sumi-theme $t >/dev/null 2>&1
   WAIT=4 run_qs themes-$t SUMI_DEMO=1 SUMI_OPEN=themes
   WAIT=4 run_qs bar-$t SUMI_DEMO=1
@@ -257,11 +260,11 @@ log "qs warnings/errors:"
 for f in $OUT/qs-*.log; do echo "--- $(basename $f)"; grep -E "WARN|ERROR|FATAL|TypeError|ReferenceError|is not defined|Cannot|Unable|failed" $f | grep -v "Failed to create wl_display" | head -40; done >> $OUT/summary.txt
 
 # theme switch end to end
-sumi-theme iso wall-iso-2.jpg pill > $OUT/theme-switch.log 2>&1; log "sumi-theme iso rc=$? layout=$(cat ~/.config/sumi/layout 2>/dev/null) wall=$(cat ~/.config/sumi/wall 2>/dev/null)"
+sumi-theme koyo wall-koyo-2.jpg pill > $OUT/theme-switch.log 2>&1; log "sumi-theme koyo rc=$? layout=$(cat ~/.config/sumi/layout 2>/dev/null) wall=$(cat ~/.config/sumi/wall 2>/dev/null)"
 sumi-theme --layout auto; log "layout after auto: $(cat ~/.config/sumi/layout 2>/dev/null || echo none)"
 head -3 ~/.config/sumi/kitty.conf >> $OUT/summary.txt
-WAIT=4 run_qs iso-agents SUMI_DEMO=1 SUMI_OPEN=agents
-sumi-theme sumi >/dev/null 2>&1
+WAIT=4 run_qs koyo-agents SUMI_DEMO=1 SUMI_OPEN=agents
+sumi-theme yoru >/dev/null 2>&1
 kill $QPID 2>/dev/null; QPID=
 
 # login screen
@@ -273,9 +276,9 @@ export SUMI_LOGIN_DIR=/tmp/sumi-login; mkdir -p $SUMI_LOGIN_DIR
 rm -rf /tmp/sddm-test; cp -r $PWD/sddm-sumi /tmp/sddm-test; chmod -R u+w /tmp/sddm-test
 printf '[General]\nstateDir=/tmp/sumi-login\n' > /tmp/sddm-test/theme.conf
 QTSVG=$(B qtsvg)
-for t in sumi iso kiri hagane summit; do
+for t in yoru koyo hotaru shinkai tsuki; do
   sumi-theme $t >/dev/null 2>&1
-  [ $t = sumi ] && cat $SUMI_LOGIN_DIR/palette.qml >> $OUT/summary.txt
+  [ $t = yoru ] && cat $SUMI_LOGIN_DIR/palette.qml >> $OUT/summary.txt
   (timeout 14 env QML_DISABLE_DISK_CACHE=1 QT_FORCE_STDERR_LOGGING=1 QT_QPA_PLATFORM=wayland QT_PLUGIN_PATH=$QTSVG/lib/qt-6/plugins $SDDM/bin/$GREETER --test-mode --theme /tmp/sddm-test > $OUT/sddm-$t.log 2>&1; echo "greeter rc=$? after ${SECONDS}s" >> $OUT/sddm-$t.log) &
   echo "greeter $t started at ${SECONDS}s" >> $OUT/sddm-$t.log
   sleep 2.2; $GRIM $OUT/shot-sddm-$t-intro1.png
@@ -301,14 +304,14 @@ $DBR -- bash -c "
 
 # lock screen of every theme
 HL=$(B hyprlock)/bin/hyprlock
-for t in sumi iso kiri hagane summit; do
+for t in yoru koyo hotaru shinkai tsuki; do
   sumi-theme $t >/dev/null 2>&1
   (timeout 9 $HL -c $HF/.config/hypr/hyprlock.conf --immediate-render > $OUT/hyprlock-$t.log 2>&1 &)
   sleep 5; $GRIM $OUT/shot-lock-$t.png 2>>$OUT/hyprlock-$t.log
   sleep 1.3; $GRIM -s 0.5 $OUT/shot-lock-$t-b.png 2>>$OUT/hyprlock-$t.log
   sleep 3.7
 done
-sumi-theme sumi >/dev/null 2>&1
+sumi-theme yoru >/dev/null 2>&1
 log "hyprlock config problems:"
 grep -hiE "error|unknown|invalid|no such" $OUT/hyprlock-*.log | sort | uniq -c | head -20 >> $OUT/summary.txt
 log "lockinfo samples:"

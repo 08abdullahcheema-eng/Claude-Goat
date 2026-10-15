@@ -20,11 +20,11 @@ Singleton {
     }
 
     property var p: ({})
-    readonly property string name: p.name ?? "sumi"
+    readonly property string name: p.name ?? "yoru"
     readonly property string label: p.label ?? "Sumi"
     readonly property bool dark: p.dark ?? true
-    readonly property string kanji: p.kanji ?? "墨"
-    readonly property string logo: Quickshell.shellPath("assets/" + (p.logo ?? "logo-sumi.svg"))
+    readonly property string kanji: p.kanji ?? "夜"
+    readonly property string logo: Quickshell.shellPath("assets/" + (p.logo ?? "logo-yoru.svg"))
 
     readonly property color bg: p.bg ?? "#0f0f14"
     readonly property color bg1: p.bg1 ?? "#16161d"
@@ -173,7 +173,7 @@ Singleton {
     }
     FileView {
         id: defaultView
-        path: root.themeDir + "/sumi.json"
+        path: root.themeDir + "/yoru.json"
         onLoaded: root.load()
     }
 }

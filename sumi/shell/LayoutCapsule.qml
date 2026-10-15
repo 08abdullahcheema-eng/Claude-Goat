@@ -32,9 +32,11 @@ Scope {
                     GradientStop { position: 1; color: "transparent" } }
             }
 
-            Workspaces {
-                anchors { left: parent.left; leftMargin: Theme.px(18); verticalCenter: parent.verticalCenter }
-                screenName: lay.screenRef.name
+            Row {
+                anchors { left: parent.left; leftMargin: Theme.px(8); verticalCenter: parent.verticalCenter }
+                spacing: Theme.px(10)
+                Logo { anchors.verticalCenter: parent.verticalCenter; size: Theme.px(24) }
+                Workspaces { anchors.verticalCenter: parent.verticalCenter; screenName: lay.screenRef.name }
             }
             ModClock {
                 anchors.centerIn: parent

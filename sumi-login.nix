@@ -23,13 +23,12 @@ let
     pick() { f=$(find "$1" -iname "$2" | sort | head -1); [ -n "$f" ] || { echo "font $2 not found in $1" >&2; exit 1; }; echo "$f"; }
     mk() { grub-mkfont -s "$3" -r "$4" -o "$out/fonts/$1.pf2" ''${5:+-n "$5"} "$2"; }
     shr=$(pick ${fontSrc} 'ShipporiMincho-Regular.ttf')
-    gro=$(pick ${fontSrc} 'SpaceGrotesk*.ttf')
     int=$(pick ${pkgs.inter} 'InterVariable.ttf' 2>/dev/null || pick ${pkgs.inter} 'Inter*.tt[fc]')
     jbm=$(pick ${pkgs.nerd-fonts.jetbrains-mono} 'JetBrainsMonoNerdFont-Regular.ttf')
     # sizes for the 1920x1200 the laptop's firmware offers in GRUB
-    mk shippori-32 "$shr" 32 "${latin}"
-    mk grotesk-32 "$gro" 32 "${latin}"
-    mk inter-32 "$int" 32 "${latin}"
+    mk shippori-30 "$shr" 30 "${latin}"
+    mk inter-28 "$int" 28 "${latin}"
+    mk inter-24 "$int" 24 "${latin}"
     mk jbmono-15 "$jbm" 15 "${latin}"
 
     python3 $out/render.py $out
@@ -43,7 +42,7 @@ in
     gfxmodeEfi = lib.mkDefault "1920x1200,auto";
     gfxmodeBios = lib.mkDefault "1920x1200,auto";
     # GRUB paints its hidden text console with the splash image; the Sumi picture keeps it from showing as a black box
-    splashImage = "${sumi-grub}/sumi/background.jpg";
+    splashImage = "${sumi-grub}/yoru/background.jpg";
     splashMode = lib.mkDefault "normal";
     extraConfig = builtins.readFile ./sumi/grub/select.cfg;
     # menu order: NixOS (default), Windows, then "NixOS - All configurations".

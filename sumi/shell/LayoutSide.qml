@@ -29,11 +29,7 @@ Scope {
             Column {
                 anchors { top: parent.top; topMargin: Theme.px(14); horizontalCenter: parent.horizontalCenter }
                 spacing: Theme.px(12)
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: Theme.kanji; color: Theme.accent; font.family: Theme.head; font.pixelSize: Theme.px(22); font.weight: Font.Bold
-                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: Ui.toggle("launcher") }
-                }
+                Logo { anchors.horizontalCenter: parent.horizontalCenter; size: Theme.px(32) }
                 Line {}
                 // workspaces: a tall bar for the active one, dots for the rest
                 Column {

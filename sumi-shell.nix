@@ -48,7 +48,7 @@ in
     yazi
     btop
     claude-code
-    # theme fonts: Shippori Mincho (Sumi, Iso), Space Grotesk (Kiri, Summit), Inter (Hagane, Iso)
+    # theme fonts: Shippori Mincho (Kōyō, Tsuki), Inter (Yoru, Hotaru, Shinkai), Space Grotesk
     inter
     (google-fonts.override { fonts = [ "ShipporiMincho" "SpaceGrotesk" ]; })
   ]) ++ [ sumi-theme sumi-agents sumi-lockinfo ];

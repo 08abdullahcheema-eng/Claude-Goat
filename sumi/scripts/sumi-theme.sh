@@ -1,4 +1,4 @@
-# sumi-theme <name> [wall.jpg] [layout]   switch theme (sumi iso kiri hagane summit),
+# sumi-theme <name> [wall.jpg] [layout]   switch theme (yoru koyo hotaru shinkai tsuki),
 #                                        optionally with one of its wallpapers and a bar layout
 # sumi-theme --wall <wall.jpg>   change only the wallpaper of the current theme
 # sumi-theme --layout <layout>   change only the bar layout: islands capsule rail side ridge notch pill bottom corners, or auto
@@ -41,24 +41,24 @@ case "$mode" in
 esac
 
 if [ ! -f "$CONF/theme.json" ]; then
-  cp "$SHELL_DIR/themes/sumi.json" "$CONF/theme.json"; chmod u+w "$CONF/theme.json"
+  cp "$SHELL_DIR/themes/yoru.json" "$CONF/theme.json"; chmod u+w "$CONF/theme.json"
 fi
 
 t="$CONF/theme.json"
 get() { jq -r ".$1" "$t"; }
 name=$(get name)
-# a theme that no longer exists (removed in an update) falls back to sumi
+# a theme that no longer exists (removed in an update) falls back to yoru
 if [ ! -f "$SHELL_DIR/themes/$name.json" ]; then
-  cp "$SHELL_DIR/themes/sumi.json" "$t"; chmod u+w "$t"; rm -f "$CONF/wall"; name=sumi
+  cp "$SHELL_DIR/themes/yoru.json" "$t"; chmod u+w "$t"; rm -f "$CONF/wall" "$CONF/layout"; name=yoru
 fi
 w0=$(jq -r '.walls[0] // empty' "$t")
 wall="$SHELL_DIR/assets/walls/${w0:-wall-$name.jpg}"
 wf=$(cat "$CONF/wall" 2>/dev/null || true)
-# only one of the theme's own wallpapers (so "sumi" never picks up a "summit" picture)
+# only one of the theme's own wallpapers
 if [ -n "$wf" ] && jq -e --arg w "$wf" '.walls | index($w)' "$t" >/dev/null 2>&1 && [ -f "$SHELL_DIR/assets/walls/$wf" ]; then
   wall="$SHELL_DIR/assets/walls/$wf"
 fi
-[ -f "$wall" ] || wall="$SHELL_DIR/assets/walls/wall-sumi-ink.jpg"
+[ -f "$wall" ] || wall="$SHELL_DIR/assets/walls/wall-yoru-1.jpg"
 hex() { get "$1" | tr -d '#'; }
 dark=$(get dark)
 if [ "$dark" = "true" ]; then ink=$(hex bg); else ink=$(hex hi); fi
@@ -365,7 +365,7 @@ EOK
 mv "$kg.tmp" "$kg"
 
 # lock screen layout of the theme
-lock="$SHELL_DIR/locks/$name.conf"; [ -f "$lock" ] || lock="$SHELL_DIR/locks/sumi.conf"
+lock="$SHELL_DIR/locks/$name.conf"; [ -f "$lock" ] || lock="$SHELL_DIR/locks/yoru.conf"
 cp "$lock" "$CONF/hyprlock-theme.conf.tmp" && chmod u+w "$CONF/hyprlock-theme.conf.tmp" && mv "$CONF/hyprlock-theme.conf.tmp" "$CONF/hyprlock-theme.conf"
 
 # active window border: the theme's gradient (it turns on focus changes, see borderangle), else the accent
@@ -388,9 +388,9 @@ mv "$CONF/hypr-theme.conf.tmp" "$CONF/hypr-theme.conf"
 L="${SUMI_LOGIN_DIR:-/var/lib/sumi}"
 if [ -d "$L" ] && [ -w "$L" ]; then
   cp "$wall" "$L/login-wall.jpg.tmp" 2>/dev/null && mv "$L/login-wall.jpg.tmp" "$L/login-wall.jpg"
-  logo="$SHELL_DIR/assets/$(get logo)"; [ -f "$logo" ] || logo="$SHELL_DIR/assets/logo-sumi.svg"
+  logo="$SHELL_DIR/assets/$(get logo)"; [ -f "$logo" ] || logo="$SHELL_DIR/assets/logo-yoru.svg"
   cp "$logo" "$L/logo.svg.tmp" 2>/dev/null && mv "$L/logo.svg.tmp" "$L/logo.svg"
-  case "$name" in hagane) rad=4 ;; sumi|summit) rad=16 ;; *) rad=24 ;; esac
+  case "$name" in tsuki) rad=8 ;; yoru|koyo) rad=16 ;; *) rad=24 ;; esac
   q() { get "$1" | sed 's/"/\\"/g'; }
   cat > "$L/palette.qml.tmp" <<EOQ
 import QtQuick

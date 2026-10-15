@@ -8,6 +8,11 @@ import QtQuick.Effects
 //   kiri    three layers of fog moving against each other, the whole veil breathing
 //   hagane  fine snow and a cold sheen of light running across the steel
 //   summit  twinkling stars, fog in the valleys, snow blown off the ridge, a shooting star
+//   yoru    rain falling through neon light, the city glow pulsing
+//   koyo    maple leaves drifting down, a warm haze low over the hills
+//   hotaru  fireflies wandering through the forest
+//   shinkai marine snow rising slowly, glints of light from the deep
+//   tsuki   stars twinkling, a mist lying on the sea
 Item {
     id: amb
     property string name: "sumi"
@@ -260,5 +265,94 @@ Item {
             NumberAnimation { target: meteor; property: "opacity"; to: 0; duration: 260 }
             PauseAnimation { duration: 6000 }
         }
+    }
+
+    // ================= yoru =================
+    Item {
+        anchors.fill: parent
+        visible: amb.name === "yoru"
+        Bloom { tint: amb.accent; band: 0.45; peak: 0.14; period: 9000; offset: 0; width: 700 * amb.s }
+        Bloom { tint: amb.accent2; band: 0.5; peak: 0.10; period: 11000; offset: 3500; width: 600 * amb.s }
+    }
+    Emitter {
+        system: sys; group: "snow"
+        enabled: amb.name === "yoru"
+        x: -amb.width * 0.1; y: -20; width: amb.width * 1.2; height: 10
+        emitRate: 160
+        lifeSpan: 1600; lifeSpanVariation: 400
+        size: 2.2 * amb.s; sizeVariation: 1 * amb.s
+        velocity: AngleDirection { angle: 98; angleVariation: 2; magnitude: 900 * amb.s; magnitudeVariation: 200 * amb.s }
+    }
+    Emitter {
+        system: sys; group: "ember"
+        enabled: amb.name === "yoru"
+        x: 0; y: amb.height * 0.45; width: amb.width; height: amb.height * 0.2
+        emitRate: 3
+        lifeSpan: 1800; lifeSpanVariation: 800
+        size: 5 * amb.s; sizeVariation: 3 * amb.s
+    }
+
+    // ================= koyo =================
+    Item {
+        anchors.fill: parent
+        visible: amb.name === "koyo"
+        Fog { y: amb.height * 0.62; height: amb.height * 0.3; speed: 240000; tint: amb.accent; opacity: 0.14 }
+    }
+    Emitter {
+        system: sys; group: "ember"
+        enabled: amb.name === "koyo"
+        x: -amb.width * 0.1; y: -20; width: amb.width * 1.1; height: 10
+        emitRate: 4
+        lifeSpan: 20000; lifeSpanVariation: 5000
+        size: 12 * amb.s; sizeVariation: 6 * amb.s
+        velocity: AngleDirection { angle: 80; angleVariation: 20; magnitude: 40 * amb.s; magnitudeVariation: 15 * amb.s }
+        acceleration: AngleDirection { angle: 0; angleVariation: 180; magnitude: 6 * amb.s }
+    }
+
+    // ================= hotaru =================
+    Emitter {
+        system: sys; group: "ember"
+        enabled: amb.name === "hotaru"
+        x: 0; y: amb.height * 0.3; width: amb.width; height: amb.height * 0.6
+        emitRate: 6
+        lifeSpan: 7000; lifeSpanVariation: 3000
+        size: 9 * amb.s; sizeVariation: 5 * amb.s
+        velocity: AngleDirection { angle: 0; angleVariation: 180; magnitude: 14 * amb.s; magnitudeVariation: 8 * amb.s }
+        acceleration: AngleDirection { angle: 0; angleVariation: 180; magnitude: 5 * amb.s }
+    }
+
+    // ================= shinkai =================
+    Emitter {
+        system: sys; group: "mote"
+        enabled: amb.name === "shinkai"
+        x: 0; y: amb.height; width: amb.width; height: 10
+        emitRate: 10
+        lifeSpan: 22000; lifeSpanVariation: 6000
+        size: 4 * amb.s; sizeVariation: 2 * amb.s
+        velocity: AngleDirection { angle: 270; angleVariation: 10; magnitude: 40 * amb.s; magnitudeVariation: 15 * amb.s }
+        acceleration: AngleDirection { angle: 0; angleVariation: 180; magnitude: 2 * amb.s }
+    }
+    Emitter {
+        system: sys; group: "ember"
+        enabled: amb.name === "shinkai"
+        x: 0; y: amb.height * 0.2; width: amb.width; height: amb.height * 0.7
+        emitRate: 2
+        lifeSpan: 3000; lifeSpanVariation: 1500
+        size: 6 * amb.s; sizeVariation: 3 * amb.s
+    }
+
+    // ================= tsuki =================
+    Item {
+        anchors.fill: parent
+        visible: amb.name === "tsuki"
+        Fog { y: amb.height * 0.6; height: amb.height * 0.25; speed: 300000; tint: "#e9dcc0"; opacity: 0.08 }
+    }
+    Emitter {
+        system: sys; group: "star"
+        enabled: amb.name === "tsuki"
+        x: 0; y: 0; width: amb.width; height: amb.height * 0.55
+        emitRate: 6
+        lifeSpan: 5000; lifeSpanVariation: 2500
+        size: 3 * amb.s; sizeVariation: 2 * amb.s
     }
 }

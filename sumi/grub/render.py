@@ -34,7 +34,7 @@ themes = [d for d in sorted(os.listdir(out)) if os.path.isfile(os.path.join(out,
 for t in themes:
     src = os.path.join(out, t, "theme.txt.in")
     open(os.path.join(out, t, "theme.txt"), "w", encoding="utf-8").write(render(src, ""))
-open(os.path.join(out, "theme.txt"), "w", encoding="utf-8").write(render(os.path.join(out, "sumi", "theme.txt.in"), "sumi/"))
+open(os.path.join(out, "theme.txt"), "w", encoding="utf-8").write(render(os.path.join(out, "yoru", "theme.txt.in"), "yoru/"))
 for t in themes:
     os.remove(os.path.join(out, t, "theme.txt.in"))
 print("themes:", " ".join(themes))

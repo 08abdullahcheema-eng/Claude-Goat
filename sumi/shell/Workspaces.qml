@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
 
@@ -72,7 +73,15 @@ Row {
                 width: cell.on ? parent.width : 0; height: Theme.px(3); color: Theme.accent
                 Behavior on width { NumberAnimation { duration: Theme.mMed; easing.type: Theme.mEaseSmall } }
             }
-            // text mode: underline
+            // text mode: underline (neon: it glows)
+            Rectangle {
+                visible: root.mode === "text" && cell.on && (Theme.p.barFx ?? "") === "neon"
+                anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: -Theme.px(2) }
+                width: parent.width + Theme.px(18); height: Theme.px(8); radius: height / 2
+                color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.35)
+                layer.enabled: true
+                layer.effect: MultiEffect { blurEnabled: true; blur: 1; blurMax: 16 }
+            }
             Rectangle {
                 visible: root.mode === "text" && width > 0.5
                 anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: Theme.px(1) }

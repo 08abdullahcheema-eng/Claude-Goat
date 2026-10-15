@@ -1,0 +1,22 @@
+# Shinkai: mark, title and help line live in the background picture (drawn for exactly 1920x1200),
+# GRUB draws the entries and the picture behind the chosen one. No countdown.
+title-text: ""
+desktop-image: "{{DIR}}background.jpg"
+desktop-color: "#050d14"
+terminal-font: "{{F:jbmono-15}}"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
+# icons: 1 px and see-through. GRUB keeps old files in /boot/theme, and an icon left over from an
+# earlier theme scaled to 0 px stops every boot with "requested to scale to a size w/ a zero dimension".
++ boot_menu {
+  left = 298 top = 506 width = 600 height = 300
+  item_font = "{{F:inter-24}}" item_color = "#a8c2d1"
+  selected_item_font = "{{F:inter-24}}" selected_item_color = "#effaff"
+  item_height = 40 item_padding = 20 item_spacing = 30
+  icon_width = 1 icon_height = 1 item_icon_space = 0
+  selected_item_pixmap_style = "{{DIR}}select_*.png"
+  scrollbar = false
+}

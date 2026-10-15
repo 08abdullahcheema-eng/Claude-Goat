@@ -16,7 +16,7 @@ Scope {
         Rectangle {
             anchors.fill: parent
             color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.82)
-            Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: Qt.rgba(Theme.hi.r, Theme.hi.g, Theme.hi.b, 0.55) }
+            Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.5) }
         }
         Row {
             anchors { left: parent.left; leftMargin: Theme.px(16); verticalCenter: parent.verticalCenter }

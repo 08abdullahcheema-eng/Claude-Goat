@@ -20,7 +20,7 @@ Scope {
             radius: Theme.px(10)
             color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.72)
             border.width: 1
-            border.color: Qt.rgba(Theme.hi.r, Theme.hi.g, Theme.hi.b, 0.07)
+            border.color: (Theme.p.barFx ?? "") === "neon" ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.3) : Qt.rgba(Theme.hi.r, Theme.hi.g, Theme.hi.b, 0.07)
             // light along the upper edge of the glass
             Rectangle {
                 anchors { left: parent.left; right: parent.right; top: parent.top; leftMargin: parent.radius; rightMargin: parent.radius; topMargin: 1 }
