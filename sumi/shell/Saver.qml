@@ -21,7 +21,8 @@ Variants {
             color: "transparent"
             WlrLayershell.namespace: "sumi-saver"
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: Ui.saver ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            // the saver never takes the keyboard: hypridle sees any key or mouse move and hides it
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
             readonly property string style: Theme.name
             // the first moments after it appears do not count as input (the cursor reports its position)

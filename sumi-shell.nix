@@ -219,6 +219,8 @@ in
       # Sumi shell
       "SUPER, SPACE, exec, ${ipc} shell launcher all"
       "SUPER, X, exec, ${ipc} shell toggle power"
+      # emergency: restart the bar and panels (if a panel ever holds on to the keyboard)
+      "SUPER SHIFT, R, exec, pkill -f 'qs -n -c sumi'; sleep 0.5; ${qs} -n -c sumi"
       "SUPER, W, killactive,"
       "SUPER CTRL, N, exec, ${ipc} shell toggle network"
       "SUPER CTRL, A, exec, ${ipc} shell toggle agents"
