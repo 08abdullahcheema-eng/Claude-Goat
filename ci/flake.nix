@@ -58,6 +58,7 @@
         inherit (pkgs) quickshell sway grim hyprlock mesa libglvnd jq papirus-icon-theme kitty pavucontrol btop libnotify dbus hyprland grub2 xorriso mtools qemu socat imagemagick;
         fonts = pkgs.symlinkJoin { name = "fonts"; paths = [ pkgs.nerd-fonts.jetbrains-mono pkgs.noto-fonts-cjk-serif pkgs.inter ]; };
         sddm = pkgs.kdePackages.sddm;
+        dolphin = pkgs.kdePackages.dolphin;
         qtsvg = pkgs.kdePackages.qtsvg;
       };
     };

@@ -98,6 +98,85 @@ mv "$CONF/hyprlock-colors.conf.tmp" "$CONF/hyprlock-colors.conf"
 } > "$CONF/kitty.conf.tmp"
 mv "$CONF/kitty.conf.tmp" "$CONF/kitty.conf"
 
+# ---- apps: GTK colours (read by gtk.css of GTK 3 and 4, see sumi-shell.nix) ----
+{
+  echo "/* written by sumi-theme ($name) */"
+  for pair in "accent_color accent" "accent_bg_color accent" "accent_fg_color onAccent" \
+              "window_bg_color bg" "window_fg_color fg" "view_bg_color bg" "view_fg_color fg" \
+              "headerbar_bg_color bg1" "headerbar_fg_color fg" "headerbar_border_color line" "headerbar_backdrop_color bg" \
+              "sidebar_bg_color bg1" "sidebar_fg_color fg" "sidebar_backdrop_color bg1" "secondary_sidebar_bg_color bg1" \
+              "card_bg_color bg1" "card_fg_color fg" "dialog_bg_color bg1" "dialog_fg_color fg" \
+              "popover_bg_color bg1" "popover_fg_color fg" "thumbnail_bg_color bg1" "thumbnail_fg_color fg" \
+              "destructive_bg_color error" "destructive_color error" "error_color error" "warning_color warn" "success_color ok"; do
+    set -- $pair
+    echo "@define-color $1 $(get "$2");"
+  done
+} > "$CONF/gtk.css.tmp"
+mv "$CONF/gtk.css.tmp" "$CONF/gtk.css"
+
+# ---- apps: KDE colour scheme in kdeglobals (Dolphin, Kate, Okular and every other Qt/KDE app) ----
+# only the colour sections are replaced, everything else in kdeglobals stays as it is
+rgb() { h=$(get "$1" | tr -d '#'); printf '%d,%d,%d' "0x${h:0:2}" "0x${h:2:2}" "0x${h:4:2}"; }
+kgroup() {   # section, normal background, alternate background, normal text
+  cat <<EOK
+[Colors:$1]
+BackgroundNormal=$(rgb "$2")
+BackgroundAlternate=$(rgb "$3")
+ForegroundNormal=$(rgb "$4")
+ForegroundInactive=$(rgb dim)
+ForegroundActive=$(rgb hi)
+ForegroundLink=$(rgb blue)
+ForegroundVisited=$(rgb violet)
+ForegroundNegative=$(rgb error)
+ForegroundNeutral=$(rgb warn)
+ForegroundPositive=$(rgb ok)
+DecorationFocus=$(rgb accent)
+DecorationHover=$(rgb accent2)
+
+EOK
+}
+kg="$HOME/.config/kdeglobals"
+{
+  if [ -f "$kg" ]; then
+    awk '/^\[/ { skip = ($0 ~ /^\[(Colors:|WM\]|ColorEffects:)/); if (!skip && n++) print "" } !skip && NF' "$kg"
+    echo
+  else
+    printf '[General]\nColorScheme=Sumi\n\n[Icons]\nTheme=Papirus-Dark\n\n'
+  fi
+  kgroup View bg bg1 fg
+  kgroup Window bg1 bg2 fg
+  kgroup Button bg2 line fg
+  kgroup Selection accent accent onAccent
+  kgroup Tooltip bg2 bg1 fg
+  kgroup Complementary bg bg1 fg
+  kgroup Header bg1 bg fg
+  cat <<EOK
+[Colors:Header][Inactive]
+BackgroundNormal=$(rgb bg)
+BackgroundAlternate=$(rgb bg)
+ForegroundNormal=$(rgb dim)
+
+[ColorEffects:Inactive]
+Enable=false
+
+[ColorEffects:Disabled]
+ColorAmount=0
+ContrastAmount=0.65
+ContrastEffect=1
+IntensityAmount=0.1
+IntensityEffect=2
+
+[WM]
+activeBackground=$(rgb bg1)
+activeForeground=$(rgb fg)
+activeBlend=$(rgb accent)
+inactiveBackground=$(rgb bg)
+inactiveForeground=$(rgb dim)
+inactiveBlend=$(rgb line)
+EOK
+} > "$kg.tmp"
+mv "$kg.tmp" "$kg"
+
 # lock screen layout of the theme
 lock="$SHELL_DIR/locks/$name.conf"; [ -f "$lock" ] || lock="$SHELL_DIR/locks/sumi.conf"
 cp "$lock" "$CONF/hyprlock-theme.conf.tmp" && chmod u+w "$CONF/hyprlock-theme.conf.tmp" && mv "$CONF/hyprlock-theme.conf.tmp" "$CONF/hyprlock-theme.conf"
@@ -177,4 +256,8 @@ if [ -w "$kb/per_zone_mode" ] && grep -q '"followTheme": true' "$CONF/predator.j
   printf '%s,%s,%s,%s,%s' "$a" "$a" "$a" "$a" "$br" > "$kb/per_zone_mode" 2>/dev/null || true
 fi
 for p in kitty .kitty-wrapped; do pkill -USR1 -x "$p" 2>/dev/null || true; done
+# running Qt/KDE apps reload their colours when they get this signal
+if [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+  dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 2>/dev/null || true
+fi
 exit 0

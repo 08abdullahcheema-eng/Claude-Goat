@@ -10,6 +10,9 @@
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];   # open/save dialogs
   };
 
+  # ---- settings store for GTK/GNOME apps (dark mode for libadwaita apps) ----
+  programs.dconf.enable = true;
+
   # ---- power: the battery panel switches these profiles (power saver / balanced / performance) ----
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;

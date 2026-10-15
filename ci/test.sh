@@ -99,6 +99,13 @@ sleep 3
 export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR | grep -E '^wayland-[0-9]+$' | head -1)
 log "wayland display: $WAYLAND_DISPLAY"
 
+# GTK settings like home-manager writes them, with the import pointing at this runner's home
+mkdir -p ~/.config/gtk-3.0 ~/.config/gtk-4.0
+cp -L $HF/.config/gtk-3.0/settings.ini ~/.config/gtk-3.0/ 2>/dev/null; cp -L $HF/.config/gtk-4.0/settings.ini ~/.config/gtk-4.0/ 2>/dev/null
+for v in 3.0 4.0; do echo "@import url(\"file://$HOME/.config/sumi/gtk.css\");" > ~/.config/gtk-$v/gtk.css; done
+cat ~/.config/gtk-4.0/settings.ini >> $OUT/summary.txt 2>/dev/null
+DOLPHIN=$(B dolphin)
+
 # theme files like the activation script does
 export SUMI_SHELL_DIR=$HF/.config/quickshell/sumi
 sumi-theme --init; log "sumi-theme --init rc=$?"
@@ -136,6 +143,10 @@ for t in iso kiri hagane summit sumi; do
   sumi-theme $t >/dev/null 2>&1
   WAIT=4 run_qs themes-$t SUMI_DEMO=1 SUMI_OPEN=themes
   WAIT=4 run_qs bar-$t SUMI_DEMO=1
+  # apps follow the theme: Dolphin (Qt/KDE) and pavucontrol (GTK) side by side
+  (timeout 14 env QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME=kde QT_STYLE_OVERRIDE=breeze QT_PLUGIN_PATH=$HM/home-path/lib/qt-6/plugins $DOLPHIN/bin/dolphin --new-window $HOME > $OUT/dolphin-$t.log 2>&1 &)
+  (timeout 14 env GDK_BACKEND=wayland pavucontrol > $OUT/pavu-$t.log 2>&1 &)
+  sleep 10; $GRIM -s 0.5 $OUT/apps-$t.png; sleep 4.5
   # motion check: open the calendar under its icon, grab frames while it moves in, close it, grab again
   $QS ipc -p $SHELLDIR call shell toggleAt calendar 800 >> $OUT/qs-anim.log 2>&1
   for i in 1 2 3; do $GRIM -s 0.5 $OUT/anim-$t-in$i.png; done

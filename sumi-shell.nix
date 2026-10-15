@@ -6,7 +6,7 @@ let
 
   sumi-theme = pkgs.writeShellApplication {
     name = "sumi-theme";
-    runtimeInputs = with pkgs; [ jq procps swaybg coreutils util-linux gnused ];
+    runtimeInputs = with pkgs; [ jq procps swaybg coreutils util-linux gnused gawk dbus ];
     text = ''
       export SUMI_SHELL_DIR="''${SUMI_SHELL_DIR:-${shellDir}}"
     '' + builtins.readFile ./sumi/scripts/sumi-theme.sh;
@@ -68,6 +68,29 @@ in
   programs.kitty.extraConfig = lib.mkAfter ''
     include ../sumi/kitty.conf
   '';
+
+  # apps follow the theme: Qt/KDE apps (Dolphin, Kate, Okular...) read the colour scheme that
+  # sumi-theme writes into ~/.config/kdeglobals (running ones recolour live), GTK apps read
+  # ~/.config/sumi/gtk.css on a dark adw-gtk3 base (they pick it up when they start)
+  qt = {
+    enable = true;
+    platformTheme.name = "kde";
+    style.name = "breeze";
+  };
+  gtk = {
+    enable = true;
+    theme = { name = "adw-gtk3-dark"; package = pkgs.adw-gtk3; };
+    iconTheme = { name = "Papirus-Dark"; package = pkgs.papirus-icon-theme; };
+    gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
+    gtk3.extraCss = ''@import url("file://${config.xdg.configHome}/sumi/gtk.css");'';
+    gtk4.extraCss = ''@import url("file://${config.xdg.configHome}/sumi/gtk.css");'';
+  };
+  # libadwaita apps ask the portal for dark or light, the portal reads this
+  dconf.settings."org/gnome/desktop/interface" = {
+    color-scheme = "prefer-dark";
+    gtk-theme = "adw-gtk3-dark";
+    icon-theme = "Papirus-Dark";
+  };
 
   # lock screen
   programs.hyprlock.enable = true;
